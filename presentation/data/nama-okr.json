@@ -1,0 +1,179 @@
+{
+  "cycles": [
+    {
+      "id": "1405-fall",
+      "title": "پاییز ۱۴۰۵",
+      "status": "ACTIVE",
+      "startDate": "2026-09-23",
+      "endDate": "2026-12-21"
+    }
+  ],
+  "objectives": [
+    {
+      "id": "a79d132c-8624-59de-a81b-2568f80456f2",
+      "code": "O-01",
+      "title": "تحویل سفارش به مشتری را قابل پیش‌بینی کنیم",
+      "description": "هدف نمونه برای دوره پاییز ۱۴۰۵",
+      "cycleId": "1405-fall",
+      "parentId": null,
+      "level": "COMPANY",
+      "ownerUnitId": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+      "pillar": "تجربه مشتری",
+      "confidence": "ON_TRACK"
+    },
+    {
+      "id": "5e1bc830-dc97-58f0-88a6-68019c94e0bc",
+      "code": "O-02",
+      "title": "جریان تولید را پایدار و کم‌اتلاف کنیم",
+      "description": "هدف نمونه برای دوره پاییز ۱۴۰۵",
+      "cycleId": "1405-fall",
+      "parentId": "a79d132c-8624-59de-a81b-2568f80456f2",
+      "level": "DEPARTMENT",
+      "ownerUnitId": "a24f27f5-7f5d-54b6-9e44-f57f6d6634c9",
+      "pillar": "عملیات",
+      "confidence": "ON_TRACK"
+    },
+    {
+      "id": "a8e6dce7-a926-54e8-b587-2679d4719dd9",
+      "code": "O-03",
+      "title": "از سفارش تا تحویل، مشتری را در جریان نگه داریم",
+      "description": "هدف نمونه برای دوره پاییز ۱۴۰۵",
+      "cycleId": "1405-fall",
+      "parentId": "a79d132c-8624-59de-a81b-2568f80456f2",
+      "level": "DEPARTMENT",
+      "ownerUnitId": "b57e3eb1-c18c-50f8-9dfc-7c72dcfc26b0",
+      "pillar": "تجربه مشتری",
+      "confidence": "ON_TRACK"
+    }
+  ],
+  "keyResults": [
+    {
+      "id": "6d459687-83bd-5f65-a734-dc04960c80b9",
+      "objectiveId": "a8e6dce7-a926-54e8-b587-2679d4719dd9",
+      "title": "زمان تأیید سفارش",
+      "baseline": 24,
+      "target": 12,
+      "current": 16,
+      "unit": "ساعت",
+      "kpiId": "a49a7c5a-0f5d-5d5c-b1ce-6146257a95b4",
+      "weight": 1
+    },
+    {
+      "id": "6d95f528-1a97-5a71-9aae-52ef26ce0716",
+      "objectiveId": "5e1bc830-dc97-58f0-88a6-68019c94e0bc",
+      "title": "تحقق برنامه تولید",
+      "baseline": 78,
+      "target": 95,
+      "current": 88,
+      "unit": "درصد",
+      "kpiId": "7dc92727-821b-5868-89b4-e5e1010c9958",
+      "weight": 1
+    },
+    {
+      "id": "6c33167f-514c-5822-b744-bf95cffafbe6",
+      "objectiveId": "5e1bc830-dc97-58f0-88a6-68019c94e0bc",
+      "title": "زمان چرخه مونتاژ",
+      "baseline": 64,
+      "target": 45,
+      "current": 51,
+      "unit": "دقیقه",
+      "kpiId": "9226ec24-ee6d-5ee1-b46f-cad0dd2c57e4",
+      "weight": 1
+    },
+    {
+      "id": "ed73c5a1-dcb6-59a2-b551-ef7463c6d119",
+      "objectiveId": "5e1bc830-dc97-58f0-88a6-68019c94e0bc",
+      "title": "قبولی در آزمون اول",
+      "baseline": 91,
+      "target": 98,
+      "current": 96,
+      "unit": "درصد",
+      "kpiId": "26d2ced6-f3cc-54fd-b2fd-26c4bd73d03a",
+      "weight": 1
+    },
+    {
+      "id": "517cc11f-8521-5a92-abd8-e87bf9f9b965",
+      "objectiveId": "a79d132c-8624-59de-a81b-2568f80456f2",
+      "title": "تحویل کامل و به‌موقع",
+      "baseline": 82,
+      "target": 96,
+      "current": 91,
+      "unit": "درصد",
+      "kpiId": "0050ce35-cd0f-558d-ac23-6357cf6b712f",
+      "weight": 1
+    },
+    {
+      "id": "e1e7bf0e-5daf-5308-985f-7f7f9567ec12",
+      "objectiveId": "a8e6dce7-a926-54e8-b587-2679d4719dd9",
+      "title": "زمان حل درخواست خدمات",
+      "baseline": 5,
+      "target": 2,
+      "current": 3,
+      "unit": "روز",
+      "kpiId": "186c1675-9bcd-5b39-8ec4-26bad5b866e8",
+      "weight": 1
+    }
+  ],
+  "checkins": [
+    {
+      "id": "f8598423-6e96-54af-89ee-fb732d666950",
+      "keyResultId": "6d459687-83bd-5f65-a734-dc04960c80b9",
+      "objectiveId": "a8e6dce7-a926-54e8-b587-2679d4719dd9",
+      "previous": 24,
+      "value": 16,
+      "confidence": "ON_TRACK",
+      "note": "اندازه‌گیری آزمایشی آبان",
+      "createdAt": "2026-11-12T09:00:00Z"
+    },
+    {
+      "id": "c00ea071-e073-58e8-b524-0f91ebd62456",
+      "keyResultId": "6d95f528-1a97-5a71-9aae-52ef26ce0716",
+      "objectiveId": "5e1bc830-dc97-58f0-88a6-68019c94e0bc",
+      "previous": 78,
+      "value": 88,
+      "confidence": "ON_TRACK",
+      "note": "اندازه‌گیری آزمایشی آبان",
+      "createdAt": "2026-11-12T09:00:00Z"
+    },
+    {
+      "id": "aa8a8a28-041e-5720-85f4-1c20f118b45d",
+      "keyResultId": "6c33167f-514c-5822-b744-bf95cffafbe6",
+      "objectiveId": "5e1bc830-dc97-58f0-88a6-68019c94e0bc",
+      "previous": 64,
+      "value": 51,
+      "confidence": "ON_TRACK",
+      "note": "اندازه‌گیری آزمایشی آبان",
+      "createdAt": "2026-11-12T09:00:00Z"
+    },
+    {
+      "id": "2a1d5ee7-566f-5c86-bbd5-da5588bdbe31",
+      "keyResultId": "ed73c5a1-dcb6-59a2-b551-ef7463c6d119",
+      "objectiveId": "5e1bc830-dc97-58f0-88a6-68019c94e0bc",
+      "previous": 91,
+      "value": 96,
+      "confidence": "ON_TRACK",
+      "note": "اندازه‌گیری آزمایشی آبان",
+      "createdAt": "2026-11-12T09:00:00Z"
+    },
+    {
+      "id": "41e25eed-1f7d-548c-b183-0fc0bc6ae77d",
+      "keyResultId": "517cc11f-8521-5a92-abd8-e87bf9f9b965",
+      "objectiveId": "a79d132c-8624-59de-a81b-2568f80456f2",
+      "previous": 82,
+      "value": 91,
+      "confidence": "ON_TRACK",
+      "note": "اندازه‌گیری آزمایشی آبان",
+      "createdAt": "2026-11-12T09:00:00Z"
+    },
+    {
+      "id": "471ddc0b-b1a4-5d0a-8b3e-63f181cd2e55",
+      "keyResultId": "e1e7bf0e-5daf-5308-985f-7f7f9567ec12",
+      "objectiveId": "a8e6dce7-a926-54e8-b587-2679d4719dd9",
+      "previous": 5,
+      "value": 3,
+      "confidence": "ON_TRACK",
+      "note": "اندازه‌گیری آزمایشی آبان",
+      "createdAt": "2026-11-12T09:00:00Z"
+    }
+  ]
+}

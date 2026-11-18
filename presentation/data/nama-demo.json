@@ -1,0 +1,952 @@
+{
+  "organization": {
+    "id": "13d1ef39-87f0-5178-acda-693893e5d503",
+    "name": "پارس تجهیز آریا",
+    "display_name": "پارس تجهیز آریا",
+    "primary_color": "#116a65",
+    "logo_data_url": null
+  },
+  "user": {
+    "name": "مشاهده‌گر دمو",
+    "email": "",
+    "role": "VIEWER"
+  },
+  "units": [
+    {
+      "id": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+      "name": "مدیریت عامل",
+      "code": "U00",
+      "sort_order": 0,
+      "parent_id": null,
+      "organization_id": "13d1ef39-87f0-5178-acda-693893e5d503"
+    },
+    {
+      "id": "b57e3eb1-c18c-50f8-9dfc-7c72dcfc26b0",
+      "name": "فروش",
+      "code": "U01",
+      "sort_order": 1,
+      "parent_id": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+      "organization_id": "13d1ef39-87f0-5178-acda-693893e5d503"
+    },
+    {
+      "id": "8190510f-e275-56aa-b939-667677b88b47",
+      "name": "برنامه‌ریزی تولید",
+      "code": "U02",
+      "sort_order": 2,
+      "parent_id": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+      "organization_id": "13d1ef39-87f0-5178-acda-693893e5d503"
+    },
+    {
+      "id": "d48e88db-f22b-5918-b477-26fb8fb755e2",
+      "name": "تدارکات",
+      "code": "U03",
+      "sort_order": 3,
+      "parent_id": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+      "organization_id": "13d1ef39-87f0-5178-acda-693893e5d503"
+    },
+    {
+      "id": "a24f27f5-7f5d-54b6-9e44-f57f6d6634c9",
+      "name": "تولید",
+      "code": "U04",
+      "sort_order": 4,
+      "parent_id": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+      "organization_id": "13d1ef39-87f0-5178-acda-693893e5d503"
+    },
+    {
+      "id": "2956bd7c-8d59-536d-80f6-b63665553c1b",
+      "name": "کنترل کیفیت",
+      "code": "U05",
+      "sort_order": 5,
+      "parent_id": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+      "organization_id": "13d1ef39-87f0-5178-acda-693893e5d503"
+    },
+    {
+      "id": "08ee5d78-e411-51cb-8bd6-9e4a794db282",
+      "name": "انبار و لجستیک",
+      "code": "U06",
+      "sort_order": 6,
+      "parent_id": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+      "organization_id": "13d1ef39-87f0-5178-acda-693893e5d503"
+    },
+    {
+      "id": "39b75349-3ffd-5832-8a22-53303e3ec142",
+      "name": "خدمات مشتری",
+      "code": "U07",
+      "sort_order": 7,
+      "parent_id": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+      "organization_id": "13d1ef39-87f0-5178-acda-693893e5d503"
+    },
+    {
+      "id": "b3d659c7-0a73-5d99-8485-a6622a07d856",
+      "name": "مالی",
+      "code": "U08",
+      "sort_order": 8,
+      "parent_id": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+      "organization_id": "13d1ef39-87f0-5178-acda-693893e5d503"
+    },
+    {
+      "id": "5c919c22-8daf-5f69-a2f4-74272b42660f",
+      "name": "منابع انسانی",
+      "code": "U09",
+      "sort_order": 9,
+      "parent_id": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+      "organization_id": "13d1ef39-87f0-5178-acda-693893e5d503"
+    }
+  ],
+  "positions": [
+    {
+      "id": "47533c9d-1b84-5b45-aa6e-35b308a82042",
+      "title": "مدیر عامل",
+      "org_unit_id": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+      "reports_to_position_id": null
+    },
+    {
+      "id": "d8dd58ea-e98f-5f67-88d1-74f9b545e7bc",
+      "title": "مسئول فروش",
+      "org_unit_id": "b57e3eb1-c18c-50f8-9dfc-7c72dcfc26b0",
+      "reports_to_position_id": "47533c9d-1b84-5b45-aa6e-35b308a82042"
+    },
+    {
+      "id": "56ee4da0-a334-5242-8a6a-ed29b2b6de63",
+      "title": "مسئول برنامه‌ریزی تولید",
+      "org_unit_id": "8190510f-e275-56aa-b939-667677b88b47",
+      "reports_to_position_id": "47533c9d-1b84-5b45-aa6e-35b308a82042"
+    },
+    {
+      "id": "8b67d25b-e11c-5acc-b5ed-754190a9a1a3",
+      "title": "مسئول تدارکات",
+      "org_unit_id": "d48e88db-f22b-5918-b477-26fb8fb755e2",
+      "reports_to_position_id": "47533c9d-1b84-5b45-aa6e-35b308a82042"
+    },
+    {
+      "id": "e314bd6f-a8cd-5f78-949d-d1bbd32e84d5",
+      "title": "مسئول تولید",
+      "org_unit_id": "a24f27f5-7f5d-54b6-9e44-f57f6d6634c9",
+      "reports_to_position_id": "47533c9d-1b84-5b45-aa6e-35b308a82042"
+    },
+    {
+      "id": "273d3012-96c2-5a34-b9e1-45d0cac26d0e",
+      "title": "مسئول کنترل کیفیت",
+      "org_unit_id": "2956bd7c-8d59-536d-80f6-b63665553c1b",
+      "reports_to_position_id": "47533c9d-1b84-5b45-aa6e-35b308a82042"
+    },
+    {
+      "id": "3ee69521-6fca-541e-abb6-4388fcbdd3f5",
+      "title": "مسئول انبار و لجستیک",
+      "org_unit_id": "08ee5d78-e411-51cb-8bd6-9e4a794db282",
+      "reports_to_position_id": "47533c9d-1b84-5b45-aa6e-35b308a82042"
+    },
+    {
+      "id": "9422edd2-1a42-5de1-8b7b-866afcf529bb",
+      "title": "مسئول خدمات مشتری",
+      "org_unit_id": "39b75349-3ffd-5832-8a22-53303e3ec142",
+      "reports_to_position_id": "47533c9d-1b84-5b45-aa6e-35b308a82042"
+    },
+    {
+      "id": "9717dc7d-f1e9-5ed1-8c25-8cefe9dd9e2a",
+      "title": "مسئول مالی",
+      "org_unit_id": "b3d659c7-0a73-5d99-8485-a6622a07d856",
+      "reports_to_position_id": "47533c9d-1b84-5b45-aa6e-35b308a82042"
+    },
+    {
+      "id": "d01f84c8-a10d-59ed-8f2d-07231937a247",
+      "title": "مسئول منابع انسانی",
+      "org_unit_id": "5c919c22-8daf-5f69-a2f4-74272b42660f",
+      "reports_to_position_id": "47533c9d-1b84-5b45-aa6e-35b308a82042"
+    }
+  ],
+  "persons": [
+    {
+      "id": "427789cb-618b-58b9-a7d2-00be8342dbc5",
+      "display_name": "آرمان نیک‌روش"
+    },
+    {
+      "id": "df5c5251-a8cb-5b7a-abd7-fb5685ee8f1b",
+      "display_name": "نیلوفر شکیبا"
+    },
+    {
+      "id": "067b1140-5cb3-5824-998d-47bb6c4549d7",
+      "display_name": "سپهر روشن"
+    },
+    {
+      "id": "e518838f-e77f-5e20-bbbc-4e2c557d55ba",
+      "display_name": "بهار فلاح"
+    },
+    {
+      "id": "ec30bade-b304-5127-bb59-df9db0e7d290",
+      "display_name": "کاوه امید"
+    },
+    {
+      "id": "aadf7284-f25f-581d-b9a5-493c196e01b2",
+      "display_name": "آوا صالح"
+    },
+    {
+      "id": "0861cf5e-a994-5a23-9653-36afb97a5b11",
+      "display_name": "سام راد"
+    },
+    {
+      "id": "d61290dd-94ee-5900-bfc5-620343f2bfb0",
+      "display_name": "ترانه مهر"
+    },
+    {
+      "id": "e805827a-29cd-521c-9708-98d41306be38",
+      "display_name": "مانی آزاد"
+    },
+    {
+      "id": "306ca505-3f6b-5cce-8b47-f38a84ff75fb",
+      "display_name": "مینا بهروش"
+    }
+  ],
+  "assignments": [
+    {
+      "id": "f8b4c32f-1d8e-5221-95e8-257c3ea5bd81",
+      "person_id": "427789cb-618b-58b9-a7d2-00be8342dbc5",
+      "position_id": "47533c9d-1b84-5b45-aa6e-35b308a82042"
+    },
+    {
+      "id": "204dd001-8d69-5f1e-b3d4-d87b5039df90",
+      "person_id": "df5c5251-a8cb-5b7a-abd7-fb5685ee8f1b",
+      "position_id": "d8dd58ea-e98f-5f67-88d1-74f9b545e7bc"
+    },
+    {
+      "id": "cd34804c-a04d-525b-8f05-f16444d7995f",
+      "person_id": "067b1140-5cb3-5824-998d-47bb6c4549d7",
+      "position_id": "56ee4da0-a334-5242-8a6a-ed29b2b6de63"
+    },
+    {
+      "id": "6bba5e5b-9f9a-5682-bbf2-66a8aff09cb5",
+      "person_id": "e518838f-e77f-5e20-bbbc-4e2c557d55ba",
+      "position_id": "8b67d25b-e11c-5acc-b5ed-754190a9a1a3"
+    },
+    {
+      "id": "9cd19f72-a360-53a9-8cf9-234144a5d0ce",
+      "person_id": "ec30bade-b304-5127-bb59-df9db0e7d290",
+      "position_id": "e314bd6f-a8cd-5f78-949d-d1bbd32e84d5"
+    },
+    {
+      "id": "110a8566-efe4-53ea-923a-3754e71cd272",
+      "person_id": "aadf7284-f25f-581d-b9a5-493c196e01b2",
+      "position_id": "273d3012-96c2-5a34-b9e1-45d0cac26d0e"
+    },
+    {
+      "id": "a504a6c0-a9d9-517d-82c8-5bbaf78e266e",
+      "person_id": "0861cf5e-a994-5a23-9653-36afb97a5b11",
+      "position_id": "3ee69521-6fca-541e-abb6-4388fcbdd3f5"
+    },
+    {
+      "id": "b8c9225a-248b-5c0c-8bd0-0582788c597b",
+      "person_id": "d61290dd-94ee-5900-bfc5-620343f2bfb0",
+      "position_id": "9422edd2-1a42-5de1-8b7b-866afcf529bb"
+    },
+    {
+      "id": "d45d2023-9757-59c1-afc7-313e5de02c32",
+      "person_id": "e805827a-29cd-521c-9708-98d41306be38",
+      "position_id": "9717dc7d-f1e9-5ed1-8c25-8cefe9dd9e2a"
+    },
+    {
+      "id": "4d9d33fd-f787-5ddf-ac57-b71d1ad83aae",
+      "person_id": "306ca505-3f6b-5cce-8b47-f38a84ff75fb",
+      "position_id": "d01f84c8-a10d-59ed-8f2d-07231937a247"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "00f5bc76-c6e7-54bd-ad09-e1aa0785b606",
+      "name": "عملیات اصلی",
+      "code": "CORE",
+      "kind": "GROUP",
+      "classification": "CORE",
+      "parent_id": null
+    },
+    {
+      "id": "b9c96f19-adcc-5915-bd59-3b7848880871",
+      "name": "راهبری",
+      "code": "MANAGEMENT",
+      "kind": "GROUP",
+      "classification": "MANAGEMENT",
+      "parent_id": null
+    },
+    {
+      "id": "09d97205-018b-5e39-9a63-6e8f2e392dd8",
+      "name": "پشتیبانی",
+      "code": "SUPPORT",
+      "kind": "GROUP",
+      "classification": "SUPPORT",
+      "parent_id": null
+    },
+    {
+      "id": "b520262c-e963-56aa-97fc-74baa8c7dd6a",
+      "code": "P-01",
+      "name": "ثبت و تأیید سفارش",
+      "kind": "PROCESS",
+      "classification": "CORE",
+      "parent_id": "00f5bc76-c6e7-54bd-ad09-e1aa0785b606",
+      "owner_org_unit_id": "b57e3eb1-c18c-50f8-9dfc-7c72dcfc26b0",
+      "summary": "از سفارش مشتری تا سفارش تأییدشده"
+    },
+    {
+      "id": "e75f3783-8843-52e4-a7e0-7d4086564746",
+      "code": "P-02",
+      "name": "برنامه‌ریزی تولید",
+      "kind": "PROCESS",
+      "classification": "CORE",
+      "parent_id": "00f5bc76-c6e7-54bd-ad09-e1aa0785b606",
+      "owner_org_unit_id": "8190510f-e275-56aa-b939-667677b88b47",
+      "summary": "از سفارش تأییدشده تا برنامه تولید مصوب"
+    },
+    {
+      "id": "a1801225-303e-5888-b971-ba2dccd556d6",
+      "code": "P-03",
+      "name": "تأمین مواد اولیه",
+      "kind": "PROCESS",
+      "classification": "CORE",
+      "parent_id": "00f5bc76-c6e7-54bd-ad09-e1aa0785b606",
+      "owner_org_unit_id": "d48e88db-f22b-5918-b477-26fb8fb755e2",
+      "summary": "از برنامه تولید مصوب تا مواد آماده مصرف"
+    },
+    {
+      "id": "58fb773c-2ac2-5174-a879-37eebfe92329",
+      "code": "P-04",
+      "name": "مونتاژ تجهیزات",
+      "kind": "PROCESS",
+      "classification": "CORE",
+      "parent_id": "00f5bc76-c6e7-54bd-ad09-e1aa0785b606",
+      "owner_org_unit_id": "a24f27f5-7f5d-54b6-9e44-f57f6d6634c9",
+      "summary": "از مواد آماده مصرف تا محصول مونتاژشده"
+    },
+    {
+      "id": "2c3c91f8-e927-5d19-bc5d-d2f05f6cdbe4",
+      "code": "P-05",
+      "name": "بازرسی و آزادسازی محصول",
+      "kind": "PROCESS",
+      "classification": "CORE",
+      "parent_id": "00f5bc76-c6e7-54bd-ad09-e1aa0785b606",
+      "owner_org_unit_id": "2956bd7c-8d59-536d-80f6-b63665553c1b",
+      "summary": "از محصول مونتاژشده تا محصول آزادشده"
+    },
+    {
+      "id": "87c08f12-ab3f-5bce-a86b-3ebb33141dd1",
+      "code": "P-06",
+      "name": "ارسال و تحویل سفارش",
+      "kind": "PROCESS",
+      "classification": "CORE",
+      "parent_id": "00f5bc76-c6e7-54bd-ad09-e1aa0785b606",
+      "owner_org_unit_id": "08ee5d78-e411-51cb-8bd6-9e4a794db282",
+      "summary": "از محصول آزادشده تا تحویل به مشتری"
+    },
+    {
+      "id": "cd5213a6-04a1-5e9f-be49-5ce191bb4f33",
+      "code": "P-07",
+      "name": "رسیدگی به خدمات پس از فروش",
+      "kind": "PROCESS",
+      "classification": "CORE",
+      "parent_id": "00f5bc76-c6e7-54bd-ad09-e1aa0785b606",
+      "owner_org_unit_id": "39b75349-3ffd-5832-8a22-53303e3ec142",
+      "summary": "از تحویل به مشتری / درخواست خدمات تا درخواست بسته‌شده"
+    },
+    {
+      "id": "6c04ec88-3033-52ae-a534-66ff62fcce89",
+      "code": "P-08",
+      "name": "صدور و وصول فاکتور",
+      "kind": "PROCESS",
+      "classification": "SUPPORT",
+      "parent_id": "09d97205-018b-5e39-9a63-6e8f2e392dd8",
+      "owner_org_unit_id": "b3d659c7-0a73-5d99-8485-a6622a07d856",
+      "summary": "از رسید تحویل تا تسویه فاکتور"
+    },
+    {
+      "id": "bc693799-434f-5e3a-b926-f9420792936e",
+      "code": "P-09",
+      "name": "آموزش اپراتورهای تولید",
+      "kind": "PROCESS",
+      "classification": "SUPPORT",
+      "parent_id": "09d97205-018b-5e39-9a63-6e8f2e392dd8",
+      "owner_org_unit_id": "5c919c22-8daf-5f69-a2f4-74272b42660f",
+      "summary": "از نیاز مهارتی ثبت‌شده تا تأیید صلاحیت اپراتور"
+    },
+    {
+      "id": "5f2cd6f4-3c3b-54c7-9030-5f9a81226e32",
+      "code": "P-10",
+      "name": "بازنگری عملکرد سازمان",
+      "kind": "PROCESS",
+      "classification": "MANAGEMENT",
+      "parent_id": "b9c96f19-adcc-5915-bd59-3b7848880871",
+      "owner_org_unit_id": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+      "summary": "از گزارش شاخص‌های واحدها تا تصمیم‌ها و اقدامات اصلاحی"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "e6833ec3-ef62-50eb-8976-768c2f4ec2b6",
+      "process_id": "b520262c-e963-56aa-97fc-74baa8c7dd6a",
+      "objective": "اطمینان از ثبت و تحویل سفارش تأییدشده",
+      "start_event": "سفارش مشتری",
+      "end_event": "سفارش تأییدشده",
+      "inputs": "سفارش مشتری",
+      "outputs": "سفارش تأییدشده",
+      "roles": "فروش",
+      "expected_outcome": "سفارش تأییدشده",
+      "notes": "سناریوی ساختگی برای ارائه نما"
+    },
+    {
+      "id": "a4cb5432-d4cc-5023-b079-e5783dc91930",
+      "process_id": "e75f3783-8843-52e4-a7e0-7d4086564746",
+      "objective": "اطمینان از ثبت و تحویل برنامه تولید مصوب",
+      "start_event": "سفارش تأییدشده",
+      "end_event": "برنامه تولید مصوب",
+      "inputs": "سفارش تأییدشده",
+      "outputs": "برنامه تولید مصوب",
+      "roles": "برنامه‌ریزی تولید",
+      "expected_outcome": "برنامه تولید مصوب",
+      "notes": "سناریوی ساختگی برای ارائه نما"
+    },
+    {
+      "id": "88fd470c-549a-5a75-b6cf-a04422412069",
+      "process_id": "a1801225-303e-5888-b971-ba2dccd556d6",
+      "objective": "اطمینان از ثبت و تحویل مواد آماده مصرف",
+      "start_event": "برنامه تولید مصوب",
+      "end_event": "مواد آماده مصرف",
+      "inputs": "برنامه تولید مصوب",
+      "outputs": "مواد آماده مصرف",
+      "roles": "تدارکات",
+      "expected_outcome": "مواد آماده مصرف",
+      "notes": "سناریوی ساختگی برای ارائه نما"
+    },
+    {
+      "id": "e2f1e8ab-9656-5e25-911b-1821379bad09",
+      "process_id": "58fb773c-2ac2-5174-a879-37eebfe92329",
+      "objective": "اطمینان از ثبت و تحویل محصول مونتاژشده",
+      "start_event": "مواد آماده مصرف",
+      "end_event": "محصول مونتاژشده",
+      "inputs": "مواد آماده مصرف",
+      "outputs": "محصول مونتاژشده",
+      "roles": "تولید",
+      "expected_outcome": "محصول مونتاژشده",
+      "notes": "سناریوی ساختگی برای ارائه نما"
+    },
+    {
+      "id": "5a3c887a-692c-59b3-90a1-e6cfec38fd9e",
+      "process_id": "2c3c91f8-e927-5d19-bc5d-d2f05f6cdbe4",
+      "objective": "اطمینان از ثبت و تحویل محصول آزادشده",
+      "start_event": "محصول مونتاژشده",
+      "end_event": "محصول آزادشده",
+      "inputs": "محصول مونتاژشده",
+      "outputs": "محصول آزادشده",
+      "roles": "کنترل کیفیت",
+      "expected_outcome": "محصول آزادشده",
+      "notes": "سناریوی ساختگی برای ارائه نما"
+    },
+    {
+      "id": "b1e3f99d-aa24-572f-85de-f88b4b1056de",
+      "process_id": "87c08f12-ab3f-5bce-a86b-3ebb33141dd1",
+      "objective": "اطمینان از ثبت و تحویل تحویل به مشتری",
+      "start_event": "محصول آزادشده",
+      "end_event": "تحویل به مشتری",
+      "inputs": "محصول آزادشده",
+      "outputs": "تحویل به مشتری",
+      "roles": "انبار و لجستیک",
+      "expected_outcome": "تحویل به مشتری",
+      "notes": "سناریوی ساختگی برای ارائه نما"
+    },
+    {
+      "id": "a56de322-030c-5b59-ae55-987bc3d08a09",
+      "process_id": "cd5213a6-04a1-5e9f-be49-5ce191bb4f33",
+      "objective": "اطمینان از ثبت و تحویل درخواست بسته‌شده",
+      "start_event": "تحویل به مشتری / درخواست خدمات",
+      "end_event": "درخواست بسته‌شده",
+      "inputs": "تحویل به مشتری / درخواست خدمات",
+      "outputs": "درخواست بسته‌شده",
+      "roles": "خدمات مشتری",
+      "expected_outcome": "درخواست بسته‌شده",
+      "notes": "سناریوی ساختگی برای ارائه نما"
+    },
+    {
+      "id": "00d45808-c864-5f84-a936-077bd8ac13cd",
+      "process_id": "6c04ec88-3033-52ae-a534-66ff62fcce89",
+      "objective": "اطمینان از ثبت و تحویل تسویه فاکتور",
+      "start_event": "رسید تحویل",
+      "end_event": "تسویه فاکتور",
+      "inputs": "رسید تحویل",
+      "outputs": "تسویه فاکتور",
+      "roles": "مالی",
+      "expected_outcome": "تسویه فاکتور",
+      "notes": "سناریوی ساختگی برای ارائه نما"
+    },
+    {
+      "id": "655cadf1-d544-5458-8efb-b5267e0f1f47",
+      "process_id": "bc693799-434f-5e3a-b926-f9420792936e",
+      "objective": "اطمینان از ثبت و تحویل تأیید صلاحیت اپراتور",
+      "start_event": "نیاز مهارتی ثبت‌شده",
+      "end_event": "تأیید صلاحیت اپراتور",
+      "inputs": "نیاز مهارتی ثبت‌شده",
+      "outputs": "تأیید صلاحیت اپراتور",
+      "roles": "منابع انسانی",
+      "expected_outcome": "تأیید صلاحیت اپراتور",
+      "notes": "سناریوی ساختگی برای ارائه نما"
+    },
+    {
+      "id": "9a9c5d35-a3bf-5dfd-9ce1-47bb2311e631",
+      "process_id": "5f2cd6f4-3c3b-54c7-9030-5f9a81226e32",
+      "objective": "اطمینان از ثبت و تحویل تصمیم‌ها و اقدامات اصلاحی",
+      "start_event": "گزارش شاخص‌های واحدها",
+      "end_event": "تصمیم‌ها و اقدامات اصلاحی",
+      "inputs": "گزارش شاخص‌های واحدها",
+      "outputs": "تصمیم‌ها و اقدامات اصلاحی",
+      "roles": "مدیریت عامل",
+      "expected_outcome": "تصمیم‌ها و اقدامات اصلاحی",
+      "notes": "سناریوی ساختگی برای ارائه نما"
+    }
+  ],
+  "kpis": [
+    {
+      "id": "a49a7c5a-0f5d-5d5c-b1ce-6146257a95b4",
+      "code": "K-01",
+      "name": "زمان تأیید سفارش",
+      "unit": "ساعت",
+      "preferred_direction": "LOWER",
+      "frequency": "ماهانه",
+      "target_value": 12,
+      "owner_person_id": "df5c5251-a8cb-5b7a-abd7-fb5685ee8f1b",
+      "formula_text": "مجموع ساعت بین دریافت و تأیید سفارش ÷ تعداد سفارش‌های تأییدشده",
+      "readiness_status": "READY",
+      "data_source": "ثبت عملیات فروش"
+    },
+    {
+      "id": "7dc92727-821b-5868-89b4-e5e1010c9958",
+      "code": "K-02",
+      "name": "تحقق برنامه تولید",
+      "unit": "درصد",
+      "preferred_direction": "HIGHER",
+      "frequency": "ماهانه",
+      "target_value": 95,
+      "owner_person_id": "067b1140-5cb3-5824-998d-47bb6c4549d7",
+      "formula_text": "تعداد دستورهای تولید تکمیل‌شده طبق برنامه ÷ دستورهای برنامه‌ریزی‌شده × ۱۰۰",
+      "readiness_status": "READY",
+      "data_source": "ثبت عملیات برنامه‌ریزی تولید"
+    },
+    {
+      "id": "9200c64b-4118-5d92-86a1-e9109f11dfb3",
+      "code": "K-03",
+      "name": "تحویل به‌موقع تأمین‌کننده",
+      "unit": "درصد",
+      "preferred_direction": "HIGHER",
+      "frequency": "ماهانه",
+      "target_value": 96,
+      "owner_person_id": "e518838f-e77f-5e20-bbbc-4e2c557d55ba",
+      "formula_text": "خطوط خرید تحویل‌شده در موعد ÷ کل خطوط خرید سررسیدشده × ۱۰۰",
+      "readiness_status": "READY",
+      "data_source": "ثبت عملیات تدارکات"
+    },
+    {
+      "id": "9226ec24-ee6d-5ee1-b46f-cad0dd2c57e4",
+      "code": "K-04",
+      "name": "زمان چرخه مونتاژ",
+      "unit": "دقیقه",
+      "preferred_direction": "LOWER",
+      "frequency": "ماهانه",
+      "target_value": 45,
+      "owner_person_id": "ec30bade-b304-5127-bb59-df9db0e7d290",
+      "formula_text": "مجموع زمان مونتاژ ÷ تعداد محصول مونتاژشده",
+      "readiness_status": "READY",
+      "data_source": "ثبت عملیات تولید"
+    },
+    {
+      "id": "26d2ced6-f3cc-54fd-b2fd-26c4bd73d03a",
+      "code": "K-05",
+      "name": "قبولی در آزمون اول",
+      "unit": "درصد",
+      "preferred_direction": "HIGHER",
+      "frequency": "ماهانه",
+      "target_value": 98,
+      "owner_person_id": "aadf7284-f25f-581d-b9a5-493c196e01b2",
+      "formula_text": "تعداد محصولات قبول در بازرسی اول ÷ تعداد محصولات بازرسی‌شده × ۱۰۰",
+      "readiness_status": "READY",
+      "data_source": "ثبت عملیات کنترل کیفیت"
+    },
+    {
+      "id": "0050ce35-cd0f-558d-ac23-6357cf6b712f",
+      "code": "K-06",
+      "name": "تحویل کامل و به‌موقع",
+      "unit": "درصد",
+      "preferred_direction": "HIGHER",
+      "frequency": "ماهانه",
+      "target_value": 96,
+      "owner_person_id": "0861cf5e-a994-5a23-9653-36afb97a5b11",
+      "formula_text": "تعداد سفارش‌های کامل و به‌موقع ÷ تعداد سفارش‌های سررسیدشده × ۱۰۰",
+      "readiness_status": "READY",
+      "data_source": "ثبت عملیات انبار و لجستیک"
+    },
+    {
+      "id": "186c1675-9bcd-5b39-8ec4-26bad5b866e8",
+      "code": "K-07",
+      "name": "زمان حل درخواست خدمات",
+      "unit": "روز",
+      "preferred_direction": "LOWER",
+      "frequency": "ماهانه",
+      "target_value": 2,
+      "owner_person_id": "d61290dd-94ee-5900-bfc5-620343f2bfb0",
+      "formula_text": "مجموع روز تا حل درخواست ÷ تعداد درخواست‌های حل‌شده",
+      "readiness_status": "READY",
+      "data_source": "ثبت عملیات خدمات مشتری"
+    },
+    {
+      "id": "50072f9e-c294-54c1-a299-2814b9e30a45",
+      "code": "K-08",
+      "name": "وصول به‌موقع فاکتور",
+      "unit": "درصد",
+      "preferred_direction": "HIGHER",
+      "frequency": "ماهانه",
+      "target_value": 90,
+      "owner_person_id": "e805827a-29cd-521c-9708-98d41306be38",
+      "formula_text": "مبلغ سررسیدشده وصول‌شده در موعد ÷ کل مبلغ سررسیدشده × ۱۰۰",
+      "readiness_status": "READY",
+      "data_source": "ثبت عملیات مالی"
+    },
+    {
+      "id": "1de66b50-b5a5-5d99-95b0-4553029e132b",
+      "code": "K-09",
+      "name": "پوشش آموزش ایستگاه‌ها",
+      "unit": "درصد",
+      "preferred_direction": "HIGHER",
+      "frequency": "ماهانه",
+      "target_value": 95,
+      "owner_person_id": "306ca505-3f6b-5cce-8b47-f38a84ff75fb",
+      "formula_text": "اپراتورهای دارای صلاحیت معتبر ÷ اپراتورهای مشمول آموزش × ۱۰۰",
+      "readiness_status": "READY",
+      "data_source": "ثبت عملیات منابع انسانی"
+    },
+    {
+      "id": "46025388-e087-5fb5-9255-48fe5bf4972c",
+      "code": "K-10",
+      "name": "اجرای اقدامات اصلاحی در موعد",
+      "unit": "درصد",
+      "preferred_direction": "HIGHER",
+      "frequency": "ماهانه",
+      "target_value": 90,
+      "owner_person_id": "427789cb-618b-58b9-a7d2-00be8342dbc5",
+      "formula_text": "اقدامات بسته‌شده در موعد ÷ اقدامات سررسیدشده × ۱۰۰",
+      "readiness_status": "READY",
+      "data_source": "ثبت عملیات مدیریت عامل"
+    }
+  ],
+  "links": [
+    {
+      "process_id": "b520262c-e963-56aa-97fc-74baa8c7dd6a",
+      "kpi_id": "a49a7c5a-0f5d-5d5c-b1ce-6146257a95b4"
+    },
+    {
+      "process_id": "e75f3783-8843-52e4-a7e0-7d4086564746",
+      "kpi_id": "7dc92727-821b-5868-89b4-e5e1010c9958"
+    },
+    {
+      "process_id": "a1801225-303e-5888-b971-ba2dccd556d6",
+      "kpi_id": "9200c64b-4118-5d92-86a1-e9109f11dfb3"
+    },
+    {
+      "process_id": "58fb773c-2ac2-5174-a879-37eebfe92329",
+      "kpi_id": "9226ec24-ee6d-5ee1-b46f-cad0dd2c57e4"
+    },
+    {
+      "process_id": "2c3c91f8-e927-5d19-bc5d-d2f05f6cdbe4",
+      "kpi_id": "26d2ced6-f3cc-54fd-b2fd-26c4bd73d03a"
+    },
+    {
+      "process_id": "87c08f12-ab3f-5bce-a86b-3ebb33141dd1",
+      "kpi_id": "0050ce35-cd0f-558d-ac23-6357cf6b712f"
+    },
+    {
+      "process_id": "cd5213a6-04a1-5e9f-be49-5ce191bb4f33",
+      "kpi_id": "186c1675-9bcd-5b39-8ec4-26bad5b866e8"
+    },
+    {
+      "process_id": "6c04ec88-3033-52ae-a534-66ff62fcce89",
+      "kpi_id": "50072f9e-c294-54c1-a299-2814b9e30a45"
+    },
+    {
+      "process_id": "bc693799-434f-5e3a-b926-f9420792936e",
+      "kpi_id": "1de66b50-b5a5-5d99-95b0-4553029e132b"
+    },
+    {
+      "process_id": "5f2cd6f4-3c3b-54c7-9030-5f9a81226e32",
+      "kpi_id": "46025388-e087-5fb5-9255-48fe5bf4972c"
+    }
+  ],
+  "documents": [],
+  "references": [],
+  "relations": [
+    {
+      "id": "11e4d323-d70a-5e2a-9366-d2175841bf0e",
+      "source_process_id": "b520262c-e963-56aa-97fc-74baa8c7dd6a",
+      "target_process_id": "e75f3783-8843-52e4-a7e0-7d4086564746",
+      "relation_type": "OUTPUT_TO",
+      "note": "سفارش تأییدشده"
+    },
+    {
+      "id": "ee96cf3b-adfd-56d6-b6a5-0467487cf571",
+      "source_process_id": "e75f3783-8843-52e4-a7e0-7d4086564746",
+      "target_process_id": "a1801225-303e-5888-b971-ba2dccd556d6",
+      "relation_type": "OUTPUT_TO",
+      "note": "برنامه تولید مصوب"
+    },
+    {
+      "id": "aa34c34a-5db2-5ff7-99de-8ac455c97bf6",
+      "source_process_id": "a1801225-303e-5888-b971-ba2dccd556d6",
+      "target_process_id": "58fb773c-2ac2-5174-a879-37eebfe92329",
+      "relation_type": "OUTPUT_TO",
+      "note": "مواد آماده مصرف"
+    },
+    {
+      "id": "48df0a47-bd7d-5bc3-9922-98e6e894b302",
+      "source_process_id": "58fb773c-2ac2-5174-a879-37eebfe92329",
+      "target_process_id": "2c3c91f8-e927-5d19-bc5d-d2f05f6cdbe4",
+      "relation_type": "OUTPUT_TO",
+      "note": "محصول مونتاژشده"
+    },
+    {
+      "id": "761c8683-9019-51db-951a-5efc2a812114",
+      "source_process_id": "2c3c91f8-e927-5d19-bc5d-d2f05f6cdbe4",
+      "target_process_id": "87c08f12-ab3f-5bce-a86b-3ebb33141dd1",
+      "relation_type": "OUTPUT_TO",
+      "note": "محصول آزادشده"
+    },
+    {
+      "id": "34e6467b-fb14-5862-a4ed-f71d7c0264eb",
+      "source_process_id": "87c08f12-ab3f-5bce-a86b-3ebb33141dd1",
+      "target_process_id": "cd5213a6-04a1-5e9f-be49-5ce191bb4f33",
+      "relation_type": "OUTPUT_TO",
+      "note": "تحویل به مشتری"
+    }
+  ],
+  "requirements": [],
+  "kpiOrgLinks": [
+    {
+      "kpi_id": "a49a7c5a-0f5d-5d5c-b1ce-6146257a95b4",
+      "org_unit_id": "b57e3eb1-c18c-50f8-9dfc-7c72dcfc26b0",
+      "position_id": null
+    },
+    {
+      "kpi_id": "7dc92727-821b-5868-89b4-e5e1010c9958",
+      "org_unit_id": "8190510f-e275-56aa-b939-667677b88b47",
+      "position_id": null
+    },
+    {
+      "kpi_id": "9200c64b-4118-5d92-86a1-e9109f11dfb3",
+      "org_unit_id": "d48e88db-f22b-5918-b477-26fb8fb755e2",
+      "position_id": null
+    },
+    {
+      "kpi_id": "9226ec24-ee6d-5ee1-b46f-cad0dd2c57e4",
+      "org_unit_id": "a24f27f5-7f5d-54b6-9e44-f57f6d6634c9",
+      "position_id": null
+    },
+    {
+      "kpi_id": "26d2ced6-f3cc-54fd-b2fd-26c4bd73d03a",
+      "org_unit_id": "2956bd7c-8d59-536d-80f6-b63665553c1b",
+      "position_id": null
+    },
+    {
+      "kpi_id": "0050ce35-cd0f-558d-ac23-6357cf6b712f",
+      "org_unit_id": "08ee5d78-e411-51cb-8bd6-9e4a794db282",
+      "position_id": null
+    },
+    {
+      "kpi_id": "186c1675-9bcd-5b39-8ec4-26bad5b866e8",
+      "org_unit_id": "39b75349-3ffd-5832-8a22-53303e3ec142",
+      "position_id": null
+    },
+    {
+      "kpi_id": "50072f9e-c294-54c1-a299-2814b9e30a45",
+      "org_unit_id": "b3d659c7-0a73-5d99-8485-a6622a07d856",
+      "position_id": null
+    },
+    {
+      "kpi_id": "1de66b50-b5a5-5d99-95b0-4553029e132b",
+      "org_unit_id": "5c919c22-8daf-5f69-a2f4-74272b42660f",
+      "position_id": null
+    },
+    {
+      "kpi_id": "46025388-e087-5fb5-9255-48fe5bf4972c",
+      "org_unit_id": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+      "position_id": null
+    }
+  ],
+  "okr": {
+    "cycles": [
+      {
+        "id": "1405-fall",
+        "title": "پاییز ۱۴۰۵",
+        "status": "ACTIVE",
+        "startDate": "2026-09-23",
+        "endDate": "2026-12-21"
+      }
+    ],
+    "objectives": [
+      {
+        "id": "a79d132c-8624-59de-a81b-2568f80456f2",
+        "code": "O-01",
+        "title": "تحویل سفارش به مشتری را قابل پیش‌بینی کنیم",
+        "description": "هدف نمونه برای دوره پاییز ۱۴۰۵",
+        "cycleId": "1405-fall",
+        "parentId": null,
+        "level": "COMPANY",
+        "ownerUnitId": "d2d7b261-3531-5940-ad0c-929aa6077f2e",
+        "pillar": "تجربه مشتری",
+        "confidence": "ON_TRACK"
+      },
+      {
+        "id": "5e1bc830-dc97-58f0-88a6-68019c94e0bc",
+        "code": "O-02",
+        "title": "جریان تولید را پایدار و کم‌اتلاف کنیم",
+        "description": "هدف نمونه برای دوره پاییز ۱۴۰۵",
+        "cycleId": "1405-fall",
+        "parentId": "a79d132c-8624-59de-a81b-2568f80456f2",
+        "level": "DEPARTMENT",
+        "ownerUnitId": "a24f27f5-7f5d-54b6-9e44-f57f6d6634c9",
+        "pillar": "عملیات",
+        "confidence": "ON_TRACK"
+      },
+      {
+        "id": "a8e6dce7-a926-54e8-b587-2679d4719dd9",
+        "code": "O-03",
+        "title": "از سفارش تا تحویل، مشتری را در جریان نگه داریم",
+        "description": "هدف نمونه برای دوره پاییز ۱۴۰۵",
+        "cycleId": "1405-fall",
+        "parentId": "a79d132c-8624-59de-a81b-2568f80456f2",
+        "level": "DEPARTMENT",
+        "ownerUnitId": "b57e3eb1-c18c-50f8-9dfc-7c72dcfc26b0",
+        "pillar": "تجربه مشتری",
+        "confidence": "ON_TRACK"
+      }
+    ],
+    "keyResults": [
+      {
+        "id": "6d459687-83bd-5f65-a734-dc04960c80b9",
+        "objectiveId": "a8e6dce7-a926-54e8-b587-2679d4719dd9",
+        "title": "زمان تأیید سفارش",
+        "baseline": 24,
+        "target": 12,
+        "current": 16,
+        "unit": "ساعت",
+        "kpiId": "a49a7c5a-0f5d-5d5c-b1ce-6146257a95b4",
+        "weight": 1
+      },
+      {
+        "id": "6d95f528-1a97-5a71-9aae-52ef26ce0716",
+        "objectiveId": "5e1bc830-dc97-58f0-88a6-68019c94e0bc",
+        "title": "تحقق برنامه تولید",
+        "baseline": 78,
+        "target": 95,
+        "current": 88,
+        "unit": "درصد",
+        "kpiId": "7dc92727-821b-5868-89b4-e5e1010c9958",
+        "weight": 1
+      },
+      {
+        "id": "6c33167f-514c-5822-b744-bf95cffafbe6",
+        "objectiveId": "5e1bc830-dc97-58f0-88a6-68019c94e0bc",
+        "title": "زمان چرخه مونتاژ",
+        "baseline": 64,
+        "target": 45,
+        "current": 51,
+        "unit": "دقیقه",
+        "kpiId": "9226ec24-ee6d-5ee1-b46f-cad0dd2c57e4",
+        "weight": 1
+      },
+      {
+        "id": "ed73c5a1-dcb6-59a2-b551-ef7463c6d119",
+        "objectiveId": "5e1bc830-dc97-58f0-88a6-68019c94e0bc",
+        "title": "قبولی در آزمون اول",
+        "baseline": 91,
+        "target": 98,
+        "current": 96,
+        "unit": "درصد",
+        "kpiId": "26d2ced6-f3cc-54fd-b2fd-26c4bd73d03a",
+        "weight": 1
+      },
+      {
+        "id": "517cc11f-8521-5a92-abd8-e87bf9f9b965",
+        "objectiveId": "a79d132c-8624-59de-a81b-2568f80456f2",
+        "title": "تحویل کامل و به‌موقع",
+        "baseline": 82,
+        "target": 96,
+        "current": 91,
+        "unit": "درصد",
+        "kpiId": "0050ce35-cd0f-558d-ac23-6357cf6b712f",
+        "weight": 1
+      },
+      {
+        "id": "e1e7bf0e-5daf-5308-985f-7f7f9567ec12",
+        "objectiveId": "a8e6dce7-a926-54e8-b587-2679d4719dd9",
+        "title": "زمان حل درخواست خدمات",
+        "baseline": 5,
+        "target": 2,
+        "current": 3,
+        "unit": "روز",
+        "kpiId": "186c1675-9bcd-5b39-8ec4-26bad5b866e8",
+        "weight": 1
+      }
+    ],
+    "checkins": [
+      {
+        "id": "f8598423-6e96-54af-89ee-fb732d666950",
+        "keyResultId": "6d459687-83bd-5f65-a734-dc04960c80b9",
+        "objectiveId": "a8e6dce7-a926-54e8-b587-2679d4719dd9",
+        "previous": 24,
+        "value": 16,
+        "confidence": "ON_TRACK",
+        "note": "اندازه‌گیری آزمایشی آبان",
+        "createdAt": "2026-11-12T09:00:00Z"
+      },
+      {
+        "id": "c00ea071-e073-58e8-b524-0f91ebd62456",
+        "keyResultId": "6d95f528-1a97-5a71-9aae-52ef26ce0716",
+        "objectiveId": "5e1bc830-dc97-58f0-88a6-68019c94e0bc",
+        "previous": 78,
+        "value": 88,
+        "confidence": "ON_TRACK",
+        "note": "اندازه‌گیری آزمایشی آبان",
+        "createdAt": "2026-11-12T09:00:00Z"
+      },
+      {
+        "id": "aa8a8a28-041e-5720-85f4-1c20f118b45d",
+        "keyResultId": "6c33167f-514c-5822-b744-bf95cffafbe6",
+        "objectiveId": "5e1bc830-dc97-58f0-88a6-68019c94e0bc",
+        "previous": 64,
+        "value": 51,
+        "confidence": "ON_TRACK",
+        "note": "اندازه‌گیری آزمایشی آبان",
+        "createdAt": "2026-11-12T09:00:00Z"
+      },
+      {
+        "id": "2a1d5ee7-566f-5c86-bbd5-da5588bdbe31",
+        "keyResultId": "ed73c5a1-dcb6-59a2-b551-ef7463c6d119",
+        "objectiveId": "5e1bc830-dc97-58f0-88a6-68019c94e0bc",
+        "previous": 91,
+        "value": 96,
+        "confidence": "ON_TRACK",
+        "note": "اندازه‌گیری آزمایشی آبان",
+        "createdAt": "2026-11-12T09:00:00Z"
+      },
+      {
+        "id": "41e25eed-1f7d-548c-b183-0fc0bc6ae77d",
+        "keyResultId": "517cc11f-8521-5a92-abd8-e87bf9f9b965",
+        "objectiveId": "a79d132c-8624-59de-a81b-2568f80456f2",
+        "previous": 82,
+        "value": 91,
+        "confidence": "ON_TRACK",
+        "note": "اندازه‌گیری آزمایشی آبان",
+        "createdAt": "2026-11-12T09:00:00Z"
+      },
+      {
+        "id": "471ddc0b-b1a4-5d0a-8b3e-63f181cd2e55",
+        "keyResultId": "e1e7bf0e-5daf-5308-985f-7f7f9567ec12",
+        "objectiveId": "a8e6dce7-a926-54e8-b587-2679d4719dd9",
+        "previous": 5,
+        "value": 3,
+        "confidence": "ON_TRACK",
+        "note": "اندازه‌گیری آزمایشی آبان",
+        "createdAt": "2026-11-12T09:00:00Z"
+      }
+    ]
+  }
+}
