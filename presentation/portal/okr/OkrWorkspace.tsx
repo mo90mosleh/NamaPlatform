@@ -1,5 +1,5 @@
 import{useEffect,useMemo,useRef,useState,type FormEvent}from'react';
-import{Target,Network,LayoutList,Table2,ChartNoAxesCombined,Building2,Plus,CalendarDays,ChevronLeft,ChevronDown,ChartColumnIncreasing,Activity,CheckCircle2,AlertTriangle,Clock3,ArrowUpLeft,X,RefreshCw,History,GitBranch,Search,Save}from'lucide-react';
+import{Target,Network,LayoutList,Table2,ChartNoAxesCombined,Building2,Plus,CalendarDays,ChevronLeft,ChevronDown,ChartColumnIncreasing,Activity,CheckCircle2,AlertTriangle,ArrowUpLeft,X,RefreshCw,History,GitBranch,Search,Save}from'lucide-react';
 import type{Data}from'../types';
 import{config}from'../api';
 import{Link}from'../ui';
@@ -240,12 +240,13 @@ export function OkrWorkspace({data}:{data:Data}){
   </section>
  </>;
  return <div ref={ref} className="okr-workspace">
-  <header className="okr-heading"><div><p className="okr-eyebrow"><Target size={14}/>مدیریت استراتژی و اهداف</p><h1>مدیریت OKR</h1><p>از اهداف سازمانی تا نتایج کلیدی و شاخص‌های مرتبط</p></div>
+  <header className="process-workspace-header okr-heading" data-tour="page-heading"><h1>مدیریت OKR</h1>
    <div className="okr-heading-actions"><label className="okr-cycle-control"><CalendarDays size={16}/><select aria-label="دوره OKR" value={cycle?.id??''} onChange={e=>{setActiveCycle(e.target.value);setSelectedId(null);setPillar('');}}>{!portfolio.cycles.length&&<option value="">دوره‌ای تعریف نشده</option>}{portfolio.cycles.map(c=><option key={c.id} value={c.id}>{c.title} {c.status==='PLANNING'?'· برنامه‌ریزی':''}</option>)}</select><ChevronDown size={13}/></label>
     {canEdit&&<button className="okr-button okr-button-muted" onClick={()=>{setSelectedId(null);setCycleManagerOpen(true);setError('');setFeedback('');}}><CalendarDays size={15}/>مدیریت دوره‌ها</button>}
     {canEdit&&<button className="okr-button okr-button-primary" onClick={()=>showForm('objective')}><Plus size={17}/>هدف جدید</button>}
    </div>
   </header>
+  <nav className="process-workspace-tabs" aria-label="بخش‌های مدیریت OKR">{(['strategy','goals','monitor']as Tab[]).map((t,i)=><button key={t} className={tab===t?'active':''} aria-current={tab===t?'page':undefined} onClick={()=>{setTab(t);setSelectedId(null);}}>{i===0?<Network size={17}/>:i===1?<Target size={17}/>:<ChartColumnIncreasing size={17}/>}<span>{titleByTab[t]}</span></button>)}</nav>
   {feedback&&<p className="okr-feedback" role="status">{feedback}<button onClick={()=>setFeedback('')} aria-label="بستن پیام">×</button></p>}
   {error&&!form&&<p className="okr-error" role="alert">{error}<button onClick={()=>setError('')}>×</button></p>}
   {canEdit&&<details className="okr-pillar-management">
@@ -260,8 +261,8 @@ export function OkrWorkspace({data}:{data:Data}){
     <span>{axis.name}</span><small>{axis.active?'فعال':'غیرفعال'}</small>
    </label></li>)}</ul>:<p>هنوز محوری تعریف نشده است.</p>}
   </details>}
-  <nav className="okr-tabs" aria-label="بخش‌های مدیریت OKR">{(['strategy','goals','monitor']as Tab[]).map((t,i)=><button key={t} className={tab===t?'active':''} aria-current={tab===t?'page':undefined} onClick={()=>{setTab(t);setSelectedId(null);}}>{i===0?<Network size={17}/>:i===1?<Target size={17}/>:<ChartColumnIncreasing size={17}/>}<span>{titleByTab[t]}</span></button>)}</nav>
-  {cycle?<div className="okr-current-cycle"><span><Clock3 size={15}/>دوره انتخاب‌شده: <b>{cycle.title}</b></span><span>{cycle.status==='ACTIVE'?'فعال':cycle.status==='PLANNING'?'برنامه‌ریزی':'بسته‌شده'} · {number.format(objectives.length)} هدف</span></div>:<p className="okr-empty">برای شروع، از «مدیریت دوره‌ها» یک دوره هدف‌گذاری بسازید.</p>}
+
+  {cycle?<div className="okr-current-cycle"><span>{cycle.status==='ACTIVE'?'فعال':cycle.status==='PLANNING'?'برنامه‌ریزی':'بسته‌شده'} · {number.format(objectives.length)} هدف</span></div>:<p className="okr-empty">برای شروع، از «مدیریت دوره‌ها» یک دوره هدف‌گذاری بسازید.</p>}
   {tab==='strategy'?strategy:tab==='goals'?goals:monitoring}
   {selected&&<div className="okr-backdrop" onPointerDown={e=>{if(e.target===e.currentTarget)setSelectedId(null);}}><aside role="dialog" aria-modal="true" aria-label="جزئیات هدف OKR" className="okr-detail">
    <header><div><span className="okr-code">{selected.code}</span><h2>{selected.title}</h2><p>{owner(selected)} · {cycle?.title}{selected.pillar&&<> · {selected.pillar}</>}</p></div><button className="okr-icon-button" aria-label="بستن جزئیات" onClick={()=>setSelectedId(null)}><X size={20}/></button></header>

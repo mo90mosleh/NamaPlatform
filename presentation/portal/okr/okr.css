@@ -21,10 +21,6 @@
 .okr-feedback,.okr-error{display:flex;justify-content:space-between;align-items:center;gap:6px;border-radius:8px;padding:9px 12px;margin:6px 0 12px;font-size:11px;background:#ebf6f0;color:#317353}
 .okr-error{background:#fff0f0;color:#a23c47}
 .okr-feedback button,.okr-error button{background:transparent;border:0;color:inherit;cursor:pointer;font-size:18px}
-.okr-tabs{display:flex;align-items:stretch;gap:5px;border-bottom:1px solid #dfe8e2;overflow-x:auto;scrollbar-width:thin;margin-bottom:14px}
-.okr-tabs button{display:inline-flex;align-items:center;gap:7px;background:transparent;border:0;border-bottom:2px solid transparent;color:#7d8c81;padding:11px 14px;font-size:12px;white-space:nowrap;cursor:pointer}
-.okr-tabs button:hover{background:#f2f5f2}
-.okr-tabs button.active{border-color:var(--okr-accent);color:var(--okr-accent);font-weight:700;background:#fff8f8}
 .okr-current-cycle{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:10px;color:#89988e;margin-bottom:16px}
 .okr-current-cycle span:first-child{display:inline-flex;gap:6px;align-items:center}
 .okr-current-cycle b{color:#415d4a}
@@ -149,7 +145,6 @@
 @media(max-width:1100px){.okr-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.okr-bottom-grid,.okr-monitor-grid{grid-template-columns:1fr}.okr-map-children{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){
  .okr-heading h1{font-size:20px}
- .okr-heading-actions{width:100%}
  .okr-heading-actions .okr-cycle-control{flex:1 1 auto}
  .okr-heading-actions .okr-cycle-control select{flex:1;min-width:100px}
  .okr-button{min-height:40px}
@@ -160,7 +155,6 @@
  .okr-map-children{grid-template-columns:1fr}
  .okr-metric{min-height:98px;padding:11px}
  .okr-metric strong{font-size:22px}
- .okr-tabs button{padding:10px;font-size:11px}
  .okr-list-row{grid-template-columns:minmax(0,1fr) 72px;gap:8px}
  .okr-list-row>.okr-status{display:none}
  .okr-list-progress small{text-align:left}
@@ -185,7 +179,7 @@
 .okr-workspace .okr-heading p:not(.okr-eyebrow),.okr-workspace .okr-current-cycle,.okr-workspace .okr-metric span{color:var(--text-secondary,var(--okr-muted))}
 .okr-workspace .okr-goal-card,.okr-workspace .okr-list-row,.okr-workspace .okr-result{border-color:var(--line,#dce3eb);color:var(--ink)}
 .okr-workspace .okr-detail,.okr-workspace .okr-form{border-radius:var(--radius-dialog,20px)}
-.okr-workspace .okr-tabs button.active,.okr-workspace .okr-detail-tabs button.active{color:var(--action,var(--okr-accent));border-color:var(--action,var(--okr-accent))}
+.okr-workspace .okr-detail-tabs button.active{color:var(--action,var(--okr-accent));border-color:var(--action,var(--okr-accent))}
 
 
 /* Compact, single-layer cycle directory; creation form opens above this dialog. */
