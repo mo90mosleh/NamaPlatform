@@ -1,4 +1,5 @@
 import type {Data} from './types';
+import {categories, emptyGovernance, raciRoles, sampleGovernance, type Governance} from './process-governance';
 
 const modeKey = 'nama-demo-admin';
 const editsKey = 'nama-demo-edits-v1';
@@ -14,7 +15,7 @@ export function setDemoAdmin(active: boolean) {
 }
 
 type EditableData = Pick<Data, 'organization' | 'units' | 'positions' | 'persons' |
-  'assignments' | 'profiles' | 'trainingVideos'>;
+  'assignments' | 'profiles' | 'trainingVideos' | 'governance'>;
 
 function readEdits(): Partial<EditableData> {
   try { return JSON.parse(localStorage.getItem(editsKey) ?? '{}') ?? {}; }
@@ -22,7 +23,8 @@ function readEdits(): Partial<EditableData> {
 }
 
 export function applyDemoEdits(data: Data): Data {
-  return {...data, ...readEdits(), user: demoAdminActive()
+  const edits = readEdits();
+  return {...data, ...edits, governance: {...sampleGovernance(data), ...edits.governance}, user: demoAdminActive()
     ? {name: 'مدیر دمو', email: '', role: 'ADMIN'}
     : data.user};
 }
@@ -61,6 +63,21 @@ export function updateDemoData(data: Data, path: string, method: string, value?:
   const edits = readEdits();
   if (kind === 'organization' && method === 'PATCH') {
     edits.organization = {...organization, ...fields(value, ['name', 'display_name', 'primary_color', 'logo_data_url'])};
+  } else if (kind === 'process-governance' && method === 'PUT' && id && data.nodes.some(node => node.id === id && node.kind === 'PROCESS')) {
+    const change = value as Partial<Governance>;
+    const next = {...(data.governance?.[id] ?? emptyGovernance), ...change};
+    const validPosition = (position: string) => positions.some(row => row.id === position);
+    if (next.apqc && !categories.some(([code]) => code === next.apqc)) throw Error('دسته APQC معتبر نیست.');
+    if (next.raci.some(row => {
+      const roles = Object.values(row.roles);
+      return !row.activity.trim() || !roles.includes('R') || roles.filter(role => role === 'A').length !== 1
+        || Object.entries(row.roles).some(([position, role]) => !validPosition(position) || !Object.hasOwn(raciRoles, role));
+    })) throw Error('هر فعالیت باید دست‌کم یک مسئول اجرا و دقیقاً یک سمت پاسخ‌گو داشته باشد.');
+    if (next.doa.some(row => !row.decision.trim() || !row.condition.trim() || !validPosition(row.position)
+      || (row.escalation && (!validPosition(row.escalation) || row.escalation === row.position)))) {
+      throw Error('تصمیم، شرط و سمت دارای اختیار را تکمیل کنید. سمت ارجاع باید متفاوت باشد.');
+    }
+    edits.governance = {...edits.governance, [id]: next};
   } else if (kind === 'profiles' && method === 'PUT' && data.nodes.some(node => node.id === id && node.kind === 'PROCESS')) {
     const profile = {
       ...profiles.find(row => row.process_id === id), process_id: id,
@@ -76,7 +93,9 @@ export function updateDemoData(data: Data, path: string, method: string, value?:
     let next: RecordRow[];
     if (method === 'DELETE' && current) {
       const hasDependency = kind === 'org-units' && (units.some(u => u.parent_id === id) || positions.some(p => p.org_unit_id === id) || data.nodes.some(n => n.owner_org_unit_id === id) || data.kpiOrgLinks?.some(l => l.org_unit_id === id))
-        || kind === 'positions' && (positions.some(p => p.reports_to_position_id === id) || assignments.some(a => a.position_id === id) || data.kpiOrgLinks?.some(l => l.position_id === id))
+        || kind === 'positions' && (positions.some(p => p.reports_to_position_id === id)
+          || Object.values(data.governance ?? {}).some(record => record.raci.some(row => Object.hasOwn(row.roles, id))
+            || record.doa.some(row => row.position === id || row.escalation === id)) || assignments.some(a => a.position_id === id) || data.kpiOrgLinks?.some(l => l.position_id === id))
         || kind === 'persons' && (assignments.some(a => a.person_id === id) || data.kpis.some(k => 'owner_person_id' in k && k.owner_person_id === id));
       if (hasDependency) throw Error('این رکورد وابستگی دارد و قابل حذف نیست.');
       next = rows.filter(row => row.id !== id);

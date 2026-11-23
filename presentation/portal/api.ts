@@ -21,7 +21,7 @@ export async function loadData():Promise<Data>{
    const response=await fetch(config.url+'/rest/v1/nama_demo_snapshot?select=data&id=eq.1',{headers:{apikey:config.publishableKey},signal:AbortSignal.timeout(6000)});
    if(response.ok){
     const [row]=await response.json();
-    if(row?.data?.organization?.id)return normalize(row.data);
+    if(row?.data?.organization?.id){const data=normalize(row.data);return config.demoManagement?applyDemoEdits(data):data;}
    }
   }catch{/* The packaged demo remains available offline. */}
  }

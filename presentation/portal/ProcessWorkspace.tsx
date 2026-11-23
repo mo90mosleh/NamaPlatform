@@ -1,17 +1,25 @@
 import{lazy,Suspense}from'react';
-import{Layers3,GitBranch,ClipboardList}from'lucide-react';
+import{Layers3,GitBranch,ClipboardList,Tags,UsersRound,ShieldCheck}from'lucide-react';
+import {config} from './api';
+import type {GovernanceSection} from './process-governance';
 import type{Data}from'./types';
 import{Link}from'./ui';
 const Architecture=lazy(()=>import('./Architecture').then(module=>({default:module.Architecture})));
 const ProcessCatalog=lazy(()=>import('./ProcessCatalog').then(module=>({default:module.ProcessCatalog})));
 const ProcessMap=lazy(()=>import('./ProcessMap').then(module=>({default:module.ProcessMap})));
 const ProcessProfile=lazy(()=>import('./ProcessDetail').then(module=>({default:module.ProcessProfile})));
+const GovernanceOverview = lazy(() => import('./ProcessGovernance').then(module => ({default: module.GovernanceOverview})));
 import'./process-workspace.css';
-export type ProcessWorkspaceSection='architecture'|'map'|'catalog';
+export type ProcessWorkspaceSection='architecture'|'map'|'catalog'|GovernanceSection;
 const tabs:[ProcessWorkspaceSection,string,string,typeof Layers3][]=[
  ['architecture','معماری فرآیندها','/architecture',Layers3],
  ['map','نقشه فرآیندها','/process-map',GitBranch],
- ['catalog','شناسنامه فرآیندها','/processes',ClipboardList]
+ ['catalog','شناسنامه فرآیندها','/processes',ClipboardList],
+ ...(config.demoManagement ? [
+   ['apqc','APQC','/process-governance/apqc',Tags],
+   ['raci','ماتریس RACI','/process-governance/raci',UsersRound],
+   ['doa','ماتریس DOA','/process-governance/doa',ShieldCheck],
+ ] satisfies [ProcessWorkspaceSection,string,string,typeof Layers3][] : [])
 ];
 export function ProcessWorkspace({data,section,refresh,detailId}:{data:Data;section:ProcessWorkspaceSection;refresh:()=>Promise<void>;detailId?:string}){
  return <div className="process-workspace">
@@ -20,7 +28,7 @@ export function ProcessWorkspace({data,section,refresh,detailId}:{data:Data;sect
    {tabs.map(([id,label,to,Icon])=><Link key={id} to={to} className={section===id?'active':''} ariaLabel={label}><Icon size={17}/><span>{label}</span></Link>)}
   </nav>
   <section className="process-workspace-body" aria-label={tabs.find(x=>x[0]===section)?.[1]}>
-   <Suspense fallback={<p className="loading" role="status">در حال دریافت بخش فرآیندها…</p>}>{section==='architecture'?<Architecture data={data} embedded/>:section==='map'?<ProcessMap data={data} refresh={refresh}/>:detailId?<ProcessProfile key={detailId} data={data} id={detailId} refresh={refresh}/>:<ProcessCatalog data={data} embedded/>}</Suspense>
+   <Suspense fallback={<p className="loading" role="status">در حال دریافت بخش فرآیندها…</p>}>{section==='architecture'?<Architecture data={data} embedded/>:section==='map'?<ProcessMap data={data} refresh={refresh}/>:section!=='catalog'?<GovernanceOverview key={section} data={data} section={section}/>:detailId?<ProcessProfile key={detailId} data={data} id={detailId} refresh={refresh}/>:<ProcessCatalog data={data} embedded/>}</Suspense>
   </section>
  </div>;
 }

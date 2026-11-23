@@ -1,0 +1,18 @@
+.governance-panel { padding: clamp(1rem, 3vw, 1.5rem); }
+.governance-panel h2 { margin-block-start: 0; }
+.governance-panel, .governance-content { min-width: 0; }
+.governance-scroll { overflow-x: auto; margin-block: .8rem; }
+.governance-scroll table { border-collapse: collapse; width: 100%; }
+.governance-scroll th, .governance-scroll td {
+  padding: .65rem .8rem;
+  border-block-end: 1px solid var(--line, #e2e8f0);
+  text-align: start;
+  min-width: 6rem;
+}
+.governance-scroll thead th { background: var(--surface-muted, #f4f7f7); }
+.governance-scroll tbody th { min-width: 11rem; }
+.governance-content label, .governance-panel label { display: grid; gap: .35rem; max-width: 24rem; }
+.governance-content select, .governance-content input, .governance-panel select { width: 100%; }
+.governance-form { display: grid; gap: .8rem; margin-block: 1rem; }
+.governance-fields { display: grid; gap: .65rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); }
+.governance-legend, .governance-actions { display: flex; flex-wrap: wrap; gap: .65rem 1rem; }
