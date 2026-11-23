@@ -1,15 +1,18 @@
-import json, sqlite3, uuid
+import base64, json, sqlite3, uuid
 from pathlib import Path
 def uid(key): return str(uuid.uuid5(uuid.NAMESPACE_URL,'namaplatform-demo/'+key))
 org=uid('org')
-d=dict(organization=dict(id=org,name='پارس تجهیز آریا',display_name='پارس تجهیز آریا',primary_color='#116a65',logo_data_url=None),user=dict(name='مشاهده‌گر دمو',email='',role='VIEWER'))
+presentation = Path(__file__).resolve().parents[1]
+logo = (presentation / 'portal/assets/pars-tajhiz-arya.png').read_bytes()
+logo_url = 'data:image/png;base64,' + base64.b64encode(logo).decode('ascii')
+d=dict(organization=dict(id=org,name='پارس تجهیز آریا',display_name='پارس تجهیز آریا',primary_color='#116a65',logo_data_url=logo_url),user=dict(name='مشاهده‌گر دمو',email='',role='VIEWER'))
 for k in 'units positions persons assignments nodes profiles kpis links documents references relations requirements kpiOrgLinks'.split(): d[k]=[]
 units=['مدیریت عامل','فروش','برنامه‌ریزی تولید','تدارکات','تولید','کنترل کیفیت','انبار و لجستیک','خدمات مشتری','مالی','منابع انسانی']
 for i,name in enumerate(units):
  u=uid(f'u{i}'); p=uid(f'p{i}'); person=uid(f'person{i}')
  d['units'].append(dict(id=u,name=name,code=f'U{i:02}',sort_order=i,parent_id=uid('u0') if i else None,organization_id=org))
  d['positions'].append(dict(id=p,title='مدیر عامل' if not i else 'مسئول '+name,org_unit_id=u,reports_to_position_id=uid('p0') if i else None))
- d['persons'].append(dict(id=person,display_name=['آرمان نیک‌روش','نیلوفر شکیبا','سپهر روشن','بهار فلاح','کاوه امید','آوا صالح','سام راد','ترانه مهر','مانی آزاد','مینا بهروش'][i]))
+ d['persons'].append(dict(id=person,display_name=['آرمان نیک‌روش','نیلوفر شکیبا','سپهر روشن','بهار فلاح','کاوه امید','آوا صالح','سام راد','ترانه مهر','مانی آزاد','مینا بهروش'][i],phone=f'+1 202 555 01{i:02}',extension=str(301+i)))
  d['assignments'].append(dict(id=uid(f'a{i}'),person_id=person,position_id=p))
 groups=[('CORE','عملیات اصلی'),('MANAGEMENT','راهبری'),('SUPPORT','پشتیبانی')]
 for key,name in groups:d['nodes'].append(dict(id=uid(key),name=name,code=key,kind='GROUP',classification=key,parent_id=None))
@@ -41,8 +44,64 @@ for i,(owner,name,inp,out,kpi,unit,base,target,current,formula) in enumerate(row
   obj=uid('o'+str(0 if i==5 else 1 if i in [1,3,4] else 2));kr=uid(f'kr{i}')
   okr['keyResults'].append(dict(id=kr,objectiveId=obj,title=kpi,baseline=base,target=target,current=current,unit=unit,kpiId=ki,weight=1))
   okr['checkins'].append(dict(id=uid(f'ci{i}'),keyResultId=kr,objectiveId=obj,previous=base,value=current,confidence='ON_TRACK',note='اندازه‌گیری آزمایشی آبان',createdAt='2026-11-12T09:00:00Z'))
+# Use different mixes of processes and indicators so each chart mode shows a distinct pattern.
+extra_processes = [
+ (1, 'CORE', 'تهیه پیش‌فاکتور', 'استعلام مشتری', 'پیش‌فاکتور ارسال‌شده'),
+ (1, 'CORE', 'بازنگری شرایط قرارداد', 'پیش‌نویس قرارداد', 'شرایط تأییدشده'),
+ (2, 'CORE', 'بررسی ظرفیت تولید', 'بار سفارش‌های باز', 'ظرفیت قابل تخصیص'),
+ (3, 'CORE', 'ارزیابی تأمین‌کننده', 'سوابق خرید و تحویل', 'فهرست تأمین‌کنندگان تأییدشده'),
+ (4, 'CORE', 'آماده‌سازی ایستگاه مونتاژ', 'دستور تولید', 'ایستگاه آماده'),
+ (4, 'CORE', 'ساخت قطعات فلزی', 'مواد اولیه آماده', 'قطعات ساخته‌شده'),
+ (4, 'CORE', 'آزمون عملکرد حین تولید', 'محصول در حال مونتاژ', 'نتیجه آزمون ثبت‌شده'),
+ (4, 'CORE', 'بازکاری قطعات نامنطبق', 'گزارش عدم انطباق تولید', 'قطعه بازکاری‌شده'),
+ (4, 'CORE', 'بسته‌بندی محصول', 'محصول آزادشده', 'محصول بسته‌بندی‌شده'),
+ (5, 'CORE', 'بازرسی مواد ورودی', 'محموله دریافتی', 'مجوز ورود به انبار'),
+ (5, 'CORE', 'رسیدگی به عدم انطباق', 'گزارش بازرسی', 'اقدام اصلاحی ثبت‌شده'),
+ (6, 'CORE', 'کنترل موجودی انبار', 'فهرست اقلام انبار', 'موجودی شمارش‌شده'),
+ (6, 'CORE', 'آماده‌سازی سفارش برای بارگیری', 'حواله خروج', 'سفارش آماده بارگیری'),
+ (6, 'CORE', 'مدیریت مرجوعی کالا', 'مجوز مرجوعی', 'رسید کالای برگشتی'),
+ (7, 'CORE', 'دریافت و دسته‌بندی درخواست مشتری', 'پیام مشتری', 'درخواست ارجاع‌شده'),
+ (8, 'SUPPORT', 'تطبیق دریافت‌های بانکی', 'گردش حساب بانکی', 'دریافت تطبیق‌داده‌شده'),
+]
+for i, (owner, group, name, inputs, outputs) in enumerate(extra_processes, start=len(rows)):
+ node = uid(f'n{i}')
+ d['nodes'].append(dict(id=node, code=f'P-{i+1:02}', name=name, kind='PROCESS',
+                        classification=group, parent_id=uid(group), owner_org_unit_id=uid(f'u{owner}'),
+                        summary=f'از {inputs} تا {outputs}'))
+ d['profiles'].append(dict(id=uid(f'pr{i}'), process_id=node, objective=f'تحویل {outputs}',
+                           start_event=inputs, end_event=outputs, inputs=inputs, outputs=outputs,
+                           roles=units[owner], expected_outcome=outputs, notes='سناریوی ساختگی برای ارائه نما'))
+
+# Each index refers to the corresponding process in the combined list.
+extra_kpis = [
+ (1, 10, 'نرخ تبدیل پیش‌فاکتور به سفارش', 'درصد', 35, 'HIGHER', 'تعداد پیش‌فاکتورهای تبدیل‌شده ÷ تعداد پیش‌فاکتورهای ارسال‌شده × ۱۰۰'),
+ (1, 0, 'سهم سفارش‌های بدون اصلاح', 'درصد', 98, 'HIGHER', 'تعداد سفارش‌های تأییدشده بدون اصلاح ÷ کل سفارش‌های تأییدشده × ۱۰۰'),
+ (3, 13, 'پوشش ارزیابی تأمین‌کنندگان', 'درصد', 95, 'HIGHER', 'تعداد تأمین‌کنندگان فعال دارای ارزیابی معتبر ÷ کل تأمین‌کنندگان فعال × ۱۰۰'),
+ (4, 14, 'زمان آماده‌سازی ایستگاه', 'دقیقه', 20, 'LOWER', 'مجموع دقیقه آماده‌سازی ÷ تعداد دفعات آماده‌سازی'),
+ (5, 19, 'نرخ پذیرش مواد ورودی', 'درصد', 97, 'HIGHER', 'تعداد محموله‌های پذیرفته‌شده ÷ کل محموله‌های بازرسی‌شده × ۱۰۰'),
+ (5, 20, 'زمان بستن عدم انطباق', 'روز', 5, 'LOWER', 'مجموع روز تا بستن گزارش ÷ تعداد گزارش‌های بسته‌شده'),
+ (5, 4, 'نرخ برگشت از بازرسی نهایی', 'درصد', 2, 'LOWER', 'تعداد محصولات برگشتی از بازرسی نهایی ÷ کل محصولات بازرسی‌شده × ۱۰۰'),
+ (5, 20, 'نرخ تکرار عدم انطباق', 'درصد', 3, 'LOWER', 'تعداد موارد تکراری ÷ کل موارد ثبت‌شده × ۱۰۰'),
+ (6, 21, 'دقت موجودی انبار', 'درصد', 98, 'HIGHER', 'تعداد اقلام با موجودی منطبق ÷ تعداد اقلام شمارش‌شده × ۱۰۰'),
+ (6, 22, 'زمان آماده‌سازی سفارش', 'ساعت', 8, 'LOWER', 'مجموع ساعت آماده‌سازی ÷ تعداد سفارش‌های آماده‌شده'),
+ (7, 24, 'زمان پاسخ اولیه به مشتری', 'ساعت', 4, 'LOWER', 'مجموع ساعت تا نخستین پاسخ ÷ تعداد درخواست‌های پاسخ‌داده‌شده'),
+ (7, 6, 'رضایت از رسیدگی به درخواست', 'درصد', 90, 'HIGHER', 'تعداد پاسخ‌های رضایت‌بخش ÷ کل پاسخ‌های نظرسنجی × ۱۰۰'),
+ (7, 6, 'نرخ بازگشایی درخواست', 'درصد', 4, 'LOWER', 'تعداد درخواست‌های بازگشایی‌شده ÷ درخواست‌های بسته‌شده × ۱۰۰'),
+]
+for i, (owner, process, name, unit, target, direction, formula) in enumerate(extra_kpis, start=len(rows)):
+ kpi = uid(f'k{i}')
+ d['kpis'].append(dict(id=kpi, code=f'K-{i+1:02}', name=name, unit=unit,
+                       preferred_direction=direction, frequency='ماهانه', target_value=target,
+                       owner_person_id=uid(f'person{owner}'), formula_text=formula,
+                       readiness_status='READY', data_source='ثبت عملیات '+units[owner]))
+ d['links'].append(dict(process_id=uid(f'n{process}'), kpi_id=kpi))
+ d['kpiOrgLinks'].append(dict(kpi_id=kpi, org_unit_id=uid(f'u{owner}'), position_id=None))
+ # Preserve role-level examples alongside department-level indicators.
+ if i in (10, 12, 13, 15, 16, 18, 19, 20, 21, 22):
+  d['kpiOrgLinks'].append(dict(kpi_id=kpi, org_unit_id=None, position_id=uid(f'p{owner}')))
+
 d['okr']=okr
-root=Path(__file__).resolve().parents[1]/'data'
+root=presentation/'data'
 with sqlite3.connect(root/'nama-demo.sqlite3') as db:
  db.execute('CREATE TABLE IF NOT EXISTS demo_snapshot (id INTEGER PRIMARY KEY CHECK(id=1), data TEXT NOT NULL CHECK(json_valid(data)))')
  db.execute('INSERT OR REPLACE INTO demo_snapshot VALUES(1,?)',(json.dumps(d,ensure_ascii=False),))
