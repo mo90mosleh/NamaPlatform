@@ -15,9 +15,9 @@
 .chart-menu-open .nama-brand-row .chart-menu-close{align-self:center;margin:0}
 
 .demo-mode-toggle { flex: none; white-space: nowrap; }
-.topbar .demo-company-logo { width: clamp(100px, 13vw, 176px); object-fit: contain; }
+.topbar .demo-company-logo { width: clamp(74px, 8vw, 112px); object-fit: contain; }
 @media (max-width: 760px) {
   .demo-mode-toggle { width: 40px; min-height: 40px; padding: 0; justify-content: center; }
   .demo-mode-toggle span { display: none; }
-  .topbar .demo-company-logo { width: clamp(66px, 23vw, 116px); }
+  .topbar .demo-company-logo { width: clamp(50px, 17vw, 76px); }
 }
