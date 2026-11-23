@@ -12,7 +12,9 @@ for i,name in enumerate(units):
  u=uid(f'u{i}'); p=uid(f'p{i}'); person=uid(f'person{i}')
  d['units'].append(dict(id=u,name=name,code=f'U{i:02}',sort_order=i,parent_id=uid('u0') if i else None,organization_id=org))
  d['positions'].append(dict(id=p,title='مدیر عامل' if not i else 'مسئول '+name,org_unit_id=u,reports_to_position_id=uid('p0') if i else None))
- d['persons'].append(dict(id=person,display_name=['آرمان نیک‌روش','نیلوفر شکیبا','سپهر روشن','بهار فلاح','کاوه امید','آوا صالح','سام راد','ترانه مهر','مانی آزاد','مینا بهروش'][i],phone=f'+1 202 555 01{i:02}',extension=str(301+i)))
+ avatar = (presentation / 'data/avatars' / f'person{i:02}.webp').read_bytes()
+ avatar_url = 'data:image/webp;base64,' + base64.b64encode(avatar).decode('ascii')
+ d['persons'].append(dict(id=person,display_name=['آرمان نیک‌روش','نیلوفر شکیبا','سپهر روشن','بهار فلاح','کاوه امید','آوا صالح','سام راد','ترانه مهر','مانی آزاد','مینا بهروش'][i],phone=f'+1 202 555 01{i:02}',extension=str(301+i),avatar_data_url=avatar_url))
  d['assignments'].append(dict(id=uid(f'a{i}'),person_id=person,position_id=p))
 groups=[('CORE','عملیات اصلی'),('MANAGEMENT','راهبری'),('SUPPORT','پشتیبانی')]
 for key,name in groups:d['nodes'].append(dict(id=uid(key),name=name,code=key,kind='GROUP',classification=key,parent_id=None))
