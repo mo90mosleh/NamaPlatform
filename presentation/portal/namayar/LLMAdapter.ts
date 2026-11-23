@@ -102,4 +102,6 @@ export class BackendLLMAdapter implements LLMAdapter{
   }
 }
 
-export const llmAdapter:LLMAdapter=new GroqPilotAdapter();
+export const llmAdapter:LLMAdapter=window.__PORTAL_CONFIG__.demoManagement
+  ? new DisabledLLMAdapter()
+  : new GroqPilotAdapter();
