@@ -1,0 +1,18 @@
+.kpi-date-filters,.kpi-form,.kpi-actions{display:flex;align-items:end;flex-wrap:wrap;gap:.65rem}
+.kpi-date-filters label,.kpi-form label{display:grid;gap:.3rem;font-size:.8rem}
+.kpi-form,.kpi-monitor-card{padding:1rem;margin-block-end:1rem}
+.kpi-form label{min-width:0;max-width:100%}
+.kpi-form select{max-width:min(100%,23rem)}
+.kpi-form-note{flex-basis:100%;margin:0;font-size:.8rem}
+.kpi-workspace>.kpi-actions{margin-block-end:.75rem}
+.kpi-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.kpi-monitor-card header{display:flex;align-items:start;justify-content:space-between;gap:.6rem;flex-wrap:wrap}
+.kpi-monitor-card h2{font-size:1rem;margin:0}
+.kpi-monitor-card small{color:var(--text-secondary,var(--muted))}
+.kpi-plot{display:block;width:100%;max-height:14rem;color:var(--action,#16786e);margin-block:.5rem}
+.kpi-pie{width:8rem;aspect-ratio:1;border-radius:50%;margin:1rem auto}
+.kpi-chart-values{font-size:.82rem;margin-block:.5rem}
+.kpi-chart-values summary{cursor:pointer}
+.kpi-chart-values ul{padding-inline-start:1.25rem}
+.kpi-chart-values i{display:inline-block;width:.75em;height:.75em;border-radius:50%;margin-inline-end:.4em}
+@media(max-width:680px){.kpi-card-grid{grid-template-columns:minmax(0,1fr)}}
