@@ -2,20 +2,22 @@ import {useEffect, useState, type FormEvent, type ReactNode} from 'react';
 import {ChartNoAxesCombined, ClipboardList, Plus, Save} from 'lucide-react';
 import type {Data, KPI} from './types';
 import {number} from './ui';
+import {JalaliDatePicker} from './JalaliDatePicker';
+import {PowerBiIcon, PowerBiReports, type PowerBiReport} from './PowerBiReports';
 import './kpi-monitoring.css';
 
 type ChartKind = 'line' | 'bar' | 'pie';
 type Card = {id: string; kpiId: string; kind: ChartKind};
 type Revision = {value: number; note: string; actor: string; savedAt: string};
 type Measurement = {kpiId: string; date: string; revisions: Revision[]};
-type Model = {cards: Card[]; measurements: Measurement[]};
+type Model = {cards: Card[]; measurements: Measurement[]; reports: PowerBiReport[]};
 
-const empty: Model = {cards: [], measurements: []};
+const empty: Model = {cards: [], measurements: [], reports: []};
 const charts = {line: 'خطی', bar: 'میله‌ای', pie: 'دایره‌ای'} as const;
 const tabs = [
   ['dashboard', 'داشبورد شاخص‌ها', ChartNoAxesCombined],
   ['profiles', 'شناسنامه شاخص‌ها', ClipboardList],
-  ['entry', 'ثبت مقادیر', Save],
+  ['power-bi', 'پاور بی‌آی', PowerBiIcon],
 ] as const;
 const colors = ['#16786e', '#406ea8', '#a65b16', '#8e54a1', '#a34755', '#517344'];
 const dates = new Intl.DateTimeFormat('fa-IR', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Tehran'});
@@ -27,7 +29,7 @@ function storageKey(data: Data) { return 'nama-kpi-monitoring-v1:' + data.organi
 function read(key: string): Model {
   try {
     const saved = JSON.parse(localStorage.getItem(key) ?? 'null');
-    if (Array.isArray(saved?.cards) && Array.isArray(saved?.measurements)) return saved;
+    if (Array.isArray(saved?.cards) && Array.isArray(saved?.measurements)) return {...saved, reports: Array.isArray(saved.reports) ? saved.reports : []};
   } catch {}
   return empty;
 }
@@ -90,6 +92,7 @@ export function KpiMonitoring({data, profiles}: {data: Data; profiles: (values: 
   const [tab, setTab] = useState<(typeof tabs)[number][0]>('dashboard');
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
+  const [entryOpen, setEntryOpen] = useState(false);
   const [entryKpi, setEntryKpi] = useState('');
   const [entryDate, setEntryDate] = useState('');
   const [value, setValue] = useState('');
@@ -152,8 +155,8 @@ export function KpiMonitoring({data, profiles}: {data: Data; profiles: (values: 
     <header className="process-workspace-header" data-tour="page-heading">
       <h1>شاخص‌های ارزیابی عملکرد</h1>
       {tab === 'dashboard' && <div className="kpi-date-filters">
-        <label>از تاریخ<input type="date" value={start} onChange={event => setStart(event.target.value)}/></label>
-        <label>تا تاریخ<input type="date" value={end} onChange={event => setEnd(event.target.value)}/></label>
+        <JalaliDatePicker label="از تاریخ" value={start} onChange={setStart}/>
+        <JalaliDatePicker label="تا تاریخ" value={end} onChange={setEnd}/>
       </div>}
     </header>
     <nav className="process-workspace-tabs" aria-label="بخش‌های شاخص‌های عملکرد">
@@ -166,7 +169,30 @@ export function KpiMonitoring({data, profiles}: {data: Data; profiles: (values: 
     {tab === 'dashboard' && <>
       {dateError && <p role="alert" className="alert error">تاریخ پایان باید برابر یا بعد از تاریخ شروع باشد.</p>}
       <div className="kpi-actions"><button type="button" className="secondary" disabled={!data.kpis.length}
-        onClick={() => setCardDraft({id: '', kpiId: '', kind: 'line'})}><Plus size={16}/>افزودن کارت</button></div>
+        onClick={() => setCardDraft({id: '', kpiId: '', kind: 'line'})}><Plus size={16}/>افزودن کارت</button>
+        <button type="button" className="secondary" aria-expanded={entryOpen}
+          onClick={() => setEntryOpen(!entryOpen)}><Save size={16}/>ثبت مقادیر</button></div>
+    {tab === 'dashboard' && entryOpen && <>
+      {admin && <form className="panel kpi-form" onSubmit={saveMeasurement}>
+        <label>شاخص{selectKpi(entryKpi, id => {setEntryKpi(id);setValue('');setNote('');})}</label>
+        <label>تاریخ اندازه‌گیری<input type="date" required value={entryDate} onChange={event => {setEntryDate(event.target.value);setValue('');setNote('');}}/></label>
+        <label>مقدار واقعی {selected?.unit && '(' + selected.unit + ')'}<input type="number" step="any" required value={value} onChange={event => setValue(event.target.value)}/></label>
+        <label>توضیح اختیاری<input maxLength={300} value={note} onChange={event => setNote(event.target.value)}/></label>
+        {existing && <p className="kpi-form-note">مقدار فعلی این تاریخ {number.format(current(existing).value)} است. مقدار جدید همراه با سابقهٔ اصلاح ذخیره می‌شود.</p>}
+        <button className="primary"><Save size={16}/>{existing ? 'ثبت اصلاح' : 'ثبت مقدار'}</button>
+      </form>}
+      {!admin && <><p className="empty-inline">ثبت و اصلاح مقدار در حالت مدیریت در دسترس است.</p><div className="kpi-form"><label>شاخص{selectKpi(entryKpi, setEntryKpi)}</label></div></>}
+      {selected && <section className="panel kpi-monitor-card"><h2>سابقهٔ مقادیر</h2>
+        {!history.length && <p className="empty-inline">هنوز مقداری برای این شاخص ثبت نشده است.</p>}
+        {history.map(row => <details key={row.date} className="kpi-chart-values">
+          <summary>{labelDate(row.date)} · {number.format(current(row).value)} {selected.unit}</summary>
+          <ul>{[...row.revisions].reverse().map((revision, index) => <li key={index}>
+            {number.format(revision.value)} {selected.unit} · {revision.actor} · {timestamps.format(new Date(revision.savedAt))}
+            {revision.note && ' · ' + revision.note}
+          </li>)}</ul>
+        </details>)}
+      </section>}
+    </>}
       {cardDraft && <form className="panel kpi-form" onSubmit={saveCard}>
         <label>شاخص{selectKpi(cardDraft.kpiId, kpiId => setCardDraft({...cardDraft, kpiId}))}</label>
         <label>نوع نمودار<select value={cardDraft.kind} onChange={event => setCardDraft({...cardDraft, kind: event.target.value as ChartKind})}>
@@ -192,26 +218,7 @@ export function KpiMonitoring({data, profiles}: {data: Data; profiles: (values: 
         </section>;
       })}</div>
     </>}
-    {tab === 'entry' && <>
-      {admin && <form className="panel kpi-form" onSubmit={saveMeasurement}>
-        <label>شاخص{selectKpi(entryKpi, id => {setEntryKpi(id);setValue('');setNote('');})}</label>
-        <label>تاریخ اندازه‌گیری<input type="date" required value={entryDate} onChange={event => {setEntryDate(event.target.value);setValue('');setNote('');}}/></label>
-        <label>مقدار واقعی {selected?.unit && '(' + selected.unit + ')'}<input type="number" step="any" required value={value} onChange={event => setValue(event.target.value)}/></label>
-        <label>توضیح اختیاری<input maxLength={300} value={note} onChange={event => setNote(event.target.value)}/></label>
-        {existing && <p className="kpi-form-note">مقدار فعلی این تاریخ {number.format(current(existing).value)} است. مقدار جدید همراه با سابقهٔ اصلاح ذخیره می‌شود.</p>}
-        <button className="primary"><Save size={16}/>{existing ? 'ثبت اصلاح' : 'ثبت مقدار'}</button>
-      </form>}
-      {!admin && <><p className="empty-inline">ثبت و اصلاح مقدار در حالت مدیریت در دسترس است.</p><div className="kpi-form"><label>شاخص{selectKpi(entryKpi, setEntryKpi)}</label></div></>}
-      {selected && <section className="panel kpi-monitor-card"><h2>سابقهٔ مقادیر</h2>
-        {!history.length && <p className="empty-inline">هنوز مقداری برای این شاخص ثبت نشده است.</p>}
-        {history.map(row => <details key={row.date} className="kpi-chart-values">
-          <summary>{labelDate(row.date)} · {number.format(current(row).value)} {selected.unit}</summary>
-          <ul>{[...row.revisions].reverse().map((revision, index) => <li key={index}>
-            {number.format(revision.value)} {selected.unit} · {revision.actor} · {timestamps.format(new Date(revision.savedAt))}
-            {revision.note && ' · ' + revision.note}
-          </li>)}</ul>
-        </details>)}
-      </section>}
-    </>}
+    {tab === 'power-bi' && <PowerBiReports reports={model.reports} canManage={admin}
+      onAdd={report => update(saved => ({...saved, reports: [...saved.reports, report]}), 'داشبورد ذخیره شد.')}/>}
   </div>;
 }
