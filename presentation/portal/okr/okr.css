@@ -278,3 +278,8 @@ button.okr-metric:hover, button.okr-info-row:hover { background: #eef6f4; }
 .okr-axis-options { position:absolute; z-index:12; inset-inline-end:0; top:100%; min-width:170px; max-height:200px; overflow:auto; padding:8px; }
 .okr-axis-options label { display:flex; gap:6px; align-items:center; padding:5px; white-space:nowrap; }
 @media(max-width:760px) { .okr-strategy-content { grid-template-columns:1fr; } }
+@media (min-width:761px) {
+ .okr-strategy-content { max-height:calc(100dvh - 156px); overflow:auto; overscroll-behavior:contain; }
+ .okr-strategy-content .okr-panel { padding-block:8px; }
+ .okr-strategy-content .okr-tree-goal { padding-block:5px; }
+}

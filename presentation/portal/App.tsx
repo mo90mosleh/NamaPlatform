@@ -1,4 +1,5 @@
 import {ProcessIcon} from './ProcessIcon';
+import {DashboardSearch, DashboardWidgets, rememberVisit} from './DashboardWidgets';
 import {QuickLinks} from './QuickLinks';
 import {KpiMonitoring, latestKpiValue} from './KpiMonitoring';
 import './process-workspace.css';
@@ -21,17 +22,7 @@ const readiness:Record<string,string>={UNASSESSED:'بررسی‌نشده',DEFINE
 function Badge({value}:{value:string}){return <span className={'badge status-'+value.toLowerCase()}>{readiness[value]??value}</span>;}
 function Skeleton(){return <div className="loading" role="status">در حال دریافت اطلاعات…</div>;}
 function Dashboard({data}:{data:Data}) {
- const modules = [
-  ['/organization/chart','چارت سازمانی','واحدها، سمت‌ها و مسیرهای گزارش‌دهی',Network],
-  ['/architecture','فرآیندها','معماری، نقشه و شناسنامهٔ فرآیندها',ProcessIcon],
-  ['/kpis','شاخص‌ها','داشبورد پایش و شناسنامهٔ شاخص‌ها',ChartNoAxesCombined],
-  ['/okr','OKR','اهداف، نتایج کلیدی و روند تحقق',TargetArrowIcon],
- ] as const;
- return <><QuickLinks data={data}/><div className="dashboard-modules">
-   {modules.map(([to,title,description,Icon])=><Link key={to} to={to} className="panel dashboard-module">
-    <Icon size={23}/><div><h2>{title}</h2><p>{description}</p></div><ArrowLeft size={15}/>
-   </Link>)}
- </div></>;
+ return <><DashboardSearch data={data}/><QuickLinks data={data}/><DashboardWidgets data={data}/></>;
 }
 function KPIList({data,id,reportId}:{data:Data;id?:string;reportId?:string}){const [search,setSearch]=useState(''),[status,setStatus]=useState(''),[scope,setScope]=useState(''),filter=useOrganizationFilters(data,'kpis');if(id){const k=data.kpis.find(x=>x.id===id),latest=config.demoManagement?latestKpiValue(data,id):undefined;if(!k)return <Empty title="شاخص پیدا نشد" text="شاخص موردنظر در دسترس نیست."/>;return <><Heading title={k.name} description="شناسنامهٔ شاخص عملکرد" action={<bdi className="code">{k.code}</bdi>}/><div className="detail-grid"><section className="panel padded"><div className="panel-title"><h2>تعریف شاخص</h2><Badge value={k.readiness_status}/></div><p className="description">{k.description}</p><div className="formula"><small>فرمول</small><p>{k.formula_text??'ثبت نشده'}</p></div><div className="facts"><div><span>سطح ارزیابی</span><b>{kpiOrganization(data,k.id).label}</b></div><div><span>دپارتمان مرتبط</span><b>{kpiOrganization(data,k.id).units.map(u=>u.name).join('، ')||'تعیین نشده'}</b></div><div><span>سمت مرتبط</span><b>{kpiOrganization(data,k.id).roles.map(p=>p.title).join('، ')||'شاخص دپارتمان'}</b></div><div><span>واحد سنجش</span><b>{k.unit??'—'}</b></div><div><span>تناوب</span><b>{k.frequency??'—'}</b></div><div><span>منبع داده</span><b>{k.data_source??'—'}</b></div><div><span>هدف</span><b>{k.target_value==null?'تعیین نشده':number.format(k.target_value)+' '+k.unit}</b></div></div></section>{latest?<section className="panel padded"><h2>آخرین مقدار ثبت‌شده</h2><p>{number.format(latest.value)} {k.unit}</p><Link to="/kpis">داشبورد شاخص‌ها</Link></section>:<Empty title="هنوز اندازه‌گیری ثبت نشده است" text="مقدار واقعی پس از ثبت اندازه‌گیری در این بخش نمایش داده می‌شود."/>}</div><Requirements data={data} kpiId={k.id}/></>;}
  const rows=data.kpis.filter(k=>{
@@ -43,7 +34,8 @@ function SettingsPage({data,refresh}:{data:Data;refresh:()=>Promise<void>}){cons
  return <><Heading title="تنظیمات سازمان" description="نام، لوگو و رنگ فضای سازمان را مدیریت کنید."/><section className="panel settings-panel"><h2>سازمان و هویت بصری</h2><form onSubmit={save}><label>نام سازمان<input name="name" defaultValue={org.name} required maxLength={150}/></label><label>نام نمایشی سامانه<input name="display_name" defaultValue={org.display_name} required maxLength={150}/></label><label>رنگ اصلی برند<input name="primary_color" type="color" defaultValue={org.primary_color}/></label><div className="logo-preview"><img src={image===undefined?org.logo_data_url??logo:image??logo} alt="لوگوی فعلی سازمان"/></div><label>لوگوی سازمان<input type="file" aria-label="لوگوی سازمان" aria-describedby="logo-hint" accept="image/png,image/jpeg,image/webp" onChange={e=>void imageChange(e.target.files?.[0])}/><small id="logo-hint">حداکثر ۱ مگابایت؛ PNG، JPEG یا WebP</small></label>{(image||org.logo_data_url)&&<button className="text-button" type="button" onClick={()=>setImage(null)}>بازگرداندن لوگوی پیش‌فرض</button>}{error&&<p className="alert error" role="alert">{error}</p>}{success&&<p className="alert success" role="status">{success}</p>}<button className="primary" disabled={pending||encoding}><Save size={16}/>{pending?'در حال ذخیره…':encoding?'در حال آماده‌سازی تصویر…':'ذخیره تغییرات'}</button></form></section></>;
 }
 function AccessDenied({openDemo}:{openDemo?:()=>void}){if(openDemo)return <><Heading title="فضای مدیریت دمو" description="ویرایش‌ها فقط در همین مرورگر ذخیره می‌شوند."/><button className="primary" onClick={openDemo}>باز کردن فضای مدیریت</button></>;return <><Heading title="دسترسی محدود" description="این بخش فقط برای مدیر سامانه قابل دسترسی است."/><section className="panel empty"><ShieldCheck size={40}/><h2>به حساب مدیر نیاز دارید</h2><p>با حساب مجاز وارد فضای مدیریت شوید.</p>{config.adminUrl?<a className="primary" href={config.adminUrl}>ورود به فضای مدیریت</a>:<p>این نسخه برای مشاهده و ثبت بازخورد است.</p>}</section></>;}
-export function App(){const[data,setData]=useState<Data|null>(null),[error,setError]=useState(''),[path,setPath]=useState(currentPath);async function refresh(){const v=await loadData();setData(v);setError('');}useEffect(()=>{
+export function App(){const[data,setData]=useState<Data|null>(null),[error,setError]=useState(''),[path,setPath]=useState(currentPath); useEffect(()=>{if(data)rememberVisit(data,path);},[data,path]);
+async function refresh(){const v=await loadData();setData(v);setError('');}useEffect(()=>{
  let cancelled=false,liveStarted=false;
  const startLive=()=>{
   if(cancelled||liveStarted)return;

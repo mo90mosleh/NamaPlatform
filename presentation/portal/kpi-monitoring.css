@@ -45,3 +45,31 @@
 .kpi-pie-layout { display:flex; flex-wrap:wrap; align-items:center; }
 .kpi-pie-labels { max-height:130px; overflow:auto; padding-inline-start:16px; font-size:11px; list-style:none; }
 .kpi-pie-labels i { display:inline-block; width:8px; height:8px; border-radius:50%; margin-inline-end:5px; }
+
+.kpi-chart-meta { display:flex; flex-wrap:wrap; align-items:center; gap:4px 12px; }
+.kpi-chart-target::before { content:""; display:inline-block; width:16px; margin-inline-end:5px; border-top:2px dashed #9a5b2c; vertical-align:middle; }
+.power-bi-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; }
+.power-bi-card { min-height:clamp(138px,22vh,210px); padding:14px; text-align:start; display:flex; flex-direction:column; align-items:start; gap:8px; color:var(--ink); }
+.power-bi-card:hover { border-color:#bd9f49; background:#fffdf5; }
+.power-bi-card span { display:flex; align-items:center; gap:8px; }
+.power-bi-card p { margin:0; font-size:.78rem; line-height:1.8; }
+.power-bi-dialog { padding:16px; width:min(1080px,calc(100% - 28px)); max-height:90dvh; }
+.power-bi-dialog header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.power-bi-dialog::backdrop { background:#182b3b80; }
+@media (max-width:1100px) { .power-bi-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media (max-width:650px) { .power-bi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (min-width:761px) {
+  .kpi-card-grid-compact { gap:8px; }
+  .kpi-card-grid-compact .kpi-monitor-card { margin:0; padding:8px 12px; }
+  .kpi-card-grid-compact .kpi-plot { max-height:clamp(90px,calc((100dvh - 445px)/2),195px); margin:2px 0; }
+  .kpi-card-grid-compact .kpi-chart-values { margin:0; }
+  .kpi-add-card { margin-block:8px 0; }
+}
+.kpi-card-settings h2 { font-size:17px; margin:0 0 10px; }
+.kpi-card-settings .kpi-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.kpi-card-settings .kpi-form > :first-child,
+.kpi-card-settings .kpi-form-note,
+.kpi-card-dialog-actions { grid-column:1 / -1; }
+.kpi-card-settings .kpi-form select { width:100%; }
+.kpi-card-dialog-actions { display:flex; gap:8px; padding-top:8px; border-top:1px solid var(--line); }
+.kpi-chart-values[open] ul { max-height:70px; overflow:auto; }

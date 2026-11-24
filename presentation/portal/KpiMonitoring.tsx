@@ -1,5 +1,5 @@
 import {useEffect, useState, type FormEvent, type ReactNode} from 'react';
-import {LayoutDashboard, ClipboardList, Plus, Save, Pencil, Settings, Trash2} from 'lucide-react';
+import {LayoutDashboard, ClipboardList, Plus, Save, Pencil, Trash2} from 'lucide-react';
 import type {Data, KPI} from './types';
 import {latestPerPeriod} from './kpi-periods';
 import {Modal} from './Modal';
@@ -76,13 +76,27 @@ function read(key: string, initial = empty): Model {
 
 const samplePowerBiReport: PowerBiReport = {
   id: 'sample-public-esg',
-  name: 'نمونه Power BI · داشبورد ESG',
+  name: 'پایش سرمایه‌گذاری مسئولانه',
+  area: 'پایداری',
+  description: 'رصد تعهدات زیست‌محیطی، اجتماعی و حاکمیتی در سبد دارایی‌ها.',
   embed: 'https://app.powerbi.com/view?r=eyJrIjoiYjc2ZTEyZjItODI0Yi00NzY2LWJkNTMtODAwYjNlNWNjYTQ5IiwidCI6IjUwZDhjMTE1LWI3N2YtNDM5NS1hM2JhLTNiNDA3Y2FmMGQ4OCIsImMiOjh9',
   guide: 'https://democracy.lbhf.gov.uk/documents/s120652/Appendix%201%20-%20Responsible%20Investment%20Statement%20LBHF%202022.pdf',
 };
 
+const reportSamples: PowerBiReport[] = [
+  ['sales','فروش و سفارش‌ها','فروش','روند ثبت سفارش، نرخ تبدیل پیش‌فاکتور و عملکرد فروش به تفکیک منطقه.'],
+  ['capacity','ظرفیت خطوط تولید','تولید','مقایسه ظرفیت برنامه‌ریزی‌شده و تولید واقعی به تفکیک خط و شیفت.'],
+  ['suppliers','عملکرد تأمین‌کنندگان','تدارکات','نرخ تحویل به‌موقع، کیفیت ورودی و تمرکز خرید روی تأمین‌کنندگان اصلی.'],
+  ['shipping','تحویل سفارش مشتری','لجستیک','پایش سفارش‌های معوق و سهم تحویل کامل و به‌موقع به تفکیک مقصد.'],
+  ['quality','کیفیت و دوباره‌کاری','کنترل کیفیت','تحلیل نرخ قبولی در آزمون اول و بیشترین علت‌های دوباره‌کاری.'],
+  ['service','خدمات پس از فروش','خدمات مشتری','روند زمان پاسخ، نرخ بازگشایی و رضایت از رسیدگی به درخواست‌ها.'],
+  ['cash','جریان نقد و مطالبات','مالی','مانده مطالبات بر اساس سررسید و مقایسه وصول واقعی با پیش‌بینی.'],
+  ['stock','موجودی و گردش انبار','انبار','پایش کسری موجودی، اقلام کم‌گردش و دقت شمارش دوره‌ای.'],
+  ['learning','آموزش و مهارت کارکنان','منابع انسانی','پوشش آموزش ایستگاه‌های کاری و وضعیت اعتبار گواهی‌های مهارتی.'],
+].map(([id,name,area,description])=>({id:'sample-'+id,name,area,description,embed:'',guide:''}));
+
 function visibleReports(reports: PowerBiReport[]) {
-  return config.demoManagement ? [samplePowerBiReport, ...reports] : reports;
+  return config.demoManagement ? [samplePowerBiReport, ...reportSamples, ...reports] : reports;
 }
 
 export function availablePowerBiReports(data: Data) {
@@ -111,8 +125,9 @@ function Chart({kpi, card, rows}: {kpi: KPI; card: Card; rows: Measurement[]}) {
     cumulative += value / total * 100;
     return colors[index % colors.length] + ' ' + start + '% ' + cumulative + '%';
   }) : [];
-  const low = Math.min(0, ...values);
-  const high = Math.max(0, ...values);
+  const target = typeof kpi.target_value === 'number' && Number.isFinite(kpi.target_value) ? kpi.target_value : null;
+  const low = Math.min(0, target ?? 0, ...values);
+  const high = Math.max(0, target ?? 0, ...values);
   const scale = Math.max(Math.abs(low), Math.abs(high)) || 1;
   const range = high / scale - low / scale || 1;
   const y = (value: number) => 110 - (value / scale - low / scale) / range * 82;
@@ -126,6 +141,7 @@ function Chart({kpi, card, rows}: {kpi: KPI; card: Card; rows: Measurement[]}) {
     </div> :
       <svg className="kpi-plot" viewBox="0 0 345 142" aria-hidden="true" style={{color:colors[0]}}>
         <line x1="24" y1={y(0)} x2="320" y2={y(0)} stroke="currentColor" opacity=".25"/>
+        {target !== null && <line x1="24" x2="320" y1={y(target)} y2={y(target)} stroke="#9a5b2c" strokeDasharray="4 3"/>}
         {kind === 'line' && <polyline points={values.map((value, index) => x(index)+','+y(value)).join(' ')} fill="none" stroke="currentColor" strokeWidth="2"/>}
         {values.map((value, index) => <g key={points[index].index}>
           <title>{points[index].label} · {number.format(value)}</title>
@@ -136,11 +152,13 @@ function Chart({kpi, card, rows}: {kpi: KPI; card: Card; rows: Measurement[]}) {
           {index%stride===0&&<text x={x(index)} y="132" textAnchor="middle" fill="currentColor" fontSize="8">{points[index].label}</text>}
         </g>)}
       </svg>}
+    <div className="kpi-chart-meta">
+    {kind !== 'pie' && target !== null && <small className="kpi-chart-target">هدف {number.format(target)} {kpi.unit}</small>}
     <details className="kpi-chart-values"><summary>مقادیر نمودار {kpi.unit && '(' + kpi.unit + ')'}</summary>
       <ul>{points.map((point, index) => <li key={point.index}>
         {point.label} · {number.format(values[index])}
       </li>)}</ul>
-    </details>
+    </details></div>
   </>;
 }
 
@@ -155,7 +173,6 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
   const [entryDate, setEntryDate] = useState('');
   const [value, setValue] = useState('');
   const [note, setNote] = useState('');
-  const [settings, setSettings] = useState<Card | null>(null);
   const [cardDraft, setCardDraft] = useState<Card | null>(null);
   const [message, setMessage] = useState<{text: string; error?: boolean} | null>(null);
   const admin = data.user.role === 'ADMIN';
@@ -251,14 +268,13 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
     {tab === 'dashboard' && <>
       {dateError && <p role="alert" className="alert error">تاریخ پایان باید برابر یا بعد از تاریخ شروع باشد.</p>}
       {!model.cards.length && <p className="panel empty-inline">برای ساخت داشبورد، اولین کارت را اضافه کنید.</p>}
-      <div className="kpi-card-grid">{model.cards.map(card => {
+      <div className={'kpi-card-grid'+(model.cards.length<=4?' kpi-card-grid-compact':'')}>{model.cards.map(card => {
         const kpi = data.kpis.find(item => item.id === card.kpiId);
         const rows = dateError ? [] : model.measurements.filter(row => row.kpiId === card.kpiId &&
           (!start || row.date >= start) && (!end || row.date <= end)).sort((a, b) => a.date.localeCompare(b.date));
         return <section className="panel kpi-monitor-card" key={card.id}>
           <header><div><h2>{kpi?.name ?? 'شاخص در دسترس نیست'}</h2><small>{charts[card.kind]}{rows.some(row => current(row).actor === 'دمو') && ' · داده نمونه'}{kpi?.unit && ' · ' + kpi.unit}</small></div>
             <div className="kpi-actions"><button className="icon-button" type="button" title="ویرایش" aria-label="ویرایش" onClick={() => setCardDraft(card)}><Pencil size={16}/></button>
-              <button className="icon-button" type="button" title="تنظیمات نمودار" aria-label="تنظیمات نمودار" onClick={()=>setSettings(card)}><Settings size={16}/></button>
               <button className="icon-button" type="button" title="حذف کارت" aria-label="حذف کارت" onClick={() => {
                 if (update(model => ({...model, cards: model.cards.filter(item => item.id !== card.id)}), 'کارت حذف شد.') && cardDraft?.id === card.id) setCardDraft(null);
               }}><Trash2 size={16}/></button></div>
@@ -276,23 +292,14 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
           {Object.entries(charts).map(([id, title]) => <option key={id} value={id}>{title}</option>)}
         </select></label>
         {cardDraft.kind === 'pie' && <p className="kpi-form-note">فقط برای شاخص‌هایی انتخاب کنید که مجموع مقادیر تاریخ‌های انتخاب‌شده معنادار است.</p>}
-        <button className="primary">ذخیرهٔ کارت</button>
-        <button type="button" className="secondary" onClick={() => setCardDraft(null)}>انصراف</button>
-      </form></Modal>}
-    </>}
-    {settings&&<Modal className="kpi-card-settings panel" label="تنظیمات نمودار" onClose={()=>setSettings(null)}>
-      <h2>تنظیمات نمودار</h2>
-      <form className="kpi-form" onSubmit={event=>{
-        event.preventDefault();
-        if(update(model=>({...model,cards:model.cards.map(card=>card.id===settings.id?{...card,labels:settings.labels,theme:settings.theme}:card)}),'تنظیمات نمودار ذخیره شد.'))setSettings(null);
-      }}>
-        <label>تم رنگی<select value={settings.theme??'ocean'} onChange={event=>setSettings({...settings,theme:event.target.value as Theme})}>
+        <label>تم رنگی<select value={cardDraft.theme??'ocean'} onChange={event=>setCardDraft({...cardDraft,theme:event.target.value as Theme})}>
           {Object.entries(themes).map(([id,theme])=><option key={id} value={id}>{theme.name}</option>)}
         </select></label>
-        <label className="kpi-label-option"><input type="checkbox" checked={settings.labels??true} onChange={event=>setSettings({...settings,labels:event.target.checked})}/>نمایش برچسب داده</label>
-        <button className="primary">ذخیره تنظیمات</button><button type="button" className="secondary" onClick={()=>setSettings(null)}>انصراف</button>
-      </form>
-    </Modal>}
+        <label className="kpi-label-option"><input type="checkbox" checked={cardDraft.labels??true} onChange={event=>setCardDraft({...cardDraft,labels:event.target.checked})}/>نمایش برچسب داده</label>
+        <div className="kpi-card-dialog-actions"><button className="primary">ذخیرهٔ کارت</button>
+        <button type="button" className="secondary" onClick={() => setCardDraft(null)}>انصراف</button></div>
+      </form></Modal>}
+    </>}
     {tab === 'power-bi' && <PowerBiReports reportId={reportId} reports={visibleReports(model.reports)} canManage={admin}
       onAdd={report => update(saved => ({...saved, reports: [...saved.reports, report]}), 'داشبورد ذخیره شد.')}/>}
   </div>;

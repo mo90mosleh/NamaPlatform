@@ -57,5 +57,6 @@ await writeFile('pages/index.html',publicHtml);
 await writeFile('pages/.nojekyll','');
 for(const file of ['favicon.svg','favicon.ico','apple-touch-icon.png']) await cp('portal/assets/'+file,'pages/'+file);
 await cp('portal/assets/OFL.txt','pages/FONT-LICENSE.txt');
+await cp('data/APQC-ATTRIBUTION.txt','pages/APQC-ATTRIBUTION.txt');
 await cp('data/nama-demo.json','pages/nama-demo.json');
 await import('./build-licenses.mjs');

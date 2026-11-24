@@ -1,3 +1,4 @@
+import {withDemoSamples} from "./demo-samples";
 import {apqcByCode} from './apqc-reference';
 import type {Data} from './types';
 import {emptyGovernance, raciRoles, sampleGovernance, type Governance} from './process-governance';
@@ -25,7 +26,7 @@ function readEdits(): Partial<EditableData> {
 
 export function applyDemoEdits(data: Data): Data {
   const edits = readEdits();
-  return {...data, ...edits, governance: {...sampleGovernance(data), ...edits.governance}, user: demoAdminActive()
+  return {...withDemoSamples(data), ...edits, governance: {...sampleGovernance(data), ...edits.governance}, user: demoAdminActive()
     ? {name: 'مدیر دمو', email: '', role: 'ADMIN'}
     : data.user};
 }

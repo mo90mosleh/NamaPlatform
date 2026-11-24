@@ -1,6 +1,7 @@
 import {useState, type FormEvent} from 'react';
+import {Modal} from './Modal';
 
-export type PowerBiReport = {id: string; name: string; embed: string; guide: string};
+export type PowerBiReport = {id: string; name: string; embed: string; guide: string; area?: string; description?: string};
 
 export function PowerBiIcon({size = 17}: {size?: number}) {
   return <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
@@ -27,7 +28,9 @@ export function PowerBiReports({reports, canManage, onAdd, reportId}: {
   reportId?: string; reports: PowerBiReport[]; canManage: boolean; onAdd: (report: PowerBiReport) => boolean;
 }) {
   const [adding, setAdding] = useState(false);
-  const [selectedId, setSelectedId] = useState(reportId ?? '');
+  const [selection, setSelection] = useState({route:reportId,id:reportId ?? ''});
+  const selectedId = selection.route === reportId ? selection.id : reportId ?? '';
+  const setSelectedId = (id: string) => setSelection({route:reportId,id});
   const [error, setError] = useState('');
   const selected = reports.find(report => report.id === selectedId);
   const source = selected && embedUrl(selected.embed);
@@ -43,7 +46,9 @@ export function PowerBiReports({reports, canManage, onAdd, reportId}: {
       setError('نام، نشانی جاسازی Power BI و نشانی HTTPS راهنما را بررسی کنید.');
       return;
     }
-    const report = {id: crypto.randomUUID(), name, embed, guide};
+    const area = String(data.get('area') ?? '').trim();
+    const description = String(data.get('description') ?? '').trim();
+    const report = {id: crypto.randomUUID(), name, embed, guide, area, description};
     if (onAdd(report)) {
       setSelectedId(report.id);
       setAdding(false);
@@ -58,20 +63,25 @@ export function PowerBiReports({reports, canManage, onAdd, reportId}: {
     </div>}
     {adding && canManage && <form className="panel kpi-form" onSubmit={submit}>
       <label>نام داشبورد<input name="name" required maxLength={120}/></label>
+      <label>حوزه<input name="area" maxLength={60}/></label>
+      <label>توضیح کوتاه<input name="description" maxLength={240}/></label>
       <label>لینک جاسازی Power BI<input type="url" dir="ltr" name="embed" required/></label>
       <label>لینک راهنما یا ویدئوی آموزشی<input type="url" dir="ltr" name="guide"/></label>
       <button className="primary">ذخیره داشبورد</button>
       {error && <p role="alert" className="alert error">{error}</p>}
     </form>}
-    {reports.length ? <div className="kpi-actions" aria-label="داشبوردهای Power BI">
-      {reports.map(report => <button key={report.id} type="button" className="secondary"
-        aria-pressed={report.id === selectedId} onClick={() => setSelectedId(report.id)}>{report.name}</button>)}
+    {reports.length ? <div className="power-bi-grid" aria-label="داشبوردهای Power BI">
+      {reports.map(report => <button key={report.id} type="button" className="panel power-bi-card"
+        aria-pressed={report.id === selectedId} onClick={() => setSelectedId(report.id)}><span><PowerBiIcon size={23}/><small>{report.area ?? 'Power BI'}</small></span>
+        <strong>{report.name}</strong>{report.description && <p>{report.description}</p>}</button>)}
     </div> : <p className="empty-inline">هنوز داشبوردی ثبت نشده است.</p>}
     {selectedId && !selected && <p className="empty-inline">داشبورد در دسترس نیست.</p>}
-    {selected && source && <section className="panel kpi-monitor-card">
-      <h2>{selected.name}</h2>
+    {selected && <Modal label={selected.name} className="panel power-bi-dialog" onClose={()=>setSelectedId('')}>
+      <header><h2>{selected.name}</h2><button type="button" className="secondary" onClick={()=>setSelectedId('')}>بستن</button></header>
+      {selected.description && <p>{selected.description}</p>}
       {guide && <a href={guide.href} target="_blank" rel="noopener noreferrer">راهنمای داشبورد</a>}
-      <iframe className="power-bi-frame" src={source} title={selected.name} allow="fullscreen"/>
-    </section>}
+      {source ? <iframe className="power-bi-frame" src={source} title={selected.name} allow="fullscreen"/> :
+        <small>نمونهٔ دمو</small>}
+    </Modal>}
   </>;
 }

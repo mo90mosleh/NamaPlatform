@@ -1,7 +1,7 @@
 import {Fragment} from 'react';
 import {Modal} from '../Modal';
 import{useEffect,useMemo,useRef,useState,type FormEvent}from'react';
-import{Target,Network,LayoutList,Table2,ChartNoAxesCombined,Building2,Plus,CalendarDays,ChevronLeft,ChevronDown,ChartColumnIncreasing,Activity,CheckCircle2,AlertTriangle,ArrowUpLeft,X,RefreshCw,History,GitBranch,Search,Save}from'lucide-react';
+import{Target,Network,LayoutList,Table2,ChartNoAxesCombined,Building2,Plus,CalendarDays,ChevronLeft,ChevronDown,ChartColumnIncreasing,Activity,CheckCircle2,AlertTriangle,ArrowUpLeft,X,RefreshCw,History,GitBranch,ListTree,Search,Save}from'lucide-react';
 import type{Data}from'../types';
 import{config}from'../api';
 import{Link}from'../ui';
@@ -198,7 +198,6 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
   </li>;
  }
  const strategy=<>
-  {summary}
   <div className="okr-strategy-content">
   <section className="okr-panel okr-strategy-tree">
    <div className="okr-panel-head"><h3>درخت اهداف</h3>
@@ -256,8 +255,8 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
    <select aria-label="سطح اهداف" value={scope} onChange={e=>setScope(e.target.value)}><option value="ALL">همه سطوح</option><option value="COMPANY">سازمانی</option><option value="DEPARTMENT">دپارتمانی</option></select>
    <div className="okr-view-toggle" role="group" aria-label="نمایش اهداف"><button className={listView==='tree'?'active':''} onClick={()=>setListView('tree')} aria-pressed={listView==='tree'}><LayoutList size={16}/>درختی</button><button className={listView==='table'?'active':''} onClick={()=>setListView('table')} aria-pressed={listView==='table'}><Table2 size={16}/>جدولی</button></div>
    <div className="okr-view-toggle" role="group" aria-label="نمایش نتایج کلیدی">
-    <button type="button" aria-label="فقط اهداف" aria-pressed={!showAllResults} className={!showAllResults?'active':''} onClick={()=>{setShowAllResults(false);setExpandedResults({});}}><Target size={17}/></button>
-    <button type="button" aria-label="اهداف و نتایج کلیدی" aria-pressed={showAllResults} className={showAllResults?'active':''} onClick={()=>{setShowAllResults(true);setExpandedResults({});}}><Target size={17}/><bdi>+ KR</bdi></button>
+    <button type="button" aria-label="فقط اهداف" aria-pressed={!showAllResults} className={!showAllResults?'active':''} onClick={()=>{setShowAllResults(false);setExpandedResults({});}}><Target size={16}/>فقط اهداف</button>
+    <button type="button" aria-label="اهداف و نتایج کلیدی" aria-pressed={showAllResults} className={showAllResults?'active':''} onClick={()=>{setShowAllResults(true);setExpandedResults({});}}><ListTree size={16}/>اهداف و نتایج کلیدی</button>
    </div>
   </div>
   <section className="okr-panel">{filtered.length?listView==='tree'?<div className="okr-list">
