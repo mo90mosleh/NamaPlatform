@@ -511,6 +511,18 @@ export function Feedback() {
                     .length.toLocaleString("fa-IR")}
                   )
                 </button>
+                <button
+                  type="button"
+                  className="secondary full"
+                  disabled={!notes.length}
+                  onClick={() => {
+                    if (confirm("همهٔ بازخوردهای ثبت‌شده در تمام صفحه‌ها حذف شوند؟") && persist([]))
+                      setMessage("همهٔ بازخوردها حذف شدند.");
+                  }}
+                >
+                  <Trash2 size={17} />
+                  حذف همهٔ بازخوردها
+                </button>
               </>
             )}
             {message && (
