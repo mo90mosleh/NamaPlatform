@@ -14,3 +14,6 @@
 .mobile-chart-browser .flow-department-positions .person-avatar-group { position:static; padding-inline:5px; justify-content:flex-start; }
 .mobile-chart-browser .flow-department-positions .person-avatar-group > button { width:30px; min-width:30px; height:30px; margin:0; }
 .interactive-chart .flow-department-node .node-analysis-count { display:block; }
+.flow-department-positions,.mobile-chart-browser .flow-department-positions { grid-template-columns:minmax(0,1fr); }
+.flow-department-positions > li { min-height:59px; border-inline-start:2px solid #9bacbe; }
+.flow-department-positions .department-position-title { min-height:28px; }

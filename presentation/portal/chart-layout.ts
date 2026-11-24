@@ -1,12 +1,12 @@
 import type{Person}from'./types';
 import dagre from '@dagrejs/dagre';
-export type DepartmentPosition={id:string;title:string;people:Person[]};
+export type DepartmentPosition={id:string;parentId:string|null;title:string;people:Person[]};
 export type ChartItem={id:string;parentId:string|null;label:string;subtitle?:string;kind:'unit'|'position';closed:boolean;childCount:number;selected:boolean;seatCount?:number;mixed?:boolean;unitId?:string;descendantCount?:number;previewChildren?:string[];analysisValue?:number;analysisLabel?:string;tone?:string;people?:Person[];departmentPositions?:DepartmentPosition[]};
 export type ChartDirection='horizontal'|'vertical';
 export function chartNodeSize(item:ChartItem,admin:boolean) {
  if(item.departmentPositions){
-  const rows=Math.ceil(item.departmentPositions.length/2);
-  return {width:rows?324:212,height:88+rows*82};
+  const rows=item.departmentPositions.length;
+  return {width:rows?324:212,height:88+rows*65};
  }
  return {width:212,height:(admin?124:104)+(item.people?.length?24:0)};
 }

@@ -1,3 +1,4 @@
+import {guideVideo,VideoPlayer} from './VideoPlayer';
 import {Video} from 'lucide-react';
 import {useState, type FormEvent} from 'react';
 import {Modal} from './Modal';
@@ -23,20 +24,6 @@ function parseHttps(value: string) {
 function embedUrl(value: string) {
   const url = parseHttps(value);
   return url?.origin === 'https://app.powerbi.com' && /^\/(reportEmbed|dashboardEmbed|view)\/?$/i.test(url.pathname) ? url.href : null;
-}
-
-export function guideVideo(value:string){
- const url=parseHttps(value);
- if(!url)return null;
- if(url.origin==='https://drive.google.com'){
-  const id=url.pathname.match(/^\/file\/d\/([\w-]+)(?:\/|$)/)?.[1];
-  if(!id)return null;
-  const preview=new URL('/file/d/'+id+'/preview',url.origin);
-  const resourceKey=url.searchParams.get('resourcekey');
-  if(resourceKey)preview.searchParams.set('resourcekey',resourceKey);
-  return {url:preview.href,embed:true};
- }
- return /\.(mp4|webm|ogv)$/i.test(url.pathname)?{url:url.href,embed:false}:null;
 }
 
 export function PowerBiReports({reports, canManage, onAdd, reportId}: {
@@ -110,11 +97,8 @@ export function PowerBiReports({reports, canManage, onAdd, reportId}: {
     </Modal>}
     {videoReport && <Modal className="panel power-bi-dialog" label={'راهنمای '+videoReport.name} onClose={()=>setVideoReport(null)}>
       <header><h2>راهنمای {videoReport.name}</h2><button type="button" className="secondary" onClick={()=>setVideoReport(null)}>بستن</button></header>
-      {player ? player.embed
-        ? <iframe className="power-bi-guide-player" src={player.url} title={'ویدئوی راهنمای '+videoReport.name} allow="autoplay; fullscreen" referrerPolicy="strict-origin-when-cross-origin"/>
-        : <video className="power-bi-guide-player" controls playsInline src={player.url}/>
-        : <p className="empty-inline">هنوز ویدئوی راهنما ثبت نشده است.</p>}
-      {player?.embed&&<a href={player.url} target="_blank" rel="noopener noreferrer">باز کردن ویدئو در Drive</a>}
+      {player ? <VideoPlayer source={player} title={'ویدئوی راهنمای '+videoReport.name}/> :
+        <p className="empty-inline">هنوز ویدئوی راهنما ثبت نشده است.</p>}
       {canManage&&<form className="kpi-form" onSubmit={event=>{
         event.preventDefault();
         const guide=String(new FormData(event.currentTarget).get('videoGuide')??'').trim();
