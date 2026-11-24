@@ -1,14 +1,22 @@
 import type{Person}from'./types';
 import dagre from '@dagrejs/dagre';
-export type ChartItem={id:string;parentId:string|null;label:string;subtitle?:string;kind:'unit'|'position';closed:boolean;childCount:number;selected:boolean;seatCount?:number;mixed?:boolean;unitId?:string;descendantCount?:number;previewChildren?:string[];analysisValue?:number;analysisLabel?:string;tone?:string;people?:Person[]};
+export type DepartmentPosition={id:string;title:string;people:Person[]};
+export type ChartItem={id:string;parentId:string|null;label:string;subtitle?:string;kind:'unit'|'position';closed:boolean;childCount:number;selected:boolean;seatCount?:number;mixed?:boolean;unitId?:string;descendantCount?:number;previewChildren?:string[];analysisValue?:number;analysisLabel?:string;tone?:string;people?:Person[];departmentPositions?:DepartmentPosition[]};
 export type ChartDirection='horizontal'|'vertical';
+export function chartNodeSize(item:ChartItem,admin:boolean) {
+ if(item.departmentPositions){
+  const rows=Math.ceil(item.departmentPositions.length/2);
+  return {width:rows?324:212,height:88+rows*82};
+ }
+ return {width:212,height:(admin?124:104)+(item.people?.length?24:0)};
+}
 export function layoutChart(items:ChartItem[],admin=false,direction:ChartDirection='horizontal'){
  const graph=new dagre.graphlib.Graph().setGraph({rankdir:direction==='vertical'?'TB':'RL',nodesep:18,ranksep:64,marginx:12,marginy:12}).setDefaultEdgeLabel(()=>({}));
- const width=212,height=admin?124:104,ids=new Set(items.map(n=>n.id));
- for(const n of items)graph.setNode(n.id,{width,height:height+(n.people?.length?24:0)});
+ const ids=new Set(items.map(n=>n.id));
+ for(const n of items)graph.setNode(n.id,chartNodeSize(n,admin));
  for(const n of items)if(n.parentId&&ids.has(n.parentId))graph.setEdge(n.parentId,n.id);
  dagre.layout(graph);
- return items.map(n=>{const p=graph.node(n.id);return{...n,x:p.x-width/2,y:p.y-graph.node(n.id).height/2,width,height:graph.node(n.id).height};});
+ return items.map(n=>{const {x,y,width,height}=graph.node(n.id);return{...n,x:x-width/2,y:y-height/2,width,height};});
 }
 // Follow IDs only. No synthetic parents and no changes to stored reporting relationships.
 export function visibleChartItems(items:ChartItem[],closed:Set<string>,focusId:string|null){
