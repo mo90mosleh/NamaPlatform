@@ -1,5 +1,5 @@
 import {useEffect, useState, type FormEvent, type ReactNode} from 'react';
-import {ChartNoAxesCombined, ClipboardList, Plus, Save} from 'lucide-react';
+import {LayoutDashboard, ClipboardList, Plus, Save} from 'lucide-react';
 import type {Data, KPI} from './types';
 import {number} from './ui';
 import {JalaliDatePicker} from './JalaliDatePicker';
@@ -10,14 +10,14 @@ type ChartKind = 'line' | 'bar' | 'pie';
 type Card = {id: string; kpiId: string; kind: ChartKind};
 type Revision = {value: number; note: string; actor: string; savedAt: string};
 type Measurement = {kpiId: string; date: string; revisions: Revision[]};
-type Model = {cards: Card[]; measurements: Measurement[]; reports: PowerBiReport[]};
+type Model = {cards: Card[]; measurements: Measurement[]; reports: PowerBiReport[]; samplesInitialized: boolean};
 
-const empty: Model = {cards: [], measurements: [], reports: []};
+const empty: Model = {cards: [], measurements: [], reports: [], samplesInitialized: true};
 const charts = {line: 'خطی', bar: 'میله‌ای', pie: 'دایره‌ای'} as const;
 const tabs = [
-  ['dashboard', 'داشبورد شاخص‌ها', ChartNoAxesCombined],
+  ['dashboard', 'داشبورد شاخص‌ها', LayoutDashboard],
   ['profiles', 'شناسنامه شاخص‌ها', ClipboardList],
-  ['power-bi', 'پاور بی‌آی', PowerBiIcon],
+  ['power-bi', 'PowerBI', PowerBiIcon],
 ] as const;
 const colors = ['#16786e', '#406ea8', '#a65b16', '#8e54a1', '#a34755', '#517344'];
 const dates = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Tehran'});
@@ -26,16 +26,48 @@ const labelDate = (date: string) => dates.format(new Date(date + 'T12:00:00Z'));
 const current = (measurement: Measurement) => measurement.revisions[measurement.revisions.length - 1];
 function storageKey(data: Data) { return 'nama-kpi-monitoring-v1:' + data.organization.id; }
 
-function read(key: string): Model {
+const sampleSeries = [
+  {code: 'K-01', kind: 'line', values: [18, 16, 13, 12]},
+  {code: 'K-02', kind: 'bar', values: [76, 84, 81, 92]},
+  {code: 'K-03', kind: 'bar', values: [71, 79, 85, 89]},
+  {code: 'K-07', kind: 'line', values: [7, 6, 5, 4]},
+] as const;
+
+function initialModel(data: Data): Model {
+  const cards: Card[] = [];
+  const measurements: Measurement[] = [];
+  for (const {code, kind, values} of sampleSeries) {
+    const kpi = data.kpis.find(item => item.code === code);
+    if (!kpi) continue;
+    cards.push({id: 'sample-' + code, kpiId: kpi.id, kind});
+    values.forEach((value, index) => {
+      const date = ['2026-10-24', '2026-11-01', '2026-11-08', '2026-11-15'][index];
+      measurements.push({kpiId: kpi.id, date, revisions: [{value, note: 'داده نمونه دمو', actor: 'دمو', savedAt: date + 'T12:00:00Z'}]});
+    });
+  }
+  return {cards, measurements, reports: [], samplesInitialized: true};
+}
+
+function read(key: string, initial = empty): Model {
   try {
-    const saved = JSON.parse(localStorage.getItem(key) ?? 'null');
-    if (Array.isArray(saved?.cards) && Array.isArray(saved?.measurements)) return {...saved, reports: Array.isArray(saved.reports) ? saved.reports : []};
+    const saved: Model | null = JSON.parse(localStorage.getItem(key) ?? 'null');
+    if (Array.isArray(saved?.cards) && Array.isArray(saved.measurements)) {
+      const reports = Array.isArray(saved.reports) ? saved.reports : [];
+      if (saved.samplesInitialized) return {...saved, reports};
+      return {
+        cards: [...saved.cards, ...initial.cards.filter(sample => !saved.cards.some(card => card.kpiId === sample.kpiId))],
+        measurements: [...saved.measurements, ...initial.measurements.filter(sample =>
+          !saved.measurements.some(row => row.kpiId === sample.kpiId))],
+        reports,
+        samplesInitialized: true,
+      };
+    }
   } catch {}
-  return empty;
+  return initial;
 }
 
 export function latestKpiValue(data: Data, id: string) {
-  const latest = read(storageKey(data)).measurements.filter(row => row.kpiId === id)
+  const latest = read(storageKey(data), initialModel(data)).measurements.filter(row => row.kpiId === id)
     .sort((a, b) => b.date.localeCompare(a.date))[0];
   return latest && current(latest);
 }
@@ -88,7 +120,7 @@ function Chart({kpi, kind, rows}: {kpi: KPI; kind: ChartKind; rows: Measurement[
 
 export function KpiMonitoring({data, profiles}: {data: Data; profiles: (values: ReadonlyMap<string, number>) => ReactNode}) {
   const key = storageKey(data);
-  const [model, setModel] = useState(() => read(key));
+  const [model, setModel] = useState(() => read(key, initialModel(data)));
   const [tab, setTab] = useState<(typeof tabs)[number][0]>('dashboard');
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
@@ -106,14 +138,14 @@ export function KpiMonitoring({data, profiles}: {data: Data; profiles: (values: 
   const dateError = Boolean(start && end && start > end);
 
   useEffect(() => {
-    const sync = (event: StorageEvent) => { if (event.key === key || event.key === null) setModel(read(key)); };
+    const sync = (event: StorageEvent) => { if (event.key === key || event.key === null) setModel(read(key, initialModel(data))); };
     window.addEventListener('storage', sync);
     return () => window.removeEventListener('storage', sync);
   }, [key]);
 
   function update(change: (saved: Model) => Model, success: string) {
     try {
-      const next = change(read(key));
+      const next = change(read(key, initialModel(data)));
       localStorage.setItem(key, JSON.stringify(next));
       setModel(next);
       setMessage({text: success});
@@ -168,8 +200,7 @@ export function KpiMonitoring({data, profiles}: {data: Data; profiles: (values: 
       .sort((a, b) => a.date.localeCompare(b.date)).map(row => [row.kpiId, current(row).value])))}
     {tab === 'dashboard' && <>
       {dateError && <p role="alert" className="alert error">تاریخ پایان باید برابر یا بعد از تاریخ شروع باشد.</p>}
-      <div className="kpi-actions"><button type="button" className="secondary" disabled={!data.kpis.length}
-        onClick={() => setCardDraft({id: '', kpiId: '', kind: 'line'})}><Plus size={16}/>افزودن کارت</button>
+      <div className="kpi-actions">
         <button type="button" className="secondary" aria-expanded={entryOpen}
           onClick={() => setEntryOpen(!entryOpen)}><Save size={16}/>ثبت مقادیر</button></div>
     {tab === 'dashboard' && entryOpen && <>
@@ -194,6 +225,23 @@ export function KpiMonitoring({data, profiles}: {data: Data; profiles: (values: 
         </details>)}
       </section>}
     </>}
+      {!model.cards.length && <p className="panel empty-inline">برای ساخت داشبورد، اولین کارت را اضافه کنید.</p>}
+      <div className="kpi-card-grid">{model.cards.map(card => {
+        const kpi = data.kpis.find(item => item.id === card.kpiId);
+        const rows = dateError ? [] : model.measurements.filter(row => row.kpiId === card.kpiId &&
+          (!start || row.date >= start) && (!end || row.date <= end)).sort((a, b) => a.date.localeCompare(b.date));
+        return <section className="panel kpi-monitor-card" key={card.id}>
+          <header><div><h2>{kpi?.name ?? 'شاخص در دسترس نیست'}</h2><small>{charts[card.kind]}{rows.some(row => current(row).actor === 'دمو') && ' · داده نمونه'}{kpi?.unit && ' · ' + kpi.unit}</small></div>
+            <div className="kpi-actions"><button className="text-button" type="button" onClick={() => setCardDraft(card)}>ویرایش</button>
+              <button className="text-button" type="button" onClick={() => {
+                if (update(model => ({...model, cards: model.cards.filter(item => item.id !== card.id)}), 'کارت حذف شد.') && cardDraft?.id === card.id) setCardDraft(null);
+              }}>حذف کارت</button></div>
+          </header>
+          {kpi && !dateError && <Chart kpi={kpi} kind={card.kind} rows={rows}/>}
+        </section>;
+      })}</div>
+      <div className="kpi-actions kpi-add-card"><button type="button" className="secondary" disabled={!data.kpis.length}
+        onClick={() => setCardDraft({id: '', kpiId: '', kind: 'line'})}><Plus size={16}/>افزودن کارت</button></div>
       {cardDraft && <form className="panel kpi-form" onSubmit={saveCard}>
         <label>شاخص{selectKpi(cardDraft.kpiId, kpiId => setCardDraft({...cardDraft, kpiId}))}</label>
         <label>نوع نمودار<select value={cardDraft.kind} onChange={event => setCardDraft({...cardDraft, kind: event.target.value as ChartKind})}>
@@ -203,21 +251,7 @@ export function KpiMonitoring({data, profiles}: {data: Data; profiles: (values: 
         <button className="primary">ذخیرهٔ کارت</button>
         <button type="button" className="secondary" onClick={() => setCardDraft(null)}>انصراف</button>
       </form>}
-      {!model.cards.length && <p className="panel empty-inline">برای ساخت داشبورد، اولین کارت را اضافه کنید.</p>}
-      <div className="kpi-card-grid">{model.cards.map(card => {
-        const kpi = data.kpis.find(item => item.id === card.kpiId);
-        const rows = dateError ? [] : model.measurements.filter(row => row.kpiId === card.kpiId &&
-          (!start || row.date >= start) && (!end || row.date <= end)).sort((a, b) => a.date.localeCompare(b.date));
-        return <section className="panel kpi-monitor-card" key={card.id}>
-          <header><div><h2>{kpi?.name ?? 'شاخص در دسترس نیست'}</h2><small>{charts[card.kind]}{kpi?.unit && ' · ' + kpi.unit}</small></div>
-            <div className="kpi-actions"><button className="text-button" type="button" onClick={() => setCardDraft(card)}>ویرایش</button>
-              <button className="text-button" type="button" onClick={() => {
-                if (update(model => ({...model, cards: model.cards.filter(item => item.id !== card.id)}), 'کارت حذف شد.') && cardDraft?.id === card.id) setCardDraft(null);
-              }}>حذف کارت</button></div>
-          </header>
-          {kpi && !dateError && <Chart kpi={kpi} kind={card.kind} rows={rows}/>}
-        </section>;
-      })}</div>
+
     </>}
     {tab === 'power-bi' && <PowerBiReports reports={model.reports} canManage={admin}
       onAdd={report => update(saved => ({...saved, reports: [...saved.reports, report]}), 'داشبورد ذخیره شد.')}/>}

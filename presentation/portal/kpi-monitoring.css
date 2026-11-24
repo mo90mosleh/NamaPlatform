@@ -31,3 +31,5 @@
   .kpi-date-picker { position: static; }
   .jalali-calendar { inset-inline: 0 auto; }
 }
+
+.kpi-add-card { justify-content: center; margin-block: 1rem; }

@@ -1,5 +1,6 @@
+import {apqcByCode} from './apqc-reference';
 import type {Data} from './types';
-import {categories, emptyGovernance, raciRoles, sampleGovernance, type Governance} from './process-governance';
+import {emptyGovernance, raciRoles, sampleGovernance, type Governance} from './process-governance';
 
 const modeKey = 'nama-demo-admin';
 const editsKey = 'nama-demo-edits-v1';
@@ -67,7 +68,7 @@ export function updateDemoData(data: Data, path: string, method: string, value?:
     const change = value as Partial<Governance>;
     const next = {...(data.governance?.[id] ?? emptyGovernance), ...change};
     const validPosition = (position: string) => positions.some(row => row.id === position);
-    if (next.apqc && !categories.some(([code]) => code === next.apqc)) throw Error('دسته APQC معتبر نیست.');
+    if (next.apqc && !apqcByCode.has(next.apqc)) throw Error('دسته APQC معتبر نیست.');
     if (next.raci.some(row => {
       const roles = Object.values(row.roles);
       return !row.activity.trim() || !roles.includes('R') || roles.filter(role => role === 'A').length !== 1

@@ -37,18 +37,30 @@ const positions = {
 };
 
 const samples = {
-  'P-01': {apqc: '3.0', activity: 'بررسی قیمت و ظرفیت تحویل سفارش', responsible: positions.sales, accountable: positions.ceo, consulted: positions.planning, decision: 'تأیید تخفیف سفارش', condition: 'سفارش با شرایط پرداخت مصوب', limit: 'تا ۵٪ مبلغ سفارش', authority: positions.sales},
-  'P-03': {apqc: '4.0', activity: 'دریافت و مقایسه پیشنهاد تأمین‌کنندگان', responsible: positions.procurement, accountable: positions.production, consulted: positions.quality, decision: 'تأیید خرید مواد اولیه', condition: 'تأمین‌کننده تأییدشده و بودجه مصوب', limit: 'تا ۵۰۰ میلیون ریال', authority: positions.procurement},
-  'P-07': {apqc: '6.0', activity: 'بررسی درخواست و احراز شرایط گارانتی', responsible: positions.service, accountable: positions.ceo, consulted: positions.quality, decision: 'تأیید تعویض قطعه در گارانتی', condition: 'خرابی مشمول گارانتی و قطعه موجود', limit: 'تا ۳۰ میلیون ریال', authority: positions.service},
+  'P-01': {activity: 'بررسی قیمت و ظرفیت تحویل سفارش', responsible: positions.sales, accountable: positions.ceo, consulted: positions.planning, decision: 'تأیید تخفیف سفارش', condition: 'سفارش با شرایط پرداخت مصوب', limit: 'تا ۵٪ مبلغ سفارش', authority: positions.sales},
+  'P-03': {activity: 'دریافت و مقایسه پیشنهاد تأمین‌کنندگان', responsible: positions.procurement, accountable: positions.production, consulted: positions.quality, decision: 'تأیید خرید مواد اولیه', condition: 'تأمین‌کننده تأییدشده و بودجه مصوب', limit: 'تا ۵۰۰ میلیون ریال', authority: positions.procurement},
+  'P-07': {activity: 'بررسی درخواست و احراز شرایط گارانتی', responsible: positions.service, accountable: positions.ceo, consulted: positions.quality, decision: 'تأیید تعویض قطعه در گارانتی', condition: 'خرابی مشمول گارانتی و قطعه موجود', limit: 'تا ۳۰ میلیون ریال', authority: positions.service},
 } as const;
+
+const sampleClassifications: Record<string, string> = {
+  'P-01': '3.5.4.1', 'P-02': '4.1.4', 'P-03': '4.2.3', 'P-04': '4.3.2',
+  'P-05': '4.3.3', 'P-06': '4.4.4', 'P-07': '6.3.4', 'P-08': '9.2.2',
+  'P-09': '7.3.4', 'P-10': '1.2.6.3', 'P-11': '3.5.3', 'P-12': '3.5.4.1',
+  'P-13': '4.3.1', 'P-14': '4.2.4', 'P-15': '4.3.2', 'P-16': '4.3.2',
+  'P-17': '4.3.3', 'P-18': '13.3.3', 'P-19': '4.3.2', 'P-20': '4.4.2',
+  'P-21': '13.3.3', 'P-22': '4.4.3', 'P-23': '4.4.3', 'P-24': '6.2.4',
+  'P-25': '6.2.2', 'P-26': '9.2.3',
+};
 
 export function sampleGovernance(data: Data) {
   const valid = new Set(data.positions.map(position => position.id));
   return Object.fromEntries(data.nodes.flatMap(node => {
     const sample = samples[node.code as keyof typeof samples];
-    if (node.kind !== 'PROCESS' || !sample || !valid.has(sample.responsible)) return [];
+    const apqc = sampleClassifications[node.code ?? ''];
+    if (node.kind !== 'PROCESS' || !apqc) return [];
+    if (!sample || !valid.has(sample.responsible)) return [[node.id, {...emptyGovernance, apqc}]];
     return [[node.id, {
-      apqc: sample.apqc,
+      apqc,
       raci: [{id: 'sample-raci', activity: sample.activity, roles: {
         [sample.responsible]: 'R', [sample.accountable]: 'A', [sample.consulted]: 'C', [positions.finance]: 'I',
       }}],

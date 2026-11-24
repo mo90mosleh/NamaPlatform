@@ -1,6 +1,8 @@
+import {ApqcExplorer} from './ApqcExplorer';
+import {apqcByCode} from './apqc-reference';
 import {useState, type FormEvent, type ReactNode} from 'react';
 import {config, mutate} from './api';
-import {apqcSource, categories, emptyGovernance, raciRoles, type GovernanceSection, type DoaRow, type Governance, type RaciRow, type RaciRole} from './process-governance';
+import {categories, emptyGovernance, raciRoles, type GovernanceSection, type DoaRow, type Governance, type RaciRow, type RaciRole} from './process-governance';
 import type {Data} from './types';
 import {errorMessage, Link} from './ui';
 import './process-governance.css';
@@ -20,7 +22,6 @@ function PositionOptions({data}: {data: Data}) {
 
 export function GovernanceOverview({data, section}: {data: Data; section: GovernanceSection}) {
   const [position, setPosition] = useState('');
-  const [category, setCategory] = useState('');
   const processes = data.nodes.filter(node => node.kind === 'PROCESS');
   const title = (id: string) => data.positions.find(item => item.id === id)?.title ?? '—';
   const processLink = (id: string, name: string) => <Link to={'/processes/' + id}>{name}</Link>;
@@ -28,23 +29,10 @@ export function GovernanceOverview({data, section}: {data: Data; section: Govern
     .filter(row => !position || row.roles[position]).map(row => ({process, row})));
   const doa = processes.flatMap(process => (data.governance?.[process.id]?.doa ?? [])
     .filter(row => !position || row.position === position || row.escalation === position).map(row => ({process, row})));
-  const visible = processes.filter(process => !category || (data.governance?.[process.id]?.apqc || 'unmapped') === category);
+  if (section === 'apqc') return <ApqcExplorer data={data}/>;
 
   return <section className="panel governance-panel">
     <h2>{labels[section]}</h2>
-    {section === 'apqc' ? <>
-      <p><a href={apqcSource} target="_blank" rel="noreferrer">مرجع APQC PCF میان‌صنعتی، نسخه ۷٫۴</a> · دسته‌های سطح اول</p>
-      <label>دسته مرجع<select value={category} onChange={event => setCategory(event.target.value)}>
-        <option value="">همه دسته‌ها</option><option value="unmapped">نیازمند بررسی</option>
-        {categories.map(([code, name]) => <option key={code} value={code}>{code} · {name}</option>)}
-      </select></label>
-      {visible.length ? <Matrix columns={['فرآیند', 'دسته مرجع']}>{visible.map(process => {
-        const code = data.governance?.[process.id]?.apqc;
-        const item = categories.find(([id]) => id === code);
-        return <tr key={process.id}><th scope="row">{processLink(process.id, process.name)}</th>
-          <td>{item ? <><bdi>{item[0]}</bdi> · {item[1]}</> : 'نیازمند بررسی'}</td></tr>;
-      })}</Matrix> : <p className="empty-inline">فرآیندی در این دسته ثبت نشده است.</p>}
-    </> : <>
       <label>فیلتر سمت<select value={position} onChange={event => setPosition(event.target.value)}>
         <option value="">همه سمت‌ها</option><PositionOptions data={data}/>
       </select></label>
@@ -57,7 +45,6 @@ export function GovernanceOverview({data, section}: {data: Data; section: Govern
         {doa.map(({process, row}) => <tr key={process.id + row.id}><th scope="row">{processLink(process.id, process.name)}</th>
           <td>{row.decision}</td><td>{title(row.position)}</td><td>{row.condition}</td><td>{row.limit || '—'}</td><td>{title(row.escalation)}</td></tr>)}
       </Matrix> : <p className="empty-inline">اختیاری برای این فیلتر ثبت نشده است.</p>)}
-    </>}
   </section>;
 }
 
@@ -74,7 +61,7 @@ export function ProcessGovernance({data, id, section, refresh}: {
   const [message, setMessage] = useState({text: '', error: false});
   const admin = config.demoManagement && data.user.role === 'ADMIN';
   const title = (id: string) => data.positions.find(position => position.id === id)?.title ?? '—';
-  const mapped = categories.find(([code]) => code === record.apqc);
+  const mapped = categories.find(([code]) => code === record.apqc)?.[1] ?? apqcByCode.get(record.apqc);
   const matrixPositions = data.positions.filter(position => record.raci.some(row => row.roles[position.id]));
 
   async function save(change: Partial<Governance>) {
@@ -112,8 +99,8 @@ export function ProcessGovernance({data, id, section, refresh}: {
     {section === 'apqc' && (admin ? <label>دسته مرجع APQC<select disabled={pending} value={record.apqc}
       onChange={event => void save({apqc: event.target.value})}>
       <option value="">نیازمند بررسی</option>
-      {categories.map(([code, label]) => <option key={code} value={code}>{code} · {label}</option>)}
-    </select></label> : <p>{mapped ? <><bdi>{mapped[0]}</bdi> · {mapped[1]}</> : 'نیازمند بررسی'}</p>)}
+      {Array.from(apqcByCode, ([code, label]) => <option key={code} value={code}>{code} · {categories.find(([key]) => key === code)?.[1] ?? label}</option>)}
+    </select></label> : <p>{mapped ? <><bdi>{record.apqc}</bdi> · {mapped}</> : 'نیازمند بررسی'}</p>)}
     {section === 'raci' && <>
       {record.raci.length ? <>
         <p className="governance-legend">{Object.entries(raciRoles).map(([role, label]) => <span key={role}><bdi>{role}</bdi> · {label}</span>)}</p>

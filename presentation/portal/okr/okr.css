@@ -244,3 +244,21 @@
 .okr-pillar-management input:not([type=checkbox]),.okr-pillar-filter select{min-height:36px;max-width:100%;padding:4px 8px}
 .okr-pillar-management ul{list-style:none;padding:0;margin:10px 0 0}
 .okr-pillar-management li label{display:flex;align-items:center;gap:9px;min-height:38px}
+
+.okr-modal { width: min(940px, calc(100% - 28px)); max-height: 85dvh; margin: auto; padding: 0; border: 1px solid var(--line); color: var(--ink); }
+.okr-modal > div { padding: clamp(14px, 3vw, 26px); }
+.okr-modal::backdrop { background: #1b302a82; }
+.okr-modal header { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.okr-modal .okr-detail-body:has(.okr-result) { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 10px; align-items: start; }
+.okr-modal .okr-add-kr { justify-self: start; grid-column: 1 / -1; }
+button.okr-metric, button.okr-info-row { text-align: start; color: inherit; }
+button.okr-info-row { width: 100%; background: transparent; border-inline: 0; border-block-start: 0; }
+button.okr-metric:hover, button.okr-info-row:hover { background: #eef6f4; }
+.okr-summary-list, .okr-inline-results { list-style: none; padding: 0; margin-block: 8px; }
+.okr-summary-list li, .okr-inline-results li { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; padding: 9px; border-bottom: 1px solid var(--line); }
+.okr-summary-list:has(li) + .okr-summary-empty { display: none; }
+.okr-goal-entry > .okr-list-row { width: 100%; }
+.okr-inline-toggle { margin: 4px 12px 8px; }
+.okr-inline-results { margin-inline: 12px; }
+.okr-goal-toolbar .okr-search { flex-basis: 135px; min-width: 0; }
+.okr-goal-toolbar .okr-view-toggle { flex-shrink: 0; }
