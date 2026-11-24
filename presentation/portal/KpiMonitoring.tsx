@@ -3,7 +3,7 @@ import {LayoutDashboard, ClipboardList, Plus, Save, Pencil, Trash2} from 'lucide
 import type {Data, KPI} from './types';
 import {latestPerPeriod} from './kpi-periods';
 import {Modal} from './Modal';
-import {number} from './ui';
+import {go, number, routeQuery} from './ui';
 import {JalaliDatePicker} from './JalaliDatePicker';
 import {PowerBiIcon, PowerBiReports, type PowerBiReport} from './PowerBiReports';
 import './kpi-monitoring.css';
@@ -14,7 +14,7 @@ type Theme = 'ocean' | 'forest' | 'sunset';
 type Card = {id: string; kpiId: string; kind: ChartKind; theme?: Theme; labels?: boolean};
 type Revision = {value: number; note: string; actor: string; savedAt: string};
 type Measurement = {kpiId: string; date: string; revisions: Revision[]};
-type Model = {cards: Card[]; measurements: Measurement[]; reports: PowerBiReport[]; samplesInitialized: boolean};
+type Model = {cards: Card[]; measurements: Measurement[]; reports: PowerBiReport[]; samplesInitialized: boolean; sampleVersion?: number};
 
 const empty: Model = {cards: [], measurements: [], reports: [], samplesInitialized: true};
 const charts = {line: 'خطی', bar: 'میله‌ای', pie: 'دایره‌ای'} as const;
@@ -41,19 +41,28 @@ const sampleSeries = [
   {code: 'K-07', kind: 'line', values: [7, 6, 5, 4]},
 ] as const;
 
+const sampleVersion = 2;
+const sampleDates = ['2026-04-15', '2026-05-15', '2026-06-15', '2026-07-15', '2026-08-15', '2026-09-15', '2026-10-15', '2026-11-15'];
+const sampleFactors = [.74,.78,.77,.84,.86,.89,.91,.95];
+
 function initialModel(data: Data): Model {
+  if (!config.demoManagement) return empty;
   const cards: Card[] = [];
   const measurements: Measurement[] = [];
-  for (const {code, kind, values} of sampleSeries) {
-    const kpi = data.kpis.find(item => item.code === code);
-    if (!kpi) continue;
-    cards.push({id: 'sample-' + code, kpiId: kpi.id, kind});
-    values.forEach((value, index) => {
-      const date = ['2026-08-15', '2026-09-15', '2026-10-15', '2026-11-15'][index];
-      measurements.push({kpiId: kpi.id, date, revisions: [{value, note: 'داده نمونه دمو', actor: 'دمو', savedAt: date + 'T12:00:00Z'}]});
+  for (const kpi of data.kpis) {
+    const sample = sampleSeries.find(item=>item.code===kpi.code);
+    if (sample) cards.push({id:'sample-'+kpi.code,kpiId:kpi.id,kind:sample.kind});
+    const dates = /سالانه|annual|yearly/i.test(kpi.frequency??'')
+      ? [2022,2023,2024,2025,2026].map(year=>year+'-11-15') : sampleDates;
+    dates.forEach((date, index) => {
+      const target = kpi.target_value ?? 100;
+      const factor = sampleFactors[index];
+      const value = (sample && index>=4 ? sample.values[index-4] : undefined) ??
+        Math.round(target * (/ساعت|روز|دقیقه/.test(kpi.unit??'')?2-factor:factor)*10)/10;
+      measurements.push({kpiId:kpi.id,date,revisions:[{value,note:'داده نمونه دمو',actor:'دمو',savedAt:date+'T12:00:00Z'}]});
     });
   }
-  return {cards, measurements, reports: [], samplesInitialized: true};
+  return {cards, measurements, reports:[], samplesInitialized:true, sampleVersion};
 }
 
 function read(key: string, initial = empty): Model {
@@ -61,13 +70,11 @@ function read(key: string, initial = empty): Model {
     const saved: Model | null = JSON.parse(localStorage.getItem(key) ?? 'null');
     if (Array.isArray(saved?.cards) && Array.isArray(saved.measurements)) {
       const reports = Array.isArray(saved.reports) ? saved.reports : [];
-      if (saved.samplesInitialized) return {...saved, reports};
+      if (!initial.sampleVersion || saved.sampleVersion===initial.sampleVersion) return {...saved,reports};
       return {
-        cards: [...saved.cards, ...initial.cards.filter(sample => !saved.cards.some(card => card.kpiId === sample.kpiId))],
-        measurements: [...saved.measurements, ...initial.measurements.filter(sample =>
-          !saved.measurements.some(row => row.kpiId === sample.kpiId))],
-        reports,
-        samplesInitialized: true,
+        cards: saved.samplesInitialized ? saved.cards : [...saved.cards,...initial.cards.filter(sample=>!saved.cards.some(card=>card.kpiId===sample.kpiId))],
+        measurements:[...saved.measurements,...initial.measurements.filter(sample=>!saved.measurements.some(row=>row.kpiId===sample.kpiId&&row.date===sample.date))],
+        reports,samplesInitialized:true,sampleVersion:initial.sampleVersion,
       };
     }
   } catch {}
@@ -127,21 +134,31 @@ function Chart({kpi, card, rows}: {kpi: KPI; card: Card; rows: Measurement[]}) {
   }) : [];
   const target = typeof kpi.target_value === 'number' && Number.isFinite(kpi.target_value) ? kpi.target_value : null;
   const low = Math.min(0, target ?? 0, ...values);
-  const high = Math.max(0, target ?? 0, ...values);
+  const high = Math.max(0, target ?? 0, ...values) || (low===0?1:0);
   const scale = Math.max(Math.abs(low), Math.abs(high)) || 1;
   const range = high / scale - low / scale || 1;
   const y = (value: number) => 110 - (value / scale - low / scale) / range * 82;
   const span = points[points.length - 1].index - points[0].index + 1;
-  const spacing = 296 / span;
-  const x = (index: number) => 24 + (points[index].index - points[0].index + .5) * spacing;
-  const stride = Math.ceil(points.length / 6);
+  const left = labels ? 24 : 45;
+  const spacing = (320-left) / span;
+  const x = (index: number) => left + (points[index].index - points[0].index + .5) * spacing;
+  const stride = Math.ceil(points.length / 8);
+  const shortMonth = /ماهانه|monthly/i.test(kpi.frequency??'');
   return <>
     {kind === 'pie' ? <div className="kpi-pie-layout"><div className="kpi-pie" aria-hidden="true" style={{background:'conic-gradient('+segments.join(',')+')'}}/>
       {labels&&<ul className="kpi-pie-labels">{points.map((point,index)=><li key={point.index}><i style={{background:colors[index%colors.length]}}/>{point.label} · {number.format(Math.round(values[index]/total*100))}٪</li>)}</ul>}
     </div> :
       <svg className="kpi-plot" viewBox="0 0 345 142" aria-hidden="true" style={{color:colors[0]}}>
-        <line x1="24" y1={y(0)} x2="320" y2={y(0)} stroke="currentColor" opacity=".25"/>
-        {target !== null && <line x1="24" x2="320" y1={y(target)} y2={y(target)} stroke="#9a5b2c" strokeDasharray="4 3"/>}
+        {!labels && [0,.25,.5,.75,1].map(fraction=>{
+          const value=low+(high-low)*fraction;
+          return <g key={fraction} className="kpi-y-tick">
+           <line x1={left} x2="320" y1={y(value)} y2={y(value)} stroke="currentColor" opacity=".17"/>
+           <text x={left-6} y={y(value)+3} textAnchor="end" fill="currentColor" fontSize="9">{number.format(Number(value.toPrecision(3)))}</text>
+          </g>;
+        })}
+        {!labels && <line x1={left} x2={left} y1={y(low)} y2={28} stroke="currentColor" opacity=".4"/>}
+        <line x1={left} y1={y(0)} x2="320" y2={y(0)} stroke="currentColor" opacity=".25"/>
+        {target !== null && <line x1={left} x2="320" y1={y(target)} y2={y(target)} stroke="#9a5b2c" strokeDasharray="4 3"/>}
         {kind === 'line' && <polyline points={values.map((value, index) => x(index)+','+y(value)).join(' ')} fill="none" stroke="currentColor" strokeWidth="2"/>}
         {values.map((value, index) => <g key={points[index].index}>
           <title>{points[index].label} · {number.format(value)}</title>
@@ -149,7 +166,7 @@ function Chart({kpi, card, rows}: {kpi: KPI; card: Card; rows: Measurement[]}) {
             <rect x={x(index)-Math.min(12,spacing*.33)} y={Math.min(y(value),y(0))}
               width={Math.min(24,spacing*.66)} height={Math.max(1,Math.abs(y(value)-y(0)))} rx="2" fill="currentColor"/>}
           {labels&&<text className="kpi-data-label" x={x(index)} y={Math.min(y(value),y(0))-5} textAnchor="middle" fill="currentColor" fontSize="9">{number.format(value)}</text>}
-          {index%stride===0&&<text x={x(index)} y="132" textAnchor="middle" fill="currentColor" fontSize="8">{points[index].label}</text>}
+          {index%stride===0&&<text x={x(index)} y="132" textAnchor="middle" fill="currentColor" fontSize="8">{shortMonth?points[index].label.split(' ')[0]:points[index].label}</text>}
         </g>)}
       </svg>}
     <div className="kpi-chart-meta">
@@ -165,7 +182,14 @@ function Chart({kpi, card, rows}: {kpi: KPI; card: Card; rows: Measurement[]}) {
 export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?: string; profiles: (values: ReadonlyMap<string, number>) => ReactNode}) {
   const key = storageKey(data);
   const [model, setModel] = useState(() => read(key, initialModel(data)));
-  const [tab, setTab] = useState<(typeof tabs)[number][0]>(reportId ? 'power-bi' : 'dashboard');
+  const tabFromUrl = () => reportId ? 'power-bi' : tabs.find(([id])=>id===routeQuery().get('tab'))?.[0] ?? 'dashboard';
+  const [tab, setTab] = useState(tabFromUrl);
+  useEffect(()=>{
+    const sync=()=>{setTab(tabFromUrl());setMessage(null);};
+    window.addEventListener('popstate',sync);
+    window.addEventListener('hashchange',sync);
+    return ()=>{window.removeEventListener('popstate',sync);window.removeEventListener('hashchange',sync);};
+  },[reportId]);
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
   const [entryOpen, setEntryOpen] = useState(false);
@@ -231,7 +255,7 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
     <div className="module-toolbar">
       <nav className="process-workspace-tabs" aria-label="بخش‌های شاخص‌های عملکرد">
         {tabs.map(([id, title, Icon]) => <button key={id} type="button" className={tab === id ? 'active' : ''}
-          aria-current={tab === id ? 'page' : undefined} onClick={() => {setTab(id); setMessage(null);}}><Icon size={17}/>{title}</button>)}
+          aria-current={tab === id ? 'page' : undefined} onClick={() => go(id==='dashboard'?'/kpis':'/kpis?tab='+id)}><Icon size={17}/>{title}</button>)}
       </nav>
       {tab === 'dashboard' && <div className="kpi-date-filters">
         <JalaliDatePicker label="از تاریخ" value={start} onChange={setStart}/>

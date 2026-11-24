@@ -283,3 +283,16 @@ button.okr-metric:hover, button.okr-info-row:hover { background: #eef6f4; }
  .okr-strategy-content .okr-panel { padding-block:8px; }
  .okr-strategy-content .okr-tree-goal { padding-block:5px; }
 }
+
+.okr-goal-row-wrap { display:flex; align-items:center; gap:4px; padding-inline-end:7px; }
+.okr-goal-row-wrap .okr-list-row { flex:1; min-width:0; }
+.okr-kr-badge { flex:none; padding:2px 5px; border:1px solid var(--line); border-radius:6px; color:var(--ink); background:#ffffffb5; font-size:10px; }
+.okr-inline-results { margin:0; padding:2px 12px 5px; }
+.okr-inline-results li { display:grid; grid-template-columns:minmax(0,2fr) minmax(45px,1fr) auto; align-items:center; gap:8px; padding:3px 0; }
+.okr-monitor-content { display:grid; gap:8px; }
+.okr-monitor-content .okr-monitor-row,.okr-monitor-content .okr-risk-row,.okr-monitor-content .okr-checkin-row { padding-block:4px; }
+.okr-monitor-content .okr-panel-head { padding-block:6px; }
+@media(min-width:761px) {
+ .okr-monitor-content { max-height:calc(100dvh - 150px); overflow:auto; }
+ .okr-strategy-content { max-height:calc(100dvh - 265px); }
+}

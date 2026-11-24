@@ -87,3 +87,14 @@
  .app.has-module-title .topbar .company-logo{width:68px}
 }
 
+
+.app.chart-focus-mode .workspace-content:has(.chart-viewport) { display:flex; flex-direction:column; max-width:none; padding:0; }
+.app.chart-focus-mode .chart-focus-controls { padding:4px 8px; min-height:42px; }
+.app.chart-focus-mode .chart-content:has(.chart-viewport),
+.app.chart-focus-mode .chart-layout:has(.chart-viewport),
+.app.chart-focus-mode .chart-viewport { display:flex; flex-direction:column; flex:1; min-height:0; padding:0; gap:0; border:0; border-radius:0; }
+.app.chart-focus-mode .interactive-chart { flex:1; height:auto; min-height:0; }
+.app.chart-focus-mode .flow-org-node { width:100%; }
+.app.chart-focus-mode .flow-org-node .node-select strong { font-size:17px; }
+.app.chart-focus-mode .flow-org-node .position-department { font-size:13px; }
+.app.chart-focus-mode .chart-content>.chart-navigation-strip { top:8px; }

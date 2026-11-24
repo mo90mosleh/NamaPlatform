@@ -57,8 +57,23 @@ export function Chart({data,refresh}:{data:Data;refresh:()=>Promise<void>}){
  // Handle direct entry and browser Back/Forward. Invalid or obsolete IDs are ignored.
  useEffect(()=>{
   const restore=()=>{
+   const url=new URL(window.location.href);
+   const query=new URLSearchParams(config.mode==='public'?url.hash.split('?')[1]:url.search);
+   if(query.get('kind')==='person'){
+    const person=data.persons.find(item=>item.id===query.get('node'));
+    if(person&&linkHandled.current!=='person:'+person.id){
+     linkHandled.current='person:'+person.id;
+     const assignment=data.assignments.find(item=>item.person_id===person.id);
+     const role=roles.find(item=>item.members.some(member=>member.id===assignment?.position_id));
+     if(role)activateCard({kind:'position',id:role.id},{center:true,diagram:true,updateUrl:false,showPath:false});
+     setDetailsOpen(false);
+     setContact({people:[person],personId:person.id,title:role?.title??person.display_name,unit:data.units.find(unit=>unit.id===role?.org_unit_id)?.name??''});
+    }
+    return;
+   }
    const ref=readChartLink(window.location.href,config.mode);
-   if(!ref){linkHandled.current=null;return;}
+   if(!ref){linkHandled.current=null;setContact(null);return;}
+   setContact(null);
    const key=ref.kind+':'+ref.id;
    if(linkHandled.current===key)return;
    if(ref.kind==='position'?!roles.some(p=>p.id===ref.id):!data.units.some(u=>u.id===ref.id))return;

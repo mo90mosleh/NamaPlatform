@@ -73,3 +73,10 @@
 .kpi-card-settings .kpi-form select { width:100%; }
 .kpi-card-dialog-actions { display:flex; gap:8px; padding-top:8px; border-top:1px solid var(--line); }
 .kpi-chart-values[open] ul { max-height:70px; overflow:auto; }
+
+@media(min-width:761px) {
+ .kpi-card-grid-compact .kpi-plot { max-height:clamp(66px,calc((100dvh - 450px)/2),190px); }
+ .kpi-card-grid-compact .kpi-monitor-card { min-height:0; }
+ .kpi-card-grid-compact .kpi-pie { width:clamp(55px,17dvh,115px); margin:4px; }
+ .kpi-card-grid-compact .kpi-pie-labels { max-height:90px; margin-block:4px; }
+}

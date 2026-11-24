@@ -1,3 +1,4 @@
+import {SegmentedControl} from './SegmentedControl';
 import translations from './apqc-fa.json';
 import {useState} from 'react';
 import {ChevronLeft, ArrowRight, Layers3} from 'lucide-react';
@@ -30,10 +31,8 @@ export function ApqcExplorer({data}: {data: Data}) {
 
   return <section className="panel governance-panel apqc-explorer">
     <header className="apqc-heading"><h2>{language === 'fa' ? 'طبقه‌بندی APQC' : 'APQC classification'}</h2>
-    <div className="apqc-language" role="group" aria-label="زبان دسته‌بندی">
-      <button type="button" className="secondary" aria-pressed={language === 'fa'} onClick={() => setLanguage('fa')}>فارسی</button>
-      <button type="button" className="secondary" aria-pressed={language === 'en'} onClick={() => setLanguage('en')}>English</button>
-    </div><a href={apqcSource} target="_blank" rel="noreferrer">مرجع میان‌صنعتی ۷٫۴</a></header>
+    <SegmentedControl className="apqc-language" label="زبان دسته‌بندی" value={language} onChange={setLanguage}
+      options={[{value:'fa',label:'فارسی',icon:null},{value:'en',label:'English',icon:null}]}/><a href={apqcSource} target="_blank" rel="noreferrer">مرجع میان‌صنعتی ۷٫۴</a></header>
     <nav className="apqc-trail" aria-label="مسیر طبقه‌بندی APQC">
       {branch && <button type="button" className="icon-button" aria-label="بازگشت به سطح قبل" onClick={() => setBranch(branch === 'unmapped' ? '' : apqcParent(branch))}><ArrowRight size={17}/></button>}
       <button type="button" className="text-button" aria-current={!branch?'page':undefined} onClick={() => setBranch('')}>{language === 'fa' ? 'همه دسته‌ها' : 'All categories'}</button>

@@ -31,7 +31,3 @@
 .apqc-card > span { display: flex; align-items: center; justify-content: space-between; width: 100%; color: var(--action,var(--brand)); }
 .apqc-card small { margin-top: auto; }
 .apqc-assigned,.apqc-attribution { margin-top: 15px; }
-
-.apqc-language { display:flex; gap:4px; }
-.apqc-language .secondary { padding:4px 10px; }
-.apqc-language [aria-pressed="true"] { background:#faeef0; color:var(--brand); border-color:#edcbd1; }

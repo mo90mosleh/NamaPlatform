@@ -41,3 +41,14 @@
 .module-toolbar .process-workspace-tabs { flex:1 1 auto; border-bottom:0; margin:0; }
 .module-toolbar .kpi-date-filters { margin:0; }
 .module-toolbar .okr-heading-actions { margin-inline-start:auto; }
+
+.process-detail-header { display:flex; align-items:center; flex-wrap:wrap; gap:6px 14px; margin-bottom:8px; }
+.process-detail-header h1 { margin:0; font-size:clamp(16px,1.6vw,22px); }
+.process-detail-header .process-meta { margin:0; gap:5px 10px; }
+.process-expand-toggle { margin-inline-start:auto; }
+@media(min-width:761px) {
+ .process-sections { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+ .process-sections>.process-section { margin:0; }
+ .process-sections>.process-section[open] { grid-column:1/-1; }
+ .process-sections>.process-section>summary { min-height:40px; padding:5px 12px; }
+}

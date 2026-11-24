@@ -3,8 +3,8 @@ import dagre from '@dagrejs/dagre';
 export type ChartItem={id:string;parentId:string|null;label:string;subtitle?:string;kind:'unit'|'position';closed:boolean;childCount:number;selected:boolean;seatCount?:number;mixed?:boolean;unitId?:string;descendantCount?:number;previewChildren?:string[];analysisValue?:number;analysisLabel?:string;tone?:string;people?:Person[]};
 export type ChartDirection='horizontal'|'vertical';
 export function layoutChart(items:ChartItem[],admin=false,direction:ChartDirection='horizontal'){
- const graph=new dagre.graphlib.Graph().setGraph({rankdir:direction==='vertical'?'TB':'RL',nodesep:items.some(n=>n.people?.length)?60:28,ranksep:100,marginx:50,marginy:76}).setDefaultEdgeLabel(()=>({}));
- const width=240,height=admin?124:104,ids=new Set(items.map(n=>n.id));
+ const graph=new dagre.graphlib.Graph().setGraph({rankdir:direction==='vertical'?'TB':'RL',nodesep:18,ranksep:64,marginx:12,marginy:12}).setDefaultEdgeLabel(()=>({}));
+ const width=212,height=admin?124:104,ids=new Set(items.map(n=>n.id));
  for(const n of items)graph.setNode(n.id,{width,height:height+(n.people?.length?24:0)});
  for(const n of items)if(n.parentId&&ids.has(n.parentId))graph.setEdge(n.parentId,n.id);
  dagre.layout(graph);
