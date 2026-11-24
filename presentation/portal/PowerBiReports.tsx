@@ -71,15 +71,22 @@ export function PowerBiReports({reports, canManage, onAdd, reportId}: {
       {error && <p role="alert" className="alert error">{error}</p>}
     </form>}
     {reports.length ? <div className="power-bi-grid" aria-label="داشبوردهای Power BI">
-      {reports.map(report => <button key={report.id} type="button" className="panel power-bi-card"
-        aria-pressed={report.id === selectedId} onClick={() => setSelectedId(report.id)}><span><PowerBiIcon size={23}/><small>{report.area ?? 'Power BI'}</small></span>
-        <strong>{report.name}</strong>{report.description && <p>{report.description}</p>}</button>)}
+      {reports.map(report => {
+        const help = parseHttps(report.guide);
+        return <article key={report.id} className="panel power-bi-card">
+          <button type="button" className="power-bi-open" aria-pressed={report.id === selectedId} onClick={() => setSelectedId(report.id)}>
+            <span><PowerBiIcon size={23}/><small>{report.area ?? 'Power BI'}</small></span>
+            <strong>{report.name}</strong>{report.description && <span className="power-bi-description">{report.description}</span>}
+          </button>
+          {help && <a className="secondary power-bi-guide" href={help.href} target="_blank" rel="noopener noreferrer">راهنمای داشبورد</a>}
+        </article>;
+      })}
     </div> : <p className="empty-inline">هنوز داشبوردی ثبت نشده است.</p>}
     {selectedId && !selected && <p className="empty-inline">داشبورد در دسترس نیست.</p>}
     {selected && <Modal label={selected.name} className="panel power-bi-dialog" onClose={()=>setSelectedId('')}>
       <header><h2>{selected.name}</h2><button type="button" className="secondary" onClick={()=>setSelectedId('')}>بستن</button></header>
       {selected.description && <p>{selected.description}</p>}
-      {guide && <a href={guide.href} target="_blank" rel="noopener noreferrer">راهنمای داشبورد</a>}
+      {guide && <a className="secondary power-bi-guide" href={guide.href} target="_blank" rel="noopener noreferrer">راهنمای داشبورد</a>}
       {source ? <iframe className="power-bi-frame" src={source} title={selected.name} allow="fullscreen"/> :
         <small>نمونهٔ دمو</small>}
     </Modal>}

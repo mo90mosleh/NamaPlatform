@@ -21,3 +21,14 @@
  .process-workspace-tabs :is(a,button){padding:10px 8px;font-size:11px;gap:4px}
  .process-workspace-tabs :is(a,button) svg{width:15px;height:15px}
 }
+
+.process-toolbar-row { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:4px 12px; border-bottom:1px solid var(--line); margin-bottom:10px; }
+.process-toolbar-row .process-workspace-tabs { border:0; margin:0; min-width:0; }
+.process-toolbar-controls { margin-inline-start:auto; }
+.process-toolbar-controls:empty { display:none; }
+.workspace-content:has(.process-toolbar-row) .process-workspace { min-height:100%; display:flex; flex-direction:column; }
+.process-workspace-body:has(.process-detail-sections) { display:flex; flex-direction:column; flex:1; }
+@media(min-width:761px) {
+ .process-sections.process-detail-sections:not(:has(>.process-section[open])) { flex:1; grid-auto-rows:minmax(46px,1fr); }
+ .process-detail-sections:not(:has(>.process-section[open]))>.process-section>summary { height:100%; }
+}

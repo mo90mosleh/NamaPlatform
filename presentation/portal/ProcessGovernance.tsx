@@ -20,7 +20,7 @@ function PositionOptions({data}: {data: Data}) {
   return <>{data.positions.map(position => <option key={position.id} value={position.id}>{position.title}</option>)}</>;
 }
 
-export function GovernanceOverview({data, section}: {data: Data; section: GovernanceSection}) {
+export function GovernanceOverview({data, section, controls}: {data: Data; section: GovernanceSection; controls?: HTMLElement|null}) {
   const [position, setPosition] = useState('');
   const processes = data.nodes.filter(node => node.kind === 'PROCESS');
   const title = (id: string) => data.positions.find(item => item.id === id)?.title ?? '—';
@@ -29,7 +29,7 @@ export function GovernanceOverview({data, section}: {data: Data; section: Govern
     .filter(row => !position || row.roles[position]).map(row => ({process, row})));
   const doa = processes.flatMap(process => (data.governance?.[process.id]?.doa ?? [])
     .filter(row => !position || row.position === position || row.escalation === position).map(row => ({process, row})));
-  if (section === 'apqc') return <ApqcExplorer data={data}/>;
+  if (section === 'apqc') return <ApqcExplorer data={data} controls={controls}/>;
 
   return <section className="panel governance-panel">
     <h2>{labels[section]}</h2>

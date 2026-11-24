@@ -1,8 +1,11 @@
-import {NamayarAvatar} from './namayar/NamayarAvatar';
+import orgArt from './assets/slide-org.jpg';
+import processArt from './assets/slide-process.jpg';
+import kpiArt from './assets/slide-kpi.jpg';
+import okrArt from './assets/slide-okr.jpg';
 import {PowerBiIcon} from './PowerBiReports';
 import {groupPositions} from './position-groups';
 import {useEffect,useState} from 'react';
-import {Search,History,Network,ChartNoAxesCombined,Target,Pause,Play,UserRound,BriefcaseBusiness,Building2,BookOpen,Files,ArrowLeft,GitBranch,ChartColumn,Flag} from 'lucide-react';
+import {Search,History,ChartNoAxesCombined,Target,Pause,Play,UserRound,BriefcaseBusiness,Building2,BookOpen,Files,ArrowLeft} from 'lucide-react';
 import {ProcessIcon} from './ProcessIcon';
 import {normalizeSearch} from './architecture-navigation';
 import {availablePowerBiReports} from './KpiMonitoring';
@@ -11,10 +14,10 @@ import type {Data} from './types';
 import {Link} from './ui';
 
 const modules = [
- {path:'/organization/chart', name:'چارت سازمانی', detail:'واحدها، سمت‌ها و مسیرهای گزارش‌دهی را در ساختار سازمان پیدا کنید.', icon:Network, visual:Building2, hint:'از چارت شروع کنید تا افراد و مسیر گزارش‌دهی هر سمت را پیدا کنید.'},
- {path:'/architecture', name:'فرآیندها', detail:'طبقه‌بندی، زنجیره‌های ارزش و شناسنامهٔ فرآیندها را مرور کنید.', icon:ProcessIcon, visual:GitBranch, hint:'از نقشهٔ ارتباط‌ها تا ورودی‌ها، خروجی‌ها و مسئول هر فرآیند را یک‌جا ببینید.'},
- {path:'/kpis', name:'شاخص‌ها', detail:'روند عملکرد را در نمودارها دنبال کنید و تعریف و منبع دادهٔ شاخص‌ها را ببینید.', icon:ChartNoAxesCombined, visual:ChartColumn, hint:'مقدار واقعی را با هدف مقایسه کنید و تغییرات هر دوره را زیر نظر بگیرید.'},
- {path:'/okr', name:'OKR', detail:'اهداف سازمان، نتایج کلیدی و پیشرفت هر دوره را دنبال کنید.', icon:Target, visual:Flag, hint:'پیشرفت اهداف سازمان و دپارتمان‌ها را از روی نتایج کلیدی بسنجید.'},
+ {path:'/organization/chart', name:'چارت سازمانی', detail:'واحدها، سمت‌ها و مسیرهای گزارش‌دهی را در ساختار سازمان پیدا کنید.', art:orgArt, hint:'از چارت شروع کنید تا افراد و مسیر گزارش‌دهی هر سمت را پیدا کنید.'},
+ {path:'/architecture', name:'فرآیندها', detail:'طبقه‌بندی، زنجیره‌های ارزش و شناسنامهٔ فرآیندها را مرور کنید.', art:processArt, hint:'از نقشهٔ ارتباط‌ها تا ورودی‌ها، خروجی‌ها و مسئول هر فرآیند را یک‌جا ببینید.'},
+ {path:'/kpis', name:'شاخص‌ها', detail:'روند عملکرد را در نمودارها دنبال کنید و تعریف و منبع دادهٔ شاخص‌ها را ببینید.', art:kpiArt, hint:'مقدار واقعی را با هدف مقایسه کنید و تغییرات هر دوره را زیر نظر بگیرید.'},
+ {path:'/okr', name:'OKR', detail:'اهداف سازمان، نتایج کلیدی و پیشرفت هر دوره را دنبال کنید.', art:okrArt, hint:'پیشرفت اهداف سازمان و دپارتمان‌ها را از روی نتایج کلیدی بسنجید.'},
 ];
 
 const searchIcons = {بخش:BookOpen, فرآیند:ProcessIcon, شاخص:ChartNoAxesCombined, هدف:Target, 'Power BI':PowerBiIcon,
@@ -75,14 +78,13 @@ export function DashboardWidgets({data}:{data:Data}){
   return ()=>window.clearInterval(timer);
  },[playing,index]);
  const active=modules[index];
- const Icon=active.icon, Visual=active.visual;
  const byPath=new Map(destinations(data).map(item=>[item.path,item]));
  const visits=recent(data).flatMap(path=>{const item=byPath.get(path);return item?[item]:[];});
  return <div className="dashboard-widgets">
   <section className="panel dashboard-tour" aria-label="آشنایی با بخش‌های نما">
    <div className="dashboard-slide" data-slide={index} key={active.path}>
-    <div className="dashboard-slide-copy"><h2><Icon size={20}/>{active.name}</h2><p>{active.detail}</p><p>{active.hint}</p></div>
-    <div className="dashboard-slide-art" aria-hidden="true"><Visual size={72} strokeWidth={1.4}/><NamayarAvatar state="awake"/></div>
+    <div className="dashboard-slide-copy"><h2>{active.name}</h2><p>{active.detail}</p><p>{active.hint}</p></div>
+    <img className="dashboard-slide-art" src={active.art} width={300} height={300} alt=""/>
    </div>
    <footer className="dashboard-slide-footer">
    <div className="dashboard-slide-controls">{modules.map((item,i)=><button type="button" key={item.path} aria-label={item.name} aria-pressed={i===index} onClick={()=>setIndex(i)}/>)}

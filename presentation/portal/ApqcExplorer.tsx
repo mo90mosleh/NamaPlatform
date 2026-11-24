@@ -1,3 +1,4 @@
+import {createPortal} from 'react-dom';
 import {SegmentedControl} from './SegmentedControl';
 import translations from './apqc-fa.json';
 import {useState} from 'react';
@@ -7,7 +8,7 @@ import {apqcSource, categories} from './process-governance';
 import type {Data} from './types';
 import {Link, number} from './ui';
 
-export function ApqcExplorer({data}: {data: Data}) {
+export function ApqcExplorer({data, controls}: {data: Data; controls?: HTMLElement|null}) {
   const [language, setLanguage] = useState<'fa' | 'en'>('fa');
   const titleFor = (code: string) => {
     if (language === 'en') return apqcByCode.get(code) ?? 'Unclassified';
@@ -29,10 +30,11 @@ export function ApqcExplorer({data}: {data: Data}) {
     </button>
   ))}</div>;
 
+  const languageSwitch = <SegmentedControl className="apqc-language" label="زبان دسته‌بندی" value={language} onChange={setLanguage}
+      options={[{value:'fa',label:'فارسی',icon:null},{value:'en',label:'English',icon:null}]}/>;
   return <section className="panel governance-panel apqc-explorer">
     <header className="apqc-heading"><h2>{language === 'fa' ? 'طبقه‌بندی APQC' : 'APQC classification'}</h2>
-    <SegmentedControl className="apqc-language" label="زبان دسته‌بندی" value={language} onChange={setLanguage}
-      options={[{value:'fa',label:'فارسی',icon:null},{value:'en',label:'English',icon:null}]}/><a href={apqcSource} target="_blank" rel="noreferrer">مرجع میان‌صنعتی ۷٫۴</a></header>
+    {controls ? createPortal(languageSwitch,controls) : languageSwitch}<a href={apqcSource} target="_blank" rel="noreferrer">مرجع میان‌صنعتی ۷٫۴</a></header>
     <nav className="apqc-trail" aria-label="مسیر طبقه‌بندی APQC">
       {branch && <button type="button" className="icon-button" aria-label="بازگشت به سطح قبل" onClick={() => setBranch(branch === 'unmapped' ? '' : apqcParent(branch))}><ArrowRight size={17}/></button>}
       <button type="button" className="text-button" aria-current={!branch?'page':undefined} onClick={() => setBranch('')}>{language === 'fa' ? 'همه دسته‌ها' : 'All categories'}</button>

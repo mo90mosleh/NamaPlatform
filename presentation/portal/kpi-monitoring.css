@@ -80,3 +80,6 @@
  .kpi-card-grid-compact .kpi-pie { width:clamp(55px,17dvh,115px); margin:4px; }
  .kpi-card-grid-compact .kpi-pie-labels { max-height:90px; margin-block:4px; }
 }
+.power-bi-open { display:grid; gap:7px; flex:1; width:100%; text-align:start; background:transparent; border:0; padding:0; color:inherit; align-content:start; }
+.power-bi-description { font-size:.78rem; line-height:1.8; }
+.power-bi-guide { display:inline-flex; width:fit-content; padding:4px 8px; margin-block:2px; font-size:11px; }

@@ -35,34 +35,20 @@ const current = (measurement: Measurement) => measurement.revisions[measurement.
 function storageKey(data: Data) { return 'nama-kpi-monitoring-v1:' + data.organization.id; }
 
 const sampleSeries = [
-  {code: 'K-01', kind: 'line', values: [18, 16, 13, 12]},
-  {code: 'K-02', kind: 'bar', values: [76, 84, 81, 92]},
-  {code: 'K-03', kind: 'bar', values: [71, 79, 85, 89]},
-  {code: 'K-07', kind: 'line', values: [7, 6, 5, 4]},
+  {code: 'K-01', kind: 'line'},
+  {code: 'K-02', kind: 'bar'},
+  {code: 'K-03', kind: 'bar'},
+  {code: 'K-07', kind: 'line'},
 ] as const;
 
-const sampleVersion = 2;
-const sampleDates = ['2026-04-15', '2026-05-15', '2026-06-15', '2026-07-15', '2026-08-15', '2026-09-15', '2026-10-15', '2026-11-15'];
-const sampleFactors = [.74,.78,.77,.84,.86,.89,.91,.95];
-
+const sampleVersion = 3;
 function initialModel(data: Data): Model {
   if (!config.demoManagement) return empty;
-  const cards: Card[] = [];
-  const measurements: Measurement[] = [];
-  for (const kpi of data.kpis) {
-    const sample = sampleSeries.find(item=>item.code===kpi.code);
-    if (sample) cards.push({id:'sample-'+kpi.code,kpiId:kpi.id,kind:sample.kind});
-    const dates = /سالانه|annual|yearly/i.test(kpi.frequency??'')
-      ? [2022,2023,2024,2025,2026].map(year=>year+'-11-15') : sampleDates;
-    dates.forEach((date, index) => {
-      const target = kpi.target_value ?? 100;
-      const factor = sampleFactors[index];
-      const value = (sample && index>=4 ? sample.values[index-4] : undefined) ??
-        Math.round(target * (/ساعت|روز|دقیقه/.test(kpi.unit??'')?2-factor:factor)*10)/10;
-      measurements.push({kpiId:kpi.id,date,revisions:[{value,note:'داده نمونه دمو',actor:'دمو',savedAt:date+'T12:00:00Z'}]});
-    });
-  }
-  return {cards, measurements, reports:[], samplesInitialized:true, sampleVersion};
+  const cards = sampleSeries.flatMap(({code,kind})=>{
+    const kpi=data.kpis.find(item=>item.code===code);
+    return kpi?[{id:'sample-'+code,kpiId:kpi.id,kind}]:[];
+  });
+  return {cards, measurements:[], reports:[], samplesInitialized:true, sampleVersion};
 }
 
 function read(key: string, initial = empty): Model {
@@ -73,7 +59,10 @@ function read(key: string, initial = empty): Model {
       if (!initial.sampleVersion || saved.sampleVersion===initial.sampleVersion) return {...saved,reports};
       return {
         cards: saved.samplesInitialized ? saved.cards : [...saved.cards,...initial.cards.filter(sample=>!saved.cards.some(card=>card.kpiId===sample.kpiId))],
-        measurements:[...saved.measurements,...initial.measurements.filter(sample=>!saved.measurements.some(row=>row.kpiId===sample.kpiId&&row.date===sample.date))],
+        measurements:saved.measurements.flatMap(row=>{
+          const revisions=row.revisions.filter(revision=>revision.actor!=='دمو'||revision.note!=='داده نمونه دمو');
+          return revisions.length?[{...row,revisions}]:[];
+        }),
         reports,samplesInitialized:true,sampleVersion:initial.sampleVersion,
       };
     }
@@ -297,7 +286,7 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
         const rows = dateError ? [] : model.measurements.filter(row => row.kpiId === card.kpiId &&
           (!start || row.date >= start) && (!end || row.date <= end)).sort((a, b) => a.date.localeCompare(b.date));
         return <section className="panel kpi-monitor-card" key={card.id}>
-          <header><div><h2>{kpi?.name ?? 'شاخص در دسترس نیست'}</h2><small>{charts[card.kind]}{rows.some(row => current(row).actor === 'دمو') && ' · داده نمونه'}{kpi?.unit && ' · ' + kpi.unit}</small></div>
+          <header><div><h2>{kpi?.name ?? 'شاخص در دسترس نیست'}</h2><small>{charts[card.kind]}{kpi?.unit && ' · ' + kpi.unit}</small></div>
             <div className="kpi-actions"><button className="icon-button" type="button" title="ویرایش" aria-label="ویرایش" onClick={() => setCardDraft(card)}><Pencil size={16}/></button>
               <button className="icon-button" type="button" title="حذف کارت" aria-label="حذف کارت" onClick={() => {
                 if (update(model => ({...model, cards: model.cards.filter(item => item.id !== card.id)}), 'کارت حذف شد.') && cardDraft?.id === card.id) setCardDraft(null);
