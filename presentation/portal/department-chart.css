@@ -1,11 +1,17 @@
 .app.chart-focus-mode .chart-content:has(.department-chart) { padding:10px 12px 12px; }
-.department-chart { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,245px),1fr)); gap:12px; align-items:stretch; min-width:0; }
-.department-box { --department-tint:#e6f6f1; --department-ink:#16685b; min-width:0; overflow:hidden; background:var(--department-tint); border-radius:14px; border:1px solid color-mix(in srgb,var(--department-ink) 20%,white); padding:0 9px 10px; }
-.department-box:nth-child(3n+2) { --department-tint:#e8f1fc; --department-ink:#265b98; }
-.department-box:nth-child(3n+3) { --department-tint:#efebfa; --department-ink:#5d4b8b; }
-.department-box h2 { font-size:15px; margin:0 -9px 10px; }
-.department-box h2 button { background:var(--department-ink); color:#fff; border:0; display:flex; align-items:center; gap:7px; text-align:start; width:100%; min-height:42px; padding:8px 12px; }
-.department-box h2 button span { flex:1; }
+.department-chart { display:grid; gap:22px; min-width:0; }
+.department-chart > .department-branch:has(>.department-roots-children) > .department-box { width:min(100%,344px); margin-inline:auto; }
+.department-roots-children { position:relative; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr)); gap:12px; padding:16px 0 0; }
+.department-roots-children::before { content:""; position:absolute; inset:0 50% auto auto; height:8px; border-inline-start:1px solid #8b9aae; }
+.department-roots-children::after { content:""; position:absolute; inset:8px 0 auto; border-block-start:1px solid #8b9aae; }
+.department-roots-children>.department-branch { position:relative; }
+.department-roots-children>.department-branch::before { content:""; position:absolute; inset:-8px 50% auto auto; height:8px; border-inline-start:1px solid #8b9aae; }
+.department-box,.department-subgroup { --department-ink:#30475d; min-width:0; background:#f5f7fa; border-radius:12px; border:1px solid var(--line,#dce3eb); padding:0 9px 9px; }
+.department-box h2,.department-subgroup h2 { font-size:14px; margin:0 -9px 8px; }
+.department-box h2 button,.department-subgroup h2 button { background:#ffffff90; color:var(--department-ink); border:0; border-radius:11px 11px 0 0; display:flex; align-items:center; gap:6px; text-align:start; width:100%; min-height:42px; padding:7px 10px; }
+.department-box h2 button span,.department-subgroup h2 button span { flex:1; }
+.department-metric { flex:none; font-size:10px; padding:2px 4px; border:1px solid var(--line); border-radius:5px; }
+.department-descendants { display:grid; gap:6px; margin-top:7px; padding-inline-start:8px; border-inline-start:1px solid #8b9aae; }
 .department-box h2 button[aria-current] { outline:2px solid currentColor; outline-offset:-4px; }
 .department-people { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
 .department-lead { grid-column:1/-1; }
@@ -16,7 +22,10 @@
 .department-person strong,.department-person small { display:block; line-height:1.55; overflow-wrap:anywhere; }
 .department-person strong { font-size:12px; }
 .department-person small { color:var(--department-ink); font-size:10px; }
-.department-subgroup { margin-top:9px; padding:6px; border:1px solid color-mix(in srgb,var(--department-ink) 24%,white); border-radius:9px; }
-.department-subgroup h2 { margin:0 0 5px; font-size:12px; }
-.department-subgroup h2 button { background:#ffffff90; color:var(--department-ink); padding:4px 6px; min-height:32px; border-radius:5px; }
-@media(max-width:600px) { .department-chart { grid-template-columns:minmax(0,1fr); gap:10px; } }
+.department-subgroup h2 { font-size:12px; }
+.department-subgroup h2 button { min-height:32px; }
+@media(max-width:600px) {
+ .department-roots-children { grid-template-columns:minmax(0,1fr); padding-inline-start:12px; border-inline-start:1px solid #8b9aae; }
+ .department-roots-children::after,.department-roots-children::before,.department-roots-children>.department-branch::before { display:none; }
+ .department-chart > .department-branch:has(>.department-roots-children) > .department-box { width:100%; }
+}

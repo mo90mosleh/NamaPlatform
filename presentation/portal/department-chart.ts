@@ -32,25 +32,17 @@ export function departmentGroups({units,positions,assignments,persons}:Data):Dep
   childrenByParent.set(unit.parent_id,children);
  }
  const visited=new Set<string>();
- function group(unit:Unit,includeChildren=true):DepartmentGroup {
+ function group(unit:Unit):DepartmentGroup {
   visited.add(unit.id);
   const members=[...(membersByUnit.get(unit.id)?.values()??[])].sort((a,b)=>Number(b.leads)-Number(a.leads));
   const children:DepartmentGroup[]=[];
-  if(includeChildren)for(const child of childrenByParent.get(unit.id)??[]){
+  for(const child of childrenByParent.get(unit.id)??[]){
    if(!visited.has(child.id))children.push(group(child));
   }
   return {unit,members,children};
  }
- const root=sorted.filter(unit=>!unit.parent_id||!unitsById.has(unit.parent_id));
- if(root.length!==1||!childrenByParent.has(root[0].id)){
-  const departments=root.filter(unit=>!visited.has(unit.id)).map(unit=>group(unit));
-  for(const unit of sorted)if(!visited.has(unit.id))departments.push(group(unit));
-  return departments;
- }
- const organization=root[0];
- const leadership=group(organization,false);
- const departments=(childrenByParent.get(organization.id)??[]).filter(unit=>!visited.has(unit.id)).map(unit=>group(unit));
+ const roots=sorted.filter(unit=>!unit.parent_id||unit.parent_id===unit.id||!unitsById.has(unit.parent_id));
+ const departments=roots.filter(unit=>!visited.has(unit.id)).map(unit=>group(unit));
  for(const unit of sorted)if(!visited.has(unit.id))departments.push(group(unit));
- departments.push(leadership);
  return departments;
 }
