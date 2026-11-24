@@ -1,3 +1,4 @@
+import {findProductHelp} from '../../supabase/functions/namayar-groq-test/product-guide';
 import{withinScope,refusalReply}from'./scope';
 import{useEffect,useRef,useState,type FormEvent}from'react';import{createPortal}from'react-dom';import{X,Send,BrushCleaning,ArrowUpLeft,ExternalLink,BookOpen,Route,Sparkles}from'lucide-react';import{Link,go}from'../ui';import{usePageContext}from'./PageContextProvider';import{NamayarAvatar}from'./NamayarAvatar';import type{ConversationState}from'./conversation';import{llmAdapter,fetchSharedQuota,type HistoryMessage}from'./LLMAdapter';import type{PageContext,Reply,AssistantLink}from'./types';import'./style.css';
 const idleMessages = [
@@ -82,8 +83,10 @@ export function Namayar(){const{data,context,requestSelection}=usePageContext(),
       message.role==='user'&&message.text?[{role:'user',content:message.text}]:
       message.role==='assistant'&&message.reply?[{role:'assistant',content:message.reply.paragraphs.join(' ').slice(0,650)}]:[]);
     let receivedDelta=false;
+    // Use the current product guide for feature questions, even when AI is enabled.
+    const localHelp=Boolean(findProductHelp(question))||/تور|راهنمای این صفحه|راهنمای صفحه/.test(question);
     const reply=!withinScope(data,origin,question)?refusalReply():
-      aiEnabled?await llmAdapter.answer(question,origin,data,controller.signal,history,(fragment)=>{
+      aiEnabled&&!localHelp?await llmAdapter.answer(question,origin,data,controller.signal,history,(fragment)=>{
         if(controller.signal.aborted)return;
         receivedDelta=true;
         updateDraft(visible+fragment);

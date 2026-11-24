@@ -8,3 +8,5 @@ createRoot(document.getElementById('app')!).render(<App/>);
 const feedback=document.createElement('div');feedback.id='feedback-mount';document.body.append(feedback);createRoot(feedback).render(<>{window.__PORTAL_CONFIG__.feedbackEnabled!==false&&<Suspense fallback={null}><Feedback/></Suspense>}<GuidedTour/></>);
 
 import './workspace-frame.css';
+
+import './mobile-workspaces.css';

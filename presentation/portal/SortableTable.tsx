@@ -26,7 +26,20 @@ export function useTableSort() {
    return sort.direction==='ascending'?difference:-difference;
   });
  }
- return {header,ordered};
+ function mobilePicker(labels:string[]) {
+  const value=sort?sort.column+':'+sort.direction:'';
+  return <label className="mobile-sort-picker">مرتب‌سازی
+   <select value={value} onChange={event=>{
+    const [column,direction]=event.target.value.split(':');
+    setSort(direction==='ascending'||direction==='descending'?{column:Number(column),direction}:undefined);
+   }}>
+    <option value="">ترتیب اولیه</option>
+    {labels.flatMap((label,column)=> (['ascending','descending'] as const).map(direction=>
+      <option key={column+':'+direction} value={column+':'+direction}>{label} · {direction==='ascending'?'صعودی':'نزولی'}</option>))}
+   </select>
+  </label>;
+ }
+ return {header,ordered,mobilePicker};
 }
 
 export function openTableRow(event:MouseEvent<HTMLTableRowElement>,path:string) {
