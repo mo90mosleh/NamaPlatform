@@ -1,0 +1,22 @@
+.app.chart-focus-mode .chart-content:has(.department-chart) { padding:10px 12px 12px; }
+.department-chart { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,245px),1fr)); gap:12px; align-items:stretch; min-width:0; }
+.department-box { --department-tint:#e6f6f1; --department-ink:#16685b; min-width:0; overflow:hidden; background:var(--department-tint); border-radius:14px; border:1px solid color-mix(in srgb,var(--department-ink) 20%,white); padding:0 9px 10px; }
+.department-box:nth-child(3n+2) { --department-tint:#e8f1fc; --department-ink:#265b98; }
+.department-box:nth-child(3n+3) { --department-tint:#efebfa; --department-ink:#5d4b8b; }
+.department-box h2 { font-size:15px; margin:0 -9px 10px; }
+.department-box h2 button { background:var(--department-ink); color:#fff; border:0; display:flex; align-items:center; gap:7px; text-align:start; width:100%; min-height:42px; padding:8px 12px; }
+.department-box h2 button span { flex:1; }
+.department-box h2 button[aria-current] { outline:2px solid currentColor; outline-offset:-4px; }
+.department-people { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+.department-lead { grid-column:1/-1; }
+.department-person { width:100%; min-width:0; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding:7px 5px; color:var(--ink); background:#fff; border:1px solid #cdd9e4; border-radius:9px; text-align:center; }
+.department-lead .department-person { flex-direction:row; justify-content:flex-start; text-align:start; padding-inline:9px; }
+.department-person:hover { border-color:var(--department-ink); }
+.department-person .person-avatar { width:35px; height:35px; flex:none; }
+.department-person strong,.department-person small { display:block; line-height:1.55; overflow-wrap:anywhere; }
+.department-person strong { font-size:12px; }
+.department-person small { color:var(--department-ink); font-size:10px; }
+.department-subgroup { margin-top:9px; padding:6px; border:1px solid color-mix(in srgb,var(--department-ink) 24%,white); border-radius:9px; }
+.department-subgroup h2 { margin:0 0 5px; font-size:12px; }
+.department-subgroup h2 button { background:#ffffff90; color:var(--department-ink); padding:4px 6px; min-height:32px; border-radius:5px; }
+@media(max-width:600px) { .department-chart { grid-template-columns:minmax(0,1fr); gap:10px; } }
