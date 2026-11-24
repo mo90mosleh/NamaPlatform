@@ -6,8 +6,9 @@ import type{Data}from'../types';
 import{config}from'../api';
 import{Link}from'../ui';
 import{sampleAutumn1405}from'./sample';
+import {loadPortfolio} from './portfolio-storage';
 import{isoToJalaliInput,suggestCycleDates,validateCycleRange}from'./persian-cycle-dates';
-import{activeObjectives,strategicPillars,averageProgress,keyResultProgress,number,objectivePace,objectiveProgress,paceStatusLabels,portfolioIsValid,withoutProcessLinks,progressBand,registerCheckIn,withKeyResult,withObjective,type OkrPortfolio,type OkrObjective,type OkrPace,type OkrPaceStatus,type OkrKeyResult}from'./model';
+import{activeObjectives,strategicPillars,averageProgress,keyResultProgress,number,objectivePace,objectiveProgress,paceStatusLabels,progressBand,registerCheckIn,withKeyResult,withObjective,type OkrPortfolio,type OkrObjective,type OkrPace,type OkrPaceStatus,type OkrKeyResult}from'./model';
 import'./okr.css';
 
 type Tab='strategy'|'goals'|'monitor';
@@ -17,17 +18,8 @@ type FormKind='cycle'|'objective'|'kr'|'checkin'|null;
 type Draft={objectiveId?:string;keyResultId?:string;cycleId?:string};
 type CycleDraft={title:string;start:string;end:string;editedStart:boolean;editedEnd:boolean};
 const initialCycleDraft:CycleDraft={title:'',start:'',end:'',editedStart:false,editedEnd:false};
-const EMPTY:OkrPortfolio={cycles:[],objectives:[],keyResults:[],checkins:[]};
 const actionTime=()=>new Date().toISOString();
 const titleByTab:Record<Tab,string>={strategy:'نقشه استراتژی',goals:'اهداف و نتایج کلیدی',monitor:'پایش و عملکرد'};
-const copy=(value:OkrPortfolio)=>JSON.parse(JSON.stringify(value)) as OkrPortfolio;
-function loadPortfolio(orgId:string,orgName:string,canEdit:boolean){
- try{
-  const saved=(canEdit||config.demoManagement)?localStorage.getItem('nama-okr-workspace-v1:'+orgId):null;
-  if(saved){const value:unknown=JSON.parse(saved);if(portfolioIsValid(value))return withoutProcessLinks(value);}
- }catch{/* Browser storage unavailable. */}
- return config.mode==='public'&&/پارس تجهیز آریا/.test(orgName)?sampleAutumn1405():copy(EMPTY);
-}
 function Status({value}:{value:OkrPaceStatus}){const tone=value==='ON_TRACK'?'is-good':value==='AT_RISK'?'is-risk':value==='OFF_TRACK'?'is-bad':'is-neutral';return <span className={'okr-status '+tone} title="وضعیت خودکار بر اساس پیشرفت و زمان سپری‌شده از دوره">{paceStatusLabels[value]}</span>;}
 function Progress({value}:{value:number}){const band=progressBand(value);return <div className={'okr-progress okr-progress-'+band} role="progressbar" aria-label="درصد پیشرفت" aria-valuemin={0} aria-valuemax={100} aria-valuenow={value}><span style={{width:value+'%'}}/></div>;}
 function EntryCard({goal,portfolio,onSelect,owner,pace}:{goal:OkrObjective;portfolio:OkrPortfolio;onSelect:()=>void;owner:string;pace:OkrPace}){
@@ -39,15 +31,16 @@ function EntryCard({goal,portfolio,onSelect,owner,pace}:{goal:OkrObjective;portf
   <Progress value={pct}/>
  </button>;
 }
-export function OkrWorkspace({data}:{data:Data}){
+export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string}){
  const [portfolio,setPortfolio]=useState<OkrPortfolio>(()=>loadPortfolio(data.organization.id,data.organization.name,data.user.role==='ADMIN'));
- const [activeCycle,setActiveCycle]=useState(()=>portfolio.cycles.find(c=>c.status==='ACTIVE')?.id??portfolio.cycles[0]?.id??'');
+ const linkedObjective=portfolio.objectives.find(goal=>goal.id===objectiveId);
+ const [activeCycle,setActiveCycle]=useState(()=>linkedObjective?.cycleId??portfolio.cycles.find(c=>c.status==='ACTIVE')?.id??portfolio.cycles[0]?.id??'');
  const [tab,setTab]=useState<Tab>('strategy'),[pillar,setPillar]=useState(''),[listView,setListView]=useState<'tree'|'table'>('tree');
  const [summaryDetail,setSummaryDetail]=useState<SummaryDetail|null>(null);
  const [showAllResults,setShowAllResults]=useState(false);
  const [expandedResults,setExpandedResults]=useState<Record<string,boolean>>({});
  const [search,setSearch]=useState(''),[scope,setScope]=useState('ALL');
- const [selectedId,setSelectedId]=useState<string|null>(null),[detailTab,setDetailTab]=useState<DetailTab>('results');
+ const [selectedId,setSelectedId]=useState<string|null>(linkedObjective?.id??null),[detailTab,setDetailTab]=useState<DetailTab>('results');
  const [form,setForm]=useState<FormKind>(null),[draft,setDraft]=useState<Draft>({}),[cycleManagerOpen,setCycleManagerOpen]=useState(false);
  const [cycleDraft,setCycleDraft]=useState<CycleDraft>(initialCycleDraft);
  const [feedback,setFeedback]=useState(''),[error,setError]=useState('');
@@ -273,7 +266,7 @@ export function OkrWorkspace({data}:{data:Data}){
   </section>
  </>;
  return <div ref={ref} className="okr-workspace">
-  <header className="process-workspace-header okr-heading" data-tour="page-heading"><h1>مدیریت OKR</h1>
+  <header className="process-workspace-header okr-heading">
    <div className="okr-heading-actions"><label className="okr-cycle-control"><CalendarDays size={16}/><select aria-label="دوره OKR" value={cycle?.id??''} onChange={e=>{setActiveCycle(e.target.value);setSelectedId(null);setPillar('');}}>{!portfolio.cycles.length&&<option value="">دوره‌ای تعریف نشده</option>}{portfolio.cycles.map(c=><option key={c.id} value={c.id}>{c.title} {c.status==='PLANNING'?'· برنامه‌ریزی':''}</option>)}</select><ChevronDown size={13}/></label>
     {canEdit&&<button className="okr-button okr-button-muted" onClick={()=>{setSelectedId(null);setCycleManagerOpen(true);setError('');setFeedback('');}}><CalendarDays size={15}/>مدیریت دوره‌ها</button>}
     {canEdit&&<button className="okr-button okr-button-primary" onClick={()=>showForm('objective')}><Plus size={17}/>هدف جدید</button>}

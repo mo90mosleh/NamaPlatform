@@ -5,6 +5,7 @@ import {number} from './ui';
 import {JalaliDatePicker} from './JalaliDatePicker';
 import {PowerBiIcon, PowerBiReports, type PowerBiReport} from './PowerBiReports';
 import './kpi-monitoring.css';
+import {config} from './api';
 
 type ChartKind = 'line' | 'bar' | 'pie';
 type Card = {id: string; kpiId: string; kind: ChartKind};
@@ -66,6 +67,21 @@ function read(key: string, initial = empty): Model {
   return initial;
 }
 
+const samplePowerBiReport: PowerBiReport = {
+  id: 'sample-public-esg',
+  name: 'نمونه Power BI · داشبورد ESG',
+  embed: 'https://app.powerbi.com/view?r=eyJrIjoiYjc2ZTEyZjItODI0Yi00NzY2LWJkNTMtODAwYjNlNWNjYTQ5IiwidCI6IjUwZDhjMTE1LWI3N2YtNDM5NS1hM2JhLTNiNDA3Y2FmMGQ4OCIsImMiOjh9',
+  guide: 'https://democracy.lbhf.gov.uk/documents/s120652/Appendix%201%20-%20Responsible%20Investment%20Statement%20LBHF%202022.pdf',
+};
+
+function visibleReports(reports: PowerBiReport[]) {
+  return config.demoManagement ? [samplePowerBiReport, ...reports] : reports;
+}
+
+export function availablePowerBiReports(data: Data) {
+  return visibleReports(read(storageKey(data)).reports);
+}
+
 export function latestKpiValue(data: Data, id: string) {
   const latest = read(storageKey(data), initialModel(data)).measurements.filter(row => row.kpiId === id)
     .sort((a, b) => b.date.localeCompare(a.date))[0];
@@ -118,10 +134,10 @@ function Chart({kpi, kind, rows}: {kpi: KPI; kind: ChartKind; rows: Measurement[
   </>;
 }
 
-export function KpiMonitoring({data, profiles}: {data: Data; profiles: (values: ReadonlyMap<string, number>) => ReactNode}) {
+export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?: string; profiles: (values: ReadonlyMap<string, number>) => ReactNode}) {
   const key = storageKey(data);
   const [model, setModel] = useState(() => read(key, initialModel(data)));
-  const [tab, setTab] = useState<(typeof tabs)[number][0]>('dashboard');
+  const [tab, setTab] = useState<(typeof tabs)[number][0]>(reportId ? 'power-bi' : 'dashboard');
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
   const [entryOpen, setEntryOpen] = useState(false);
@@ -184,13 +200,10 @@ export function KpiMonitoring({data, profiles}: {data: Data; profiles: (values: 
   </select>;
 
   return <div className="kpi-workspace">
-    <header className="process-workspace-header" data-tour="page-heading">
-      <h1>شاخص‌های ارزیابی عملکرد</h1>
-      {tab === 'dashboard' && <div className="kpi-date-filters">
+    {tab === 'dashboard' && <div className="kpi-date-filters">
         <JalaliDatePicker label="از تاریخ" value={start} onChange={setStart}/>
         <JalaliDatePicker label="تا تاریخ" value={end} onChange={setEnd}/>
-      </div>}
-    </header>
+    </div>}
     <nav className="process-workspace-tabs" aria-label="بخش‌های شاخص‌های عملکرد">
       {tabs.map(([id, title, Icon]) => <button key={id} type="button" className={tab === id ? 'active' : ''}
         aria-current={tab === id ? 'page' : undefined} onClick={() => {setTab(id); setMessage(null);}}><Icon size={17}/>{title}</button>)}
@@ -253,7 +266,7 @@ export function KpiMonitoring({data, profiles}: {data: Data; profiles: (values: 
       </form>}
 
     </>}
-    {tab === 'power-bi' && <PowerBiReports reports={model.reports} canManage={admin}
+    {tab === 'power-bi' && <PowerBiReports reportId={reportId} reports={visibleReports(model.reports)} canManage={admin}
       onAdd={report => update(saved => ({...saved, reports: [...saved.reports, report]}), 'داشبورد ذخیره شد.')}/>}
   </div>;
 }

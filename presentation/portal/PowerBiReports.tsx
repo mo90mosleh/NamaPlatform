@@ -23,11 +23,11 @@ function embedUrl(value: string) {
   return url?.origin === 'https://app.powerbi.com' && /^\/(reportEmbed|dashboardEmbed|view)\/?$/i.test(url.pathname) ? url.href : null;
 }
 
-export function PowerBiReports({reports, canManage, onAdd}: {
-  reports: PowerBiReport[]; canManage: boolean; onAdd: (report: PowerBiReport) => boolean;
+export function PowerBiReports({reports, canManage, onAdd, reportId}: {
+  reportId?: string; reports: PowerBiReport[]; canManage: boolean; onAdd: (report: PowerBiReport) => boolean;
 }) {
   const [adding, setAdding] = useState(false);
-  const [selectedId, setSelectedId] = useState('');
+  const [selectedId, setSelectedId] = useState(reportId ?? '');
   const [error, setError] = useState('');
   const selected = reports.find(report => report.id === selectedId);
   const source = selected && embedUrl(selected.embed);
@@ -67,6 +67,7 @@ export function PowerBiReports({reports, canManage, onAdd}: {
       {reports.map(report => <button key={report.id} type="button" className="secondary"
         aria-pressed={report.id === selectedId} onClick={() => setSelectedId(report.id)}>{report.name}</button>)}
     </div> : <p className="empty-inline">هنوز داشبوردی ثبت نشده است.</p>}
+    {selectedId && !selected && <p className="empty-inline">داشبورد در دسترس نیست.</p>}
     {selected && source && <section className="panel kpi-monitor-card">
       <h2>{selected.name}</h2>
       {guide && <a href={guide.href} target="_blank" rel="noopener noreferrer">راهنمای داشبورد</a>}

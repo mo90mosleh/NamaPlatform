@@ -1,0 +1,37 @@
+#app { overflow: hidden; }
+#app > .app { height: 100%; min-height: 0; overflow: hidden; }
+.app > .workspace {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+.app > .workspace > .topbar { position: relative; z-index: 45; }
+.app > .workspace > .workspace-content {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin-block: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scroll-padding-block: 12px;
+}
+.app > .workspace > footer { display: none; }
+.app > .side { overflow-y: auto; overscroll-behavior: contain; }
+.app .skip:focus { position: fixed; }
+.app .workspace-content:focus-visible { outline-offset: -2px; }
+
+.app.has-module-title .topbar .organization { gap: 8px; }
+.app.has-module-title .chart-shell-entry { padding-inline-end: 8px; }
+.kpi-date-filters { margin-block-end: 8px; }
+
+@media (max-width: 760px) {
+  .app.has-module-title .topbar { gap: 4px; padding-inline: 8px; }
+  .app.has-module-title .topbar .organization { gap: 6px; }
+  .app.has-module-title .topbar .company-logo { width: clamp(48px, 15vw, 76px); }
+  .app.has-module-title .topbar .mobile-nama-brand { width: 35px; }
+  .app.has-module-title .topbar .mobile-nama-brand .nama-mark { max-width: 100%; }
+  .app.has-module-title .chart-shell-entry { padding-inline-end: 5px; }
+  .app.has-module-title .topbar-actions { gap: 4px; }
+}

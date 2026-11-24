@@ -1,0 +1,24 @@
+.quick-links { margin-bottom: 18px; padding: 14px; }
+.quick-links-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.quick-link-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr));
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.quick-link-grid li { display: flex; min-width: 0; align-items: center; border: 1px solid var(--line); border-radius: 10px; }
+.quick-link-grid li:hover { background: var(--surface-subtle, #f6f8fa); }
+.quick-link-target { display: flex; flex: 1; align-items: center; gap: 8px; min-width: 0; padding: 8px; }
+.quick-link-target > svg { flex-shrink: 0; }
+.quick-link-icon { display: grid; flex: 0 0 34px; height: 34px; place-items: center; border-radius: 8px; background: var(--shortcut-bg); color: var(--shortcut-ink); }
+.quick-link-grid [data-kind="process"] { --shortcut-bg: #e2f4ee; --shortcut-ink: #187258; }
+.quick-link-grid [data-kind="kpi"] { --shortcut-bg: #e5efff; --shortcut-ink: #2459a3; }
+.quick-link-grid [data-kind="objective"] { --shortcut-bg: #f0e7ff; --shortcut-ink: #7043a0; }
+.quick-link-grid [data-kind="powerBi"] { --shortcut-bg: #fff1c9; --shortcut-ink: #855a0c; }
+.quick-link-copy { min-width: 0; flex: 1; display: grid; overflow-wrap: anywhere; }
+.quick-link-copy strong { font-size: 13px; line-height: 1.45; }
+.quick-link-grid .icon-button { flex-shrink: 0; margin-inline-end: 4px; }
+.quick-link-form { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; padding-block: 4px 12px; }
+.quick-link-form label { flex: 1 1 150px; min-width: 0; }
