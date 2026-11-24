@@ -8,7 +8,7 @@ import{Link}from'../ui';
 import{sampleAutumn1405}from'./sample';
 import {loadPortfolio} from './portfolio-storage';
 import{isoToJalaliInput,suggestCycleDates,validateCycleRange}from'./persian-cycle-dates';
-import{activeObjectives,strategicPillars,averageProgress,keyResultProgress,number,objectivePace,objectiveProgress,paceStatusLabels,progressBand,registerCheckIn,withKeyResult,withObjective,type OkrPortfolio,type OkrObjective,type OkrPace,type OkrPaceStatus,type OkrKeyResult}from'./model';
+import{activeObjectives,strategicPillars,averageProgress,keyResultProgress,number,objectivePace,objectiveProgress,paceStatusLabels,progressBand,registerCheckIn,withKeyResult,withObjective,type OkrPortfolio,type OkrObjective,type OkrPaceStatus,type OkrKeyResult}from'./model';
 import'./okr.css';
 
 type Tab='strategy'|'goals'|'monitor';
@@ -22,20 +22,11 @@ const actionTime=()=>new Date().toISOString();
 const titleByTab:Record<Tab,string>={strategy:'نقشه استراتژی',goals:'اهداف و نتایج کلیدی',monitor:'پایش و عملکرد'};
 function Status({value}:{value:OkrPaceStatus}){const tone=value==='ON_TRACK'?'is-good':value==='AT_RISK'?'is-risk':value==='OFF_TRACK'?'is-bad':'is-neutral';return <span className={'okr-status '+tone} title="وضعیت خودکار بر اساس پیشرفت و زمان سپری‌شده از دوره">{paceStatusLabels[value]}</span>;}
 function Progress({value}:{value:number}){const band=progressBand(value);return <div className={'okr-progress okr-progress-'+band} role="progressbar" aria-label="درصد پیشرفت" aria-valuemin={0} aria-valuemax={100} aria-valuenow={value}><span style={{width:value+'%'}}/></div>;}
-function EntryCard({goal,portfolio,onSelect,owner,pace}:{goal:OkrObjective;portfolio:OkrPortfolio;onSelect:()=>void;owner:string;pace:OkrPace}){
- const pct=objectiveProgress(portfolio,goal.id),krCount=portfolio.keyResults.filter(x=>x.objectiveId===goal.id).length;
- return <button className={'okr-goal-card '+(goal.level==='COMPANY'?'is-company':'')} onClick={onSelect} aria-label={'جزئیات هدف '+goal.title}>
-  <span className="okr-card-meta"><span>{goal.level==='COMPANY'?'هدف سازمانی':'هدف دپارتمان'}</span><bdi>{goal.code}</bdi></span>
-  <strong>{goal.title}</strong><span className="okr-card-meta"><span>{owner}</span><Status value={pace.status}/></span>
-  <span className="okr-card-meta"><span>{number.format(krCount)} نتیجه کلیدی</span><b>{number.format(pct)}٪</b></span>
-  <Progress value={pct}/>
- </button>;
-}
 export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string}){
  const [portfolio,setPortfolio]=useState<OkrPortfolio>(()=>loadPortfolio(data.organization.id,data.organization.name,data.user.role==='ADMIN'));
  const linkedObjective=portfolio.objectives.find(goal=>goal.id===objectiveId);
  const [activeCycle,setActiveCycle]=useState(()=>linkedObjective?.cycleId??portfolio.cycles.find(c=>c.status==='ACTIVE')?.id??portfolio.cycles[0]?.id??'');
- const [tab,setTab]=useState<Tab>('strategy'),[pillar,setPillar]=useState(''),[listView,setListView]=useState<'tree'|'table'>('tree');
+ const [tab,setTab]=useState<Tab>('strategy'),[selectedPillars,setSelectedPillars]=useState<string[]>([]),[listView,setListView]=useState<'tree'|'table'>('tree');
  const [summaryDetail,setSummaryDetail]=useState<SummaryDetail|null>(null);
  const [showAllResults,setShowAllResults]=useState(false);
  const [expandedResults,setExpandedResults]=useState<Record<string,boolean>>({});
@@ -108,7 +99,7 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
  };
  const cycleDateFormat=new Intl.DateTimeFormat('fa-IR-u-ca-persian',{year:'numeric',month:'short',day:'numeric'});
  const cycleDates=(start:string,end:string)=>start&&end?cycleDateFormat.format(new Date(start+'T12:00:00'))+' تا '+cycleDateFormat.format(new Date(end+'T12:00:00')):'تاریخ شروع و پایان ثبت نشده';
- const selectCycle=(id:string)=>{setActiveCycle(id);setSelectedId(null);setPillar('');setCycleManagerOpen(false);setFeedback('');};
+ const selectCycle=(id:string)=>{setActiveCycle(id);setSelectedId(null);setSelectedPillars([]);setCycleManagerOpen(false);setFeedback('');};
  const pillars=strategicPillars(portfolio);
  const activePillars=pillars.filter(axis=>axis.active);
  const cyclePillars=pillars.filter(axis=>axis.active||objectives.some(goal=>goal.pillar===axis.name));
@@ -124,7 +115,7 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
  function togglePillar(name:string,active:boolean){
   const saved=write({...portfolio,pillars:pillars.map(axis=>axis.name===name?{...axis,active}:axis)},
    active?'محور استراتژیک فعال شد.':'محور استراتژیک غیرفعال شد.');
-  if(saved&&!active&&pillar===name&&!objectives.some(goal=>goal.pillar===name))setPillar('');
+  if(saved&&!active&&!objectives.some(goal=>goal.pillar===name))setSelectedPillars(previous=>previous.filter(item=>item!==name));
  }
 
  const filtered=objectives.filter(g=>(scope==='ALL'||g.level===scope)&&(!search.trim()||(g.title+' '+g.code+' '+owner(g)).includes(search.trim())));
@@ -177,26 +168,53 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
    }
   }catch(err){setError(err instanceof Error?err.message:'ذخیره انجام نشد.');}
  }
- function resetDemo(){if(!canEdit||!demo)return;if(!window.confirm('تغییرات آزمایشی OKR بازنشانی شود؟'))return;const next=sampleAutumn1405();if(!write(next,'اطلاعات نمونه پاییز ۱۴۰۵ بازنشانی شد.'))return;setPillar('');setActiveCycle('1405-fall');setSelectedId(null);}
+ function resetDemo(){if(!canEdit||!demo)return;if(!window.confirm('تغییرات آزمایشی OKR بازنشانی شود؟'))return;const next=sampleAutumn1405();if(!write(next,'اطلاعات نمونه پاییز ۱۴۰۵ بازنشانی شد.'))return;setSelectedPillars([]);setActiveCycle('1405-fall');setSelectedId(null);}
  const summary=<div className="okr-metrics">
   {metric('objectives','اهداف دوره',number.format(objectives.length),'سازمانی و دپارتمانی')}
   {metric('results','نتایج کلیدی',number.format(results.length),'مقادیر قابل سنجش')}
   {metric('progress','میانگین تحقق',number.format(average)+'٪','میانگین اهداف فعال')}
   {metric('risk','نیازمند پیگیری',number.format(riskCount),'مقایسه تحقق با زمان دوره')}
  </div>;
+ const goalsById=new Map(objectives.map(goal=>[goal.id,goal]));
+ const includedIds=new Set<string>();
+ for(const goal of objectives){
+  if(selectedPillars.length&&!selectedPillars.includes(goal.pillar))continue;
+  let current:OkrObjective|undefined=goal;
+  while(current&&!includedIds.has(current.id)){
+   includedIds.add(current.id);
+   current=current.parentId?goalsById.get(current.parentId):undefined;
+  }
+ }
+ const visibleGoals=objectives.filter(goal=>includedIds.has(goal.id));
+ const roots=visibleGoals.filter(goal=>!goal.parentId||!includedIds.has(goal.parentId));
+ function renderGoal(goal:OkrObjective){
+  const children=visibleGoals.filter(item=>item.parentId===goal.id);
+  return <li key={goal.id}>
+   <button type="button" className="okr-tree-goal" aria-label={'جزئیات هدف '+goal.title} onClick={()=>open(goal.id)}>
+    <bdi>{goal.code}</bdi><strong>{goal.title}</strong><small>{owner(goal)}</small>
+    <span>{number.format(objectiveProgress(portfolio,goal.id))}٪</span><Status value={pace(goal).status}/>
+   </button>
+   {children.length>0&&<ul>{children.map(renderGoal)}</ul>}
+  </li>;
+ }
  const strategy=<>
   {summary}
-  <div className="okr-panel">
-   <div className="okr-panel-head"><div><h3>نقشه هم‌راستاسازی اهداف</h3><small>روی هر کارت کلیک کنید تا جزئیات و KPIهای مرتبط نمایش داده شوند.</small></div><label className="okr-pillar-filter">محور استراتژیک<select aria-label="فیلتر محور استراتژیک" value={pillar} onChange={e=>setPillar(e.target.value)}><option value="">همه محورها</option>{cyclePillars.map(axis=><option key={axis.name} value={axis.name}>{axis.name}{axis.active?'':' (غیرفعال)'}</option>)}</select></label></div>
-   {objectives.length?<div className="okr-map">
-    {objectives.filter(x=>!x.parentId&&(!pillar||x.pillar===pillar||objectives.some(child=>child.parentId===x.id&&child.pillar===pillar))).map(rootGoal=><div key={rootGoal.id} className="okr-map-tree">
-      <div className="okr-map-parent"><EntryCard goal={rootGoal} portfolio={portfolio} pace={pace(rootGoal)} owner={owner(rootGoal)} onSelect={()=>open(rootGoal.id)}/></div>
-      {objectives.some(g=>g.parentId===rootGoal.id&&(!pillar||g.pillar===pillar))&&<><div className="okr-map-stem" aria-hidden="true"/><div className="okr-map-children">{objectives.filter(g=>g.parentId===rootGoal.id&&(!pillar||g.pillar===pillar)).map(g=><div className="okr-map-child" key={g.id}><EntryCard goal={g} portfolio={portfolio} pace={pace(g)} owner={owner(g)} onSelect={()=>open(g.id)}/></div>)}</div></>}
-    </div>)}
-    {objectives.filter(x=>x.parentId&&!objectives.some(p=>p.id===x.parentId)).map(g=><EntryCard key={g.id} goal={g} portfolio={portfolio} pace={pace(g)} owner={owner(g)} onSelect={()=>open(g.id)}/>)}
-    {!objectives.some(x=>!x.parentId&&(!pillar||x.pillar===pillar||objectives.some(child=>child.parentId===x.id&&child.pillar===pillar)))&&<p className="okr-empty">هدفی برای این محور ثبت نشده است.</p>}
-   </div>:<p className="okr-empty">برای این دوره هنوز هدفی ثبت نشده است.</p>}
-  </div>
+  <div className="okr-strategy-content">
+  <section className="okr-panel okr-strategy-tree">
+   <div className="okr-panel-head"><h3>درخت اهداف</h3>
+    <details className="okr-axis-filter">
+     <summary>محور استراتژیک · {selectedPillars.length?number.format(selectedPillars.length):'همه محورها'}</summary>
+     <div className="panel okr-axis-options">
+      <label><input type="checkbox" checked={!selectedPillars.length} onChange={()=>setSelectedPillars([])}/>همه محورها</label>
+      {cyclePillars.map(axis=><label key={axis.name}>
+       <input type="checkbox" checked={selectedPillars.includes(axis.name)} onChange={event=>setSelectedPillars(previous=>event.target.checked?[...previous,axis.name]:previous.filter(name=>name!==axis.name))}/>
+       {axis.name}{!axis.active&&' (غیرفعال)'}
+      </label>)}
+     </div>
+    </details>
+   </div>
+   {roots.length?<ul className="okr-tree-list">{roots.map(renderGoal)}</ul>:<p className="okr-empty">هدفی برای نمایش وجود ندارد.</p>}
+  </section>
   <div className="okr-bottom-grid">
    <div className="okr-panel"><div className="okr-panel-head"><h3>ردیابی ارتباط‌ها در نما</h3><small>OKR → KPI</small></div>
     <button type="button" className="okr-info-row" onClick={()=>setSummaryDetail('linked')}><span><ChartNoAxesCombined size={15}/>نتایج کلیدی دارای KPI مرتبط</span><strong>{number.format(results.filter(k=>k.kpiId&&data.kpis.some(x=>x.id===k.kpiId)).length)}</strong></button>
@@ -207,6 +225,7 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
     <button type="button" className="okr-info-row" onClick={()=>setSummaryDetail('risk')}><span><AlertTriangle size={15}/>نیازمند پیگیری</span><strong>{number.format(riskCount)}</strong></button>
     <button type="button" className="okr-info-row" onClick={()=>setSummaryDetail('unscored')}><span><History size={15}/>بدون مبنا / شروع‌نشده</span><strong>{number.format(unscoredCount)}</strong></button><button type="button" className="okr-info-row" onClick={()=>setSummaryDetail('checkins')}><span><Activity size={15}/>Check-in ثبت‌شده</span><strong>{number.format(checkins.length)}</strong></button>
    </div>
+  </div>
   </div>
  </>;
  const detailNames:Record<SummaryDetail,string>={
@@ -266,13 +285,13 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
   </section>
  </>;
  return <div ref={ref} className="okr-workspace">
-  <header className="process-workspace-header okr-heading">
-   <div className="okr-heading-actions"><label className="okr-cycle-control"><CalendarDays size={16}/><select aria-label="دوره OKR" value={cycle?.id??''} onChange={e=>{setActiveCycle(e.target.value);setSelectedId(null);setPillar('');}}>{!portfolio.cycles.length&&<option value="">دوره‌ای تعریف نشده</option>}{portfolio.cycles.map(c=><option key={c.id} value={c.id}>{c.title} {c.status==='PLANNING'?'· برنامه‌ریزی':''}</option>)}</select><ChevronDown size={13}/></label>
+  <div className="module-toolbar">
+   <nav className="process-workspace-tabs" aria-label="بخش‌های مدیریت OKR">{(['strategy','goals','monitor']as Tab[]).map((t,i)=><button key={t} className={tab===t?'active':''} aria-current={tab===t?'page':undefined} onClick={()=>{setTab(t);setSelectedId(null);}}>{i===0?<Network size={17}/>:i===1?<Target size={17}/>:<ChartColumnIncreasing size={17}/>}<span>{titleByTab[t]}</span></button>)}</nav>
+   <div className="okr-heading-actions"><label className="okr-cycle-control"><CalendarDays size={16}/><select aria-label="دوره OKR" value={cycle?.id??''} onChange={e=>{setActiveCycle(e.target.value);setSelectedId(null);setSelectedPillars([]);}}>{!portfolio.cycles.length&&<option value="">دوره‌ای تعریف نشده</option>}{portfolio.cycles.map(c=><option key={c.id} value={c.id}>{c.title} {c.status==='PLANNING'?'· برنامه‌ریزی':''}</option>)}</select><ChevronDown size={13}/></label>
     {canEdit&&<button className="okr-button okr-button-muted" onClick={()=>{setSelectedId(null);setCycleManagerOpen(true);setError('');setFeedback('');}}><CalendarDays size={15}/>مدیریت دوره‌ها</button>}
     {canEdit&&<button className="okr-button okr-button-primary" onClick={()=>showForm('objective')}><Plus size={17}/>هدف جدید</button>}
    </div>
-  </header>
-  <nav className="process-workspace-tabs" aria-label="بخش‌های مدیریت OKR">{(['strategy','goals','monitor']as Tab[]).map((t,i)=><button key={t} className={tab===t?'active':''} aria-current={tab===t?'page':undefined} onClick={()=>{setTab(t);setSelectedId(null);}}>{i===0?<Network size={17}/>:i===1?<Target size={17}/>:<ChartColumnIncreasing size={17}/>}<span>{titleByTab[t]}</span></button>)}</nav>
+  </div>
   {feedback&&<p className="okr-feedback" role="status">{feedback}<button onClick={()=>setFeedback('')} aria-label="بستن پیام">×</button></p>}
   {error&&!form&&<p className="okr-error" role="alert">{error}<button onClick={()=>setError('')}>×</button></p>}
   {canEdit&&<details className="okr-pillar-management">
@@ -288,7 +307,7 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
    </label></li>)}</ul>:<p>هنوز محوری تعریف نشده است.</p>}
   </details>}
 
-  {cycle?<div className="okr-current-cycle"><span>{cycle.status==='ACTIVE'?'فعال':cycle.status==='PLANNING'?'برنامه‌ریزی':'بسته‌شده'} · {number.format(objectives.length)} هدف</span></div>:<p className="okr-empty">برای شروع، از «مدیریت دوره‌ها» یک دوره هدف‌گذاری بسازید.</p>}
+  {!cycle&&<p className="okr-empty">برای شروع، از «مدیریت دوره‌ها» یک دوره هدف‌گذاری بسازید.</p>}
   {tab==='strategy'?strategy:tab==='goals'?goals:monitoring}
   {summaryDetail&&<Modal className="okr-detail okr-modal" label={detailNames[summaryDetail]} onClose={()=>setSummaryDetail(null)}>
    <header><h2>{detailNames[summaryDetail]}</h2><button type="button" className="okr-icon-button" aria-label="بستن جزئیات" onClick={()=>setSummaryDetail(null)}><X size={20}/></button></header>

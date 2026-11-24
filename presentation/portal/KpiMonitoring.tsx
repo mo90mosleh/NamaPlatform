@@ -1,6 +1,8 @@
 import {useEffect, useState, type FormEvent, type ReactNode} from 'react';
-import {LayoutDashboard, ClipboardList, Plus, Save} from 'lucide-react';
+import {LayoutDashboard, ClipboardList, Plus, Save, Pencil, Settings, Trash2} from 'lucide-react';
 import type {Data, KPI} from './types';
+import {latestPerPeriod} from './kpi-periods';
+import {Modal} from './Modal';
 import {number} from './ui';
 import {JalaliDatePicker} from './JalaliDatePicker';
 import {PowerBiIcon, PowerBiReports, type PowerBiReport} from './PowerBiReports';
@@ -8,7 +10,8 @@ import './kpi-monitoring.css';
 import {config} from './api';
 
 type ChartKind = 'line' | 'bar' | 'pie';
-type Card = {id: string; kpiId: string; kind: ChartKind};
+type Theme = 'ocean' | 'forest' | 'sunset';
+type Card = {id: string; kpiId: string; kind: ChartKind; theme?: Theme; labels?: boolean};
 type Revision = {value: number; note: string; actor: string; savedAt: string};
 type Measurement = {kpiId: string; date: string; revisions: Revision[]};
 type Model = {cards: Card[]; measurements: Measurement[]; reports: PowerBiReport[]; samplesInitialized: boolean};
@@ -20,7 +23,11 @@ const tabs = [
   ['profiles', 'شناسنامه شاخص‌ها', ClipboardList],
   ['power-bi', 'PowerBI', PowerBiIcon],
 ] as const;
-const colors = ['#16786e', '#406ea8', '#a65b16', '#8e54a1', '#a34755', '#517344'];
+const themes = {
+  ocean: {name:'آبی اقیانوسی', colors:['#2669a7','#1a8391','#6b60af','#4b8cbf','#277173','#754e88']},
+  forest: {name:'سبز جنگلی', colors:['#267452','#63994c','#257a75','#906d37','#57744e','#749d8a']},
+  sunset: {name:'غروب گرم', colors:['#af492e','#b87b29','#963a5b','#8a5191','#8a654c','#c28843']},
+};
 const dates = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Tehran'});
 const timestamps = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Tehran'});
 const labelDate = (date: string) => dates.format(new Date(date + 'T12:00:00Z'));
@@ -42,7 +49,7 @@ function initialModel(data: Data): Model {
     if (!kpi) continue;
     cards.push({id: 'sample-' + code, kpiId: kpi.id, kind});
     values.forEach((value, index) => {
-      const date = ['2026-10-24', '2026-11-01', '2026-11-08', '2026-11-15'][index];
+      const date = ['2026-08-15', '2026-09-15', '2026-10-15', '2026-11-15'][index];
       measurements.push({kpiId: kpi.id, date, revisions: [{value, note: 'داده نمونه دمو', actor: 'دمو', savedAt: date + 'T12:00:00Z'}]});
     });
   }
@@ -88,9 +95,12 @@ export function latestKpiValue(data: Data, id: string) {
   return latest && current(latest);
 }
 
-function Chart({kpi, kind, rows}: {kpi: KPI; kind: ChartKind; rows: Measurement[]}) {
-  if (!rows.length) return <p className="empty-inline">در این بازه مقداری ثبت نشده است.</p>;
-  const values = rows.map(row => current(row).value);
+function Chart({kpi, card, rows}: {kpi: KPI; card: Card; rows: Measurement[]}) {
+  const points = latestPerPeriod(rows, kpi.frequency);
+  if (!points.length) return <p className="empty-inline">در این بازه مقداری ثبت نشده است.</p>;
+  const {kind, labels = true} = card;
+  const colors = (themes[card.theme ?? 'ocean'] ?? themes.ocean).colors;
+  const values = points.map(point => current(point.row).value);
   const total = values.reduce((sum, value) => sum + value, 0);
   if (kind === 'pie' && (values.some(value => value < 0) || total <= 0 || !Number.isFinite(total))) {
     return <p className="empty-inline">نمودار دایره‌ای به مقادیر غیرمنفی با مجموع بیشتر از صفر نیاز دارد.</p>;
@@ -105,30 +115,30 @@ function Chart({kpi, kind, rows}: {kpi: KPI; kind: ChartKind; rows: Measurement[
   const high = Math.max(0, ...values);
   const scale = Math.max(Math.abs(low), Math.abs(high)) || 1;
   const range = high / scale - low / scale || 1;
-  const y = (value: number) => 122 - (value / scale - low / scale) / range * 103;
-  const spacing = 300 / rows.length;
-  const first = Date.parse(rows[0].date);
-  const last = Date.parse(rows[rows.length - 1].date);
-  const x = (index: number) => kind === 'line' && last > first
-    ? 23 + (Date.parse(rows[index].date) - first) / (last - first) * 300
-    : 23 + (index + 0.5) * spacing;
+  const y = (value: number) => 110 - (value / scale - low / scale) / range * 82;
+  const span = points[points.length - 1].index - points[0].index + 1;
+  const spacing = 296 / span;
+  const x = (index: number) => 24 + (points[index].index - points[0].index + .5) * spacing;
+  const stride = Math.ceil(points.length / 6);
   return <>
-    {kind === 'pie' ? <div className="kpi-pie" aria-hidden="true" style={{background: 'conic-gradient(' + segments.join(',') + ')'}}/> :
-      <svg className="kpi-plot" viewBox="0 0 345 144" aria-hidden="true">
-        <line x1="23" y1={y(0)} x2="323" y2={y(0)} stroke="currentColor" opacity=".25"/>
-        {kind === 'line' && <polyline points={values.map((value, index) => x(index) + ',' + y(value)).join(' ')} fill="none" stroke="currentColor" strokeWidth="2"/>}
-        {values.map((value, index) => kind === 'line' ?
-          <circle key={rows[index].date} cx={x(index)} cy={y(value)} r="3" fill="currentColor"><title>{labelDate(rows[index].date)} · {number.format(value)}</title></circle> :
-          <rect key={rows[index].date} x={x(index) - Math.min(12, spacing * .33)} y={Math.min(y(value), y(0))}
-            width={Math.min(24, spacing * .66)} height={Math.max(1, Math.abs(y(value) - y(0)))} rx="2" fill="currentColor"><title>{labelDate(rows[index].date)} · {number.format(value)}</title></rect>)}
-      <text x="23" y="140" fill="currentColor" fontSize="9" textAnchor="start">{labelDate(rows[0].date)}</text>
-        {rows.length > 1 && <text x="323" y="140" fill="currentColor" fontSize="9" textAnchor="end">{labelDate(rows[rows.length - 1].date)}</text>}
+    {kind === 'pie' ? <div className="kpi-pie-layout"><div className="kpi-pie" aria-hidden="true" style={{background:'conic-gradient('+segments.join(',')+')'}}/>
+      {labels&&<ul className="kpi-pie-labels">{points.map((point,index)=><li key={point.index}><i style={{background:colors[index%colors.length]}}/>{point.label} · {number.format(Math.round(values[index]/total*100))}٪</li>)}</ul>}
+    </div> :
+      <svg className="kpi-plot" viewBox="0 0 345 142" aria-hidden="true" style={{color:colors[0]}}>
+        <line x1="24" y1={y(0)} x2="320" y2={y(0)} stroke="currentColor" opacity=".25"/>
+        {kind === 'line' && <polyline points={values.map((value, index) => x(index)+','+y(value)).join(' ')} fill="none" stroke="currentColor" strokeWidth="2"/>}
+        {values.map((value, index) => <g key={points[index].index}>
+          <title>{points[index].label} · {number.format(value)}</title>
+          {kind==='line'?<circle cx={x(index)} cy={y(value)} r="3" fill="currentColor"/>:
+            <rect x={x(index)-Math.min(12,spacing*.33)} y={Math.min(y(value),y(0))}
+              width={Math.min(24,spacing*.66)} height={Math.max(1,Math.abs(y(value)-y(0)))} rx="2" fill="currentColor"/>}
+          {labels&&<text className="kpi-data-label" x={x(index)} y={Math.min(y(value),y(0))-5} textAnchor="middle" fill="currentColor" fontSize="9">{number.format(value)}</text>}
+          {index%stride===0&&<text x={x(index)} y="132" textAnchor="middle" fill="currentColor" fontSize="8">{points[index].label}</text>}
+        </g>)}
       </svg>}
     <details className="kpi-chart-values"><summary>مقادیر نمودار {kpi.unit && '(' + kpi.unit + ')'}</summary>
-      <ul>{rows.map((row, index) => <li key={row.date}>
-        {kind === 'pie' && <i aria-hidden="true" style={{backgroundColor: colors[index % colors.length]}}/>}
-        {labelDate(row.date)} · {number.format(values[index])}
-        {kind === 'pie' && ' · ' + number.format(values[index] / total * 100) + '٪'}
+      <ul>{points.map((point, index) => <li key={point.index}>
+        {point.label} · {number.format(values[index])}
       </li>)}</ul>
     </details>
   </>;
@@ -145,6 +155,7 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
   const [entryDate, setEntryDate] = useState('');
   const [value, setValue] = useState('');
   const [note, setNote] = useState('');
+  const [settings, setSettings] = useState<Card | null>(null);
   const [cardDraft, setCardDraft] = useState<Card | null>(null);
   const [message, setMessage] = useState<{text: string; error?: boolean} | null>(null);
   const admin = data.user.role === 'ADMIN';
@@ -200,23 +211,20 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
   </select>;
 
   return <div className="kpi-workspace">
-    {tab === 'dashboard' && <div className="kpi-date-filters">
+    <div className="module-toolbar">
+      <nav className="process-workspace-tabs" aria-label="بخش‌های شاخص‌های عملکرد">
+        {tabs.map(([id, title, Icon]) => <button key={id} type="button" className={tab === id ? 'active' : ''}
+          aria-current={tab === id ? 'page' : undefined} onClick={() => {setTab(id); setMessage(null);}}><Icon size={17}/>{title}</button>)}
+      </nav>
+      {tab === 'dashboard' && <div className="kpi-date-filters">
         <JalaliDatePicker label="از تاریخ" value={start} onChange={setStart}/>
         <JalaliDatePicker label="تا تاریخ" value={end} onChange={setEnd}/>
-    </div>}
-    <nav className="process-workspace-tabs" aria-label="بخش‌های شاخص‌های عملکرد">
-      {tabs.map(([id, title, Icon]) => <button key={id} type="button" className={tab === id ? 'active' : ''}
-        aria-current={tab === id ? 'page' : undefined} onClick={() => {setTab(id); setMessage(null);}}><Icon size={17}/>{title}</button>)}
-    </nav>
+      </div>}
+      {tab === 'profiles'&&<button type="button" className="secondary" aria-expanded={entryOpen}
+        onClick={()=>setEntryOpen(!entryOpen)}><Save size={16}/>ثبت مقادیر</button>}
+    </div>
     {message && <p className={'alert ' + (message.error ? 'error' : 'success')} role={message.error ? 'alert' : 'status'}>{message.text}</p>}
-    {tab === 'profiles' && profiles(new Map([...model.measurements]
-      .sort((a, b) => a.date.localeCompare(b.date)).map(row => [row.kpiId, current(row).value])))}
-    {tab === 'dashboard' && <>
-      {dateError && <p role="alert" className="alert error">تاریخ پایان باید برابر یا بعد از تاریخ شروع باشد.</p>}
-      <div className="kpi-actions">
-        <button type="button" className="secondary" aria-expanded={entryOpen}
-          onClick={() => setEntryOpen(!entryOpen)}><Save size={16}/>ثبت مقادیر</button></div>
-    {tab === 'dashboard' && entryOpen && <>
+    {tab === 'profiles' && entryOpen && <>
       {admin && <form className="panel kpi-form" onSubmit={saveMeasurement}>
         <label>شاخص{selectKpi(entryKpi, id => {setEntryKpi(id);setValue('');setNote('');})}</label>
         <JalaliDatePicker label="تاریخ اندازه‌گیری" value={entryDate}
@@ -238,6 +246,10 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
         </details>)}
       </section>}
     </>}
+    {tab === 'profiles' && profiles(new Map([...model.measurements]
+      .sort((a, b) => a.date.localeCompare(b.date)).map(row => [row.kpiId, current(row).value])))}
+    {tab === 'dashboard' && <>
+      {dateError && <p role="alert" className="alert error">تاریخ پایان باید برابر یا بعد از تاریخ شروع باشد.</p>}
       {!model.cards.length && <p className="panel empty-inline">برای ساخت داشبورد، اولین کارت را اضافه کنید.</p>}
       <div className="kpi-card-grid">{model.cards.map(card => {
         const kpi = data.kpis.find(item => item.id === card.kpiId);
@@ -245,17 +257,20 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
           (!start || row.date >= start) && (!end || row.date <= end)).sort((a, b) => a.date.localeCompare(b.date));
         return <section className="panel kpi-monitor-card" key={card.id}>
           <header><div><h2>{kpi?.name ?? 'شاخص در دسترس نیست'}</h2><small>{charts[card.kind]}{rows.some(row => current(row).actor === 'دمو') && ' · داده نمونه'}{kpi?.unit && ' · ' + kpi.unit}</small></div>
-            <div className="kpi-actions"><button className="text-button" type="button" onClick={() => setCardDraft(card)}>ویرایش</button>
-              <button className="text-button" type="button" onClick={() => {
+            <div className="kpi-actions"><button className="icon-button" type="button" title="ویرایش" aria-label="ویرایش" onClick={() => setCardDraft(card)}><Pencil size={16}/></button>
+              <button className="icon-button" type="button" title="تنظیمات نمودار" aria-label="تنظیمات نمودار" onClick={()=>setSettings(card)}><Settings size={16}/></button>
+              <button className="icon-button" type="button" title="حذف کارت" aria-label="حذف کارت" onClick={() => {
                 if (update(model => ({...model, cards: model.cards.filter(item => item.id !== card.id)}), 'کارت حذف شد.') && cardDraft?.id === card.id) setCardDraft(null);
-              }}>حذف کارت</button></div>
+              }}><Trash2 size={16}/></button></div>
           </header>
-          {kpi && !dateError && <Chart kpi={kpi} kind={card.kind} rows={rows}/>}
+          {kpi && !dateError && <Chart kpi={kpi} card={card} rows={rows}/>}
         </section>;
       })}</div>
       <div className="kpi-actions kpi-add-card"><button type="button" className="secondary" disabled={!data.kpis.length}
         onClick={() => setCardDraft({id: '', kpiId: '', kind: 'line'})}><Plus size={16}/>افزودن کارت</button></div>
-      {cardDraft && <form className="panel kpi-form" onSubmit={saveCard}>
+      {cardDraft && <Modal className="kpi-card-settings panel" label={cardDraft.id?'ویرایش کارت':'افزودن کارت'} onClose={()=>setCardDraft(null)}>
+        <h2>{cardDraft.id?'ویرایش کارت':'افزودن کارت'}</h2>
+        <form className="kpi-form" onSubmit={saveCard}>
         <label>شاخص{selectKpi(cardDraft.kpiId, kpiId => setCardDraft({...cardDraft, kpiId}))}</label>
         <label>نوع نمودار<select value={cardDraft.kind} onChange={event => setCardDraft({...cardDraft, kind: event.target.value as ChartKind})}>
           {Object.entries(charts).map(([id, title]) => <option key={id} value={id}>{title}</option>)}
@@ -263,9 +278,21 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
         {cardDraft.kind === 'pie' && <p className="kpi-form-note">فقط برای شاخص‌هایی انتخاب کنید که مجموع مقادیر تاریخ‌های انتخاب‌شده معنادار است.</p>}
         <button className="primary">ذخیرهٔ کارت</button>
         <button type="button" className="secondary" onClick={() => setCardDraft(null)}>انصراف</button>
-      </form>}
-
+      </form></Modal>}
     </>}
+    {settings&&<Modal className="kpi-card-settings panel" label="تنظیمات نمودار" onClose={()=>setSettings(null)}>
+      <h2>تنظیمات نمودار</h2>
+      <form className="kpi-form" onSubmit={event=>{
+        event.preventDefault();
+        if(update(model=>({...model,cards:model.cards.map(card=>card.id===settings.id?{...card,labels:settings.labels,theme:settings.theme}:card)}),'تنظیمات نمودار ذخیره شد.'))setSettings(null);
+      }}>
+        <label>تم رنگی<select value={settings.theme??'ocean'} onChange={event=>setSettings({...settings,theme:event.target.value as Theme})}>
+          {Object.entries(themes).map(([id,theme])=><option key={id} value={id}>{theme.name}</option>)}
+        </select></label>
+        <label className="kpi-label-option"><input type="checkbox" checked={settings.labels??true} onChange={event=>setSettings({...settings,labels:event.target.checked})}/>نمایش برچسب داده</label>
+        <button className="primary">ذخیره تنظیمات</button><button type="button" className="secondary" onClick={()=>setSettings(null)}>انصراف</button>
+      </form>
+    </Modal>}
     {tab === 'power-bi' && <PowerBiReports reportId={reportId} reports={visibleReports(model.reports)} canManage={admin}
       onAdd={report => update(saved => ({...saved, reports: [...saved.reports, report]}), 'داشبورد ذخیره شد.')}/>}
   </div>;

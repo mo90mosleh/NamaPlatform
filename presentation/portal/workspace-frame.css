@@ -35,3 +35,9 @@
   .app.has-module-title .chart-shell-entry { padding-inline-end: 5px; }
   .app.has-module-title .topbar-actions { gap: 4px; }
 }
+
+.app > .workspace > .workspace-content:has(.module-toolbar) { padding-block-start:0; }
+.module-toolbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:4px 12px; margin-bottom:10px; border-bottom:1px solid var(--line); }
+.module-toolbar .process-workspace-tabs { flex:1 1 auto; border-bottom:0; margin:0; }
+.module-toolbar .kpi-date-filters { margin:0; }
+.module-toolbar .okr-heading-actions { margin-inline-start:auto; }

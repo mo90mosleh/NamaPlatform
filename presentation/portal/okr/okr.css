@@ -262,3 +262,19 @@ button.okr-metric:hover, button.okr-info-row:hover { background: #eef6f4; }
 .okr-inline-results { margin-inline: 12px; }
 .okr-goal-toolbar .okr-search { flex-basis: 135px; min-width: 0; }
 .okr-goal-toolbar .okr-view-toggle { flex-shrink: 0; }
+
+.okr-strategy-content { display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr); gap:12px; }
+.okr-strategy-content .okr-bottom-grid { grid-template-columns:minmax(0,1fr); align-content:start; }
+.okr-strategy-tree { min-width:0; }
+.okr-tree-list,.okr-tree-list ul { list-style:none; padding:0; margin:0; }
+.okr-tree-list { max-height:clamp(145px,42dvh,440px); overflow:auto; }
+.okr-tree-list ul { margin-inline-start:13px; border-inline-start:1px solid var(--line); padding-inline-start:8px; }
+.okr-tree-goal { display:flex; width:100%; flex-wrap:wrap; align-items:center; gap:4px 8px; padding:7px; border:0; border-bottom:1px solid var(--line); background:transparent; text-align:start; color:var(--ink); }
+.okr-tree-goal:hover { background:var(--surface-subtle); }
+.okr-tree-goal strong { flex:1 1 160px; font-size:12px; }
+.okr-tree-goal > :is(bdi,span) { font-size:11px; }
+.okr-axis-filter { position:relative; font-size:12px; }
+.okr-axis-filter summary { cursor:pointer; padding:5px 8px; border:1px solid var(--line); border-radius:8px; }
+.okr-axis-options { position:absolute; z-index:12; inset-inline-end:0; top:100%; min-width:170px; max-height:200px; overflow:auto; padding:8px; }
+.okr-axis-options label { display:flex; gap:6px; align-items:center; padding:5px; white-space:nowrap; }
+@media(max-width:760px) { .okr-strategy-content { grid-template-columns:1fr; } }

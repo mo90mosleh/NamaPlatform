@@ -33,3 +33,15 @@
 }
 
 .kpi-add-card { justify-content: center; margin-block: 1rem; }
+
+.kpi-date-picker summary { border:1px solid var(--line); border-radius:7px; padding:2px 8px; }
+.kpi-date-picker .kpi-date-empty { opacity:.62; }
+.kpi-monitor-card .kpi-actions { gap:2px; }
+.kpi-card-settings { width:min(420px,calc(100% - 24px)); padding:16px; color:var(--ink); }
+.kpi-card-settings::backdrop { background:#182b3b80; }
+.kpi-card-settings .kpi-form { margin:0; padding:8px 0 0; }
+.kpi-card-settings .kpi-label-option { display:flex; flex-direction:row; align-items:center; }
+.kpi-card-settings .kpi-label-option input { width:auto; }
+.kpi-pie-layout { display:flex; flex-wrap:wrap; align-items:center; }
+.kpi-pie-labels { max-height:130px; overflow:auto; padding-inline-start:16px; font-size:11px; list-style:none; }
+.kpi-pie-labels i { display:inline-block; width:8px; height:8px; border-radius:50%; margin-inline-end:5px; }

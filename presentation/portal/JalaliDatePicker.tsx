@@ -34,7 +34,7 @@ export function JalaliDatePicker({label, value, onChange}: {
     }}
     onKeyDown={event => { if (event.key === 'Escape') close(); }}>
     <summary ref={trigger} onClick={() => setMonth(calendarMonth(value))}>
-      <CalendarDays size={16}/>{label}<bdi>{isoToJalaliInput(value) || 'انتخاب تاریخ'}</bdi>
+      <CalendarDays size={16}/>{label}<bdi className={value?'':'kpi-date-empty'} aria-label={value?undefined:'بدون تاریخ'}>{isoToJalaliInput(value) || 'ــــ/ــ/ــ'}</bdi>
     </summary>
     <div className="panel jalali-calendar" aria-label={label}>
       <div className="jalali-calendar-month">
