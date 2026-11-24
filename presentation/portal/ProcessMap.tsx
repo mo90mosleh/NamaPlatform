@@ -73,6 +73,7 @@ export function ProcessMap({data,refresh}:{data:Data;refresh:()=>Promise<void>})
    </div>
    <select className="pm-department-filter" aria-label="دپارتمان نقشه" value={department} onChange={e=>{const value=e.target.value;setDepartment(value);if(value){const first=processes.find(p=>p.owner_org_unit_id===value);if(first)setFocus(first.id);}}}><option value="">همه دپارتمان‌ها</option>{departments.map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select>
    {editable&&<button className="primary process-map-add" onClick={()=>{setEdit(null);setError('');}}><Plus size={16}/>تعریف ارتباط</button>}
+   {config.demoManagement&&<button type="button" className="secondary pm-unlinked-button" onClick={()=>setUnlinkedOpen(true)}>فرآیندهای بدون ارتباط · {number.format(unlinked.length)}</button>}
   </div>
   {message&&<p role="status" className="alert success">{message}</p>}{error&&edit===undefined&&<p role="alert" className="alert error">{error}</p>}
   <div className="process-map-body">
@@ -85,10 +86,7 @@ export function ProcessMap({data,refresh}:{data:Data;refresh:()=>Promise<void>})
       </li>)}</ol>
      </section>)}
     </div>
-    <div className="pm-chain-extras">
-     {otherLinked.map(processCard)}
-     <button type="button" className="secondary" onClick={()=>setUnlinkedOpen(true)}>فرآیندهای بدون ارتباط · {number.format(unlinked.length)}</button>
-    </div>
+    {otherLinked.length>0&&<div className="pm-chain-extras">{otherLinked.map(processCard)}</div>}
    </section> : <section className="panel process-map-canvas-panel">
     <ProcessNetwork data={data} relations={relations} focus={focus} search={search.trim()} department={department} onFocus={reveal}/>
    </section>}

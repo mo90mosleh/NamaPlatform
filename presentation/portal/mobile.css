@@ -45,3 +45,11 @@
  .chart-header .chart-format-switch svg,.chart-header .chart-view-switch svg{display:none}
  .chart-header .chart-direction-switch button span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 }
+.mobile-chart-crumbs,.mobile-chart-crumbs>span { display:flex; flex-wrap:wrap; align-items:center; gap:5px; }
+.mobile-chart-crumbs { flex:1; }
+.mobile-chart-crumbs [aria-current="location"] { font-weight:800; color:var(--ink); }
+.mobile-chart-browser li:has(>.person-avatar-group) { position:relative; overflow:visible; margin-block-start:30px; }
+.mobile-chart-browser li>.person-avatar-group { position:absolute; z-index:1; inset-block-start:-29px; inset-inline:0; justify-content:center; padding:0; pointer-events:none; }
+.mobile-chart-browser li>.person-avatar-group>button { pointer-events:auto; min-width:58px; width:58px; height:58px; border:3px solid #fff; box-shadow:0 2px 8px #233b5530; }
+.mobile-chart-browser li>.person-avatar-group>button:not(:first-child) { margin-inline-start:-13px; }
+.mobile-chart-browser li:has(>.person-avatar-group)>.mobile-chart-select { padding-block-start:38px; }

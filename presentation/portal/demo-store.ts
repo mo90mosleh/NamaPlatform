@@ -82,7 +82,7 @@ export function updateDemoData(data: Data, path: string, method: string, value?:
     edits.governance = {...edits.governance, [id]: next};
   } else if (kind === 'profiles' && method === 'PUT' && data.nodes.some(node => node.id === id && node.kind === 'PROCESS')) {
     const profile = {
-      ...profiles.find(row => row.process_id === id), process_id: id,
+      ...profiles.find(row => row.process_id === id), process_id: id, updated_at: new Date().toISOString(),
       ...fields(value, ['objective', 'start_event', 'end_event', 'inputs', 'outputs', 'roles', 'expected_outcome', 'notes']),
     } as Data['profiles'][number];
     edits.profiles = [...profiles.filter(row => row.process_id !== id), profile];

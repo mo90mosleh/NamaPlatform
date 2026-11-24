@@ -39,5 +39,12 @@ export function withDemoSamples(data: Data): Data {
       relation.relation_type === 'OUTPUT_TO')) return;
     relations.push({id:sampleId(5,chain*10+index), source_process_id, target_process_id, relation_type:'OUTPUT_TO'});
   }));
-  return {...data, units, positions, persons, assignments, relations};
+  const nodes = data.nodes.map(node=>{
+    const ordinal = Number(node.code?.match(/^P-(\d+)$/)?.[1]);
+    if(node.kind!=='PROCESS'||!Number.isFinite(ordinal))return node;
+    const sampleDate=(month:number,day:number)=>new Date(Date.UTC(2026,month-1,day)).toISOString();
+    return {...node, created_at:node.created_at??sampleDate(4,ordinal),
+      updated_at:node.updated_at??(node.created_at?undefined:sampleDate(10,ordinal))};
+  });
+  return {...data, nodes, units, positions, persons, assignments, relations};
 }

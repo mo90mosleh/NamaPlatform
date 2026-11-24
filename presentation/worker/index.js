@@ -33,7 +33,7 @@ export default {async fetch(request,env){try{
   const get=(table,select,order='')=>rest(env,table,'select='+select+'&'+(table==='organizations'?'id':'organization_id')+'=eq.'+ORG+order,{headers});
   const [orgs,units,nodes,kpis,links,documents,profiles]=await Promise.all([
    get('organizations','id,name,display_name,primary_color,logo_data_url'),get('org_units','id,name,parent_id,code,sort_order','&order=sort_order'),
-   get('process_nodes',env.PRESENTATION_ORG_ID?'*':'id,parent_id,kind,classification,code,name,summary,owner_org_unit_id','&order=code'),
+   get('process_nodes',env.PRESENTATION_ORG_ID?'*':'id,parent_id,kind,classification,code,name,summary,owner_org_unit_id,created_at,updated_at','&order=code'),
    get('kpis','*','&order=code'),get('process_kpis','process_id,kpi_id'),get('documents',env.PRESENTATION_ORG_ID?'id,title,process_id,doc_type,external_url,content_status,content_revision':'id,title'),get('process_profiles','*')]);
   if(!orgs.length)throw new ApiError(503,'اطلاعات سازمان در دسترس نیست.');
   let positions=[],persons=[],assignments=[],references=[],relations=[],requirements=[];
