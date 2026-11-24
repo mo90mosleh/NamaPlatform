@@ -20,8 +20,8 @@ const tabs = [
   ['power-bi', 'پاور بی‌آی', PowerBiIcon],
 ] as const;
 const colors = ['#16786e', '#406ea8', '#a65b16', '#8e54a1', '#a34755', '#517344'];
-const dates = new Intl.DateTimeFormat('fa-IR', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Tehran'});
-const timestamps = new Intl.DateTimeFormat('fa-IR', {dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Tehran'});
+const dates = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Tehran'});
+const timestamps = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Tehran'});
 const labelDate = (date: string) => dates.format(new Date(date + 'T12:00:00Z'));
 const current = (measurement: Measurement) => measurement.revisions[measurement.revisions.length - 1];
 function storageKey(data: Data) { return 'nama-kpi-monitoring-v1:' + data.organization.id; }
@@ -175,11 +175,12 @@ export function KpiMonitoring({data, profiles}: {data: Data; profiles: (values: 
     {tab === 'dashboard' && entryOpen && <>
       {admin && <form className="panel kpi-form" onSubmit={saveMeasurement}>
         <label>شاخص{selectKpi(entryKpi, id => {setEntryKpi(id);setValue('');setNote('');})}</label>
-        <label>تاریخ اندازه‌گیری<input type="date" required value={entryDate} onChange={event => {setEntryDate(event.target.value);setValue('');setNote('');}}/></label>
+        <JalaliDatePicker label="تاریخ اندازه‌گیری" value={entryDate}
+          onChange={date => {setEntryDate(date);setValue('');setNote('');}}/>
         <label>مقدار واقعی {selected?.unit && '(' + selected.unit + ')'}<input type="number" step="any" required value={value} onChange={event => setValue(event.target.value)}/></label>
         <label>توضیح اختیاری<input maxLength={300} value={note} onChange={event => setNote(event.target.value)}/></label>
         {existing && <p className="kpi-form-note">مقدار فعلی این تاریخ {number.format(current(existing).value)} است. مقدار جدید همراه با سابقهٔ اصلاح ذخیره می‌شود.</p>}
-        <button className="primary"><Save size={16}/>{existing ? 'ثبت اصلاح' : 'ثبت مقدار'}</button>
+        <button className="primary" disabled={!entryDate}><Save size={16}/>{existing ? 'ثبت اصلاح' : 'ثبت مقدار'}</button>
       </form>}
       {!admin && <><p className="empty-inline">ثبت و اصلاح مقدار در حالت مدیریت در دسترس است.</p><div className="kpi-form"><label>شاخص{selectKpi(entryKpi, setEntryKpi)}</label></div></>}
       {selected && <section className="panel kpi-monitor-card"><h2>سابقهٔ مقادیر</h2>

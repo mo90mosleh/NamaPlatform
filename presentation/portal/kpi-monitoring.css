@@ -27,7 +27,7 @@
 .jalali-calendar-days button:hover, .jalali-calendar-days button[aria-pressed="true"] { background: var(--surface-subtle, #eaf0f6); }
 .power-bi-frame { display: block; width: 100%; min-height: 440px; height: 68vh; border: 0; }
 @media (max-width: 760px) {
-  .kpi-date-filters { position: relative; }
+  .kpi-date-filters, .kpi-form { position: relative; }
   .kpi-date-picker { position: static; }
   .jalali-calendar { inset-inline: 0 auto; }
 }
