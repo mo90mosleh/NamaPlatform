@@ -55,7 +55,8 @@ export function DashboardSearch({data}:{data:Data}){
  const [query,setQuery]=useState('');
  const [open,setOpen]=useState(false);
  const term=normalizeSearch(query.trim());
- const matches=term?destinations(data).filter(item=>normalizeSearch([item.name,item.type,'code' in item?item.code:''].join(' ')).includes(term)).slice(0,12):[];
+ const matches=term?destinations(data).filter(item=>normalizeSearch([item.name,item.type,'code' in item?item.code:''].join(' ')).includes(term))
+  .sort((a,b)=>Number(normalizeSearch(b.name)===term)-Number(normalizeSearch(a.name)===term)).slice(0,12):[];
  return <div className="dashboard-search" onBlur={e=>{if(!e.currentTarget.contains(e.relatedTarget))setOpen(false);}} onKeyDown={e=>{if(e.key==='Escape')setOpen(false);}}>
   <label><Search size={21}/><input type="search" aria-label="جست‌وجو در نما" placeholder="جست‌وجو در نما…" value={query} onFocus={()=>setOpen(true)} onChange={e=>{setQuery(e.target.value);setOpen(true);}}/></label>
   {open&&term&&<div className="panel dashboard-search-results" aria-label="نتایج جست‌وجو">
