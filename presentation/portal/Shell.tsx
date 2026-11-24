@@ -1,5 +1,6 @@
+import {ProcessIcon} from './ProcessIcon';
 import{MobileNavigation,MobileMenu}from'./mobile';
-import{useEffect,useState,type ReactNode}from'react';import{LayoutDashboard,Network,ListChecks,ClipboardList,ChartNoAxesCombined,Settings,ShieldCheck,UserRound,ChevronDown,LogIn}from'lucide-react';import type{Data}from'./types';import{Link,go,errorMessage,BackButton}from'./ui';import{config}from'./api';import{signOut}from'./auth';import logo from'./assets/nama-wordmark.png';
+import{useEffect,useState,type ReactNode}from'react';import{LayoutDashboard,Network,ClipboardList,ChartNoAxesCombined,Settings,ShieldCheck,UserRound,ChevronDown,LogIn}from'lucide-react';import type{Data}from'./types';import{Link,go,errorMessage,BackButton}from'./ui';import{config}from'./api';import{signOut}from'./auth';import logo from'./assets/nama-wordmark.png';
 import wordmark from './assets/nama-wordmark.png';
 import{TargetArrowIcon}from'./TargetArrowIcon';
 import './nama-brand.css';
@@ -10,7 +11,7 @@ function NamaMark({width}: {width: number}) {
 function FoldArrow() {
   return <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2.5 12 8l-7 5.5v-3.7L7.5 8 5 6.2Z" fill="currentColor"/></svg>;
 }
-const navigation=[['/dashboard','داشبورد',LayoutDashboard],['/organization/chart','چارت سازمانی',Network],['/architecture','مدیریت فرآیندها',ListChecks],['/kpis','شاخص‌های عملکرد',ChartNoAxesCombined],['/okr','مدیریت OKR',TargetArrowIcon]]as const;
+const navigation=[['/dashboard','داشبورد',LayoutDashboard],['/organization/chart','چارت سازمانی',Network],['/architecture','مدیریت فرآیندها',ProcessIcon],['/kpis','شاخص‌های عملکرد',ChartNoAxesCombined],['/okr','مدیریت OKR',TargetArrowIcon]]as const;
 export function Shell({data,path,children,onDemoMode}:{data:Data;path:string;children:ReactNode;onDemoMode?:(active:boolean)=>void}){const[collapsed,setCollapsed]=useState(()=>{try{return localStorage.getItem('nama-sidebar-collapsed-v2')!=='false';}catch{return true;}});const chart=path==='/organization/chart',admin=data.user.role==='ADMIN',hideBreadcrumb=path.startsWith('/okr/')||path==='/dashboard'||path==='/architecture'||path.startsWith('/process-governance/')||path==='/process-map'||path==='/processes'||path.startsWith('/processes/')||path==='/okr'||path==='/kpis'||path.startsWith('/kpis/'),menuLabel=collapsed?'باز کردن منوی اصلی':'جمع کردن منوی اصلی';
  const processPage=['/architecture','/process-map','/processes'].includes(path)||path.startsWith('/processes/')||path.startsWith('/process-governance/');
  const pageLabel=path==='/dashboard'?'داشبورد':chart?'چارت سازمانی':processPage?'فرآیندها':path==='/kpis'||path.startsWith('/kpis/')?'شاخص‌ها':path==='/okr'||path.startsWith('/okr/')?'OKR':'';

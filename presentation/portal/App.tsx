@@ -1,3 +1,4 @@
+import {ProcessIcon} from './ProcessIcon';
 import {QuickLinks} from './QuickLinks';
 import {KpiMonitoring, latestKpiValue} from './KpiMonitoring';
 import './process-workspace.css';
@@ -9,7 +10,7 @@ import{useOrganizationFilters,OrganizationFilters,OrganizationFilterNote}from'./
 import{Shell}from'./Shell';
 import{Login}from'./Login';import{authClient,signOut}from'./auth';
 import{Documents,Requirements}from'./References';import{ProcessProfile}from'./ProcessDetail';
-import{lazy,Suspense,useEffect,useState,type FormEvent}from'react';import{LayoutDashboard,Network,Layers3,ClipboardList,ChartNoAxesCombined,Settings as SettingsIcon,ChevronLeft,ChevronDown,ArrowLeft,UserRound,ShieldCheck,Save,LogIn,Menu,X}from'lucide-react';
+import{lazy,Suspense,useEffect,useState,type FormEvent}from'react';import{LayoutDashboard,Network,ClipboardList,ChartNoAxesCombined,Settings as SettingsIcon,ChevronLeft,ChevronDown,ArrowLeft,UserRound,ShieldCheck,Save,LogIn,Menu,X}from'lucide-react';
 import{loadData,loadInitialSnapshot,mutate,config}from'./api';import type{Data,Process}from'./types';import{Heading,Empty,Link,go,currentPath,number,errorMessage}from'./ui';import logo from'./assets/nama-wordmark.png';import{TargetArrowIcon}from'./TargetArrowIcon';import'./style.css';import'./mobile.css';import'./assistance-layout.css';import'./design-system.css';import'./chart-shell.css';
 
 const Chart=lazy(()=>import('./Chart').then(module=>({default:module.Chart})));
@@ -22,7 +23,7 @@ function Skeleton(){return <div className="loading" role="status">در حال د
 function Dashboard({data}:{data:Data}) {
  const modules = [
   ['/organization/chart','چارت سازمانی','واحدها، سمت‌ها و مسیرهای گزارش‌دهی',Network],
-  ['/architecture','فرآیندها','معماری، نقشه و شناسنامهٔ فرآیندها',Layers3],
+  ['/architecture','فرآیندها','معماری، نقشه و شناسنامهٔ فرآیندها',ProcessIcon],
   ['/kpis','شاخص‌ها','داشبورد پایش و شناسنامهٔ شاخص‌ها',ChartNoAxesCombined],
   ['/okr','OKR','اهداف، نتایج کلیدی و روند تحقق',TargetArrowIcon],
  ] as const;
