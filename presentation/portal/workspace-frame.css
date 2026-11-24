@@ -52,3 +52,20 @@
  .process-sections>.process-section[open] { grid-column:1/-1; }
  .process-sections>.process-section>summary { min-height:40px; padding:5px 12px; }
 }
+
+.kpi-profile-page .heading { margin-block-end:8px; }
+.kpi-profile-page .heading h1 { font-size:clamp(17px,2vw,23px); margin:0; }
+.kpi-profile-page .detail-grid { align-items:start; gap:8px; margin-block-end:8px; }
+.kpi-profile-page .detail-grid .padded { padding:10px 12px; }
+.kpi-profile-page .facts { gap:6px; margin-block:8px; }
+.kpi-profile-page .formula,.kpi-profile-page .description { margin-block:6px; }
+.kpi-profile-page .requirements { margin-block:8px; }
+.process-profile-pair { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.process-profile-pair>div { border:1px solid var(--line); padding:8px 10px; border-radius:9px; background:var(--surface-subtle,#f6f8fb); }
+@media(min-width:761px) {
+ .app>.workspace>.workspace-content:has(.kpi-profile-page) { display:flex; flex-direction:column; }
+ .kpi-profile-page { min-height:0; flex:1; overflow:auto; overscroll-behavior:contain; padding-inline-end:2px; }
+}
+@media(max-width:520px) { .process-profile-pair { grid-template-columns:minmax(0,1fr); } }
+.demo-admin-login { display:grid; gap:10px; padding-top:6px; }
+.demo-admin-login label { display:grid; gap:4px; }

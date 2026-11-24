@@ -1,3 +1,4 @@
+import apqcFa from './apqc-fa.json';
 import {ApqcExplorer} from './ApqcExplorer';
 import {apqcByCode} from './apqc-reference';
 import {useState, type FormEvent, type ReactNode} from 'react';
@@ -61,7 +62,8 @@ export function ProcessGovernance({data, id, section, refresh}: {
   const [message, setMessage] = useState({text: '', error: false});
   const admin = config.demoManagement && data.user.role === 'ADMIN';
   const title = (id: string) => data.positions.find(position => position.id === id)?.title ?? '—';
-  const mapped = categories.find(([code]) => code === record.apqc)?.[1] ?? apqcByCode.get(record.apqc);
+  const english = apqcByCode.get(record.apqc);
+  const mapped = categories.find(([code]) => code === record.apqc)?.[1] ?? (apqcFa as Record<string,string>)[record.apqc];
   const matrixPositions = data.positions.filter(position => record.raci.some(row => row.roles[position.id]));
 
   async function save(change: Partial<Governance>) {
@@ -96,11 +98,14 @@ export function ProcessGovernance({data, id, section, refresh}: {
   }
 
   return <div className="governance-content">
-    {section === 'apqc' && (admin ? <label>دسته مرجع APQC<select disabled={pending} value={record.apqc}
+    {section === 'apqc' && <><dl className="profile-fields process-profile-pair">
+      <div><dt>طبقه‌بندی APQC · فارسی</dt><dd>{mapped ?? 'نیازمند بررسی'}</dd></div>
+      <div><dt>طبقه‌بندی APQC · English</dt><dd dir="auto">{english?<><bdi>{record.apqc}</bdi> · {english}</>:'—'}</dd></div>
+    </dl>{admin && <label>دسته مرجع APQC<select disabled={pending} value={record.apqc}
       onChange={event => void save({apqc: event.target.value})}>
       <option value="">نیازمند بررسی</option>
       {Array.from(apqcByCode, ([code, label]) => <option key={code} value={code}>{code} · {categories.find(([key]) => key === code)?.[1] ?? label}</option>)}
-    </select></label> : <p>{mapped ? <><bdi>{record.apqc}</bdi> · {mapped}</> : 'نیازمند بررسی'}</p>)}
+    </select></label>}</>}
     {section === 'raci' && <>
       {record.raci.length ? <>
         <p className="governance-legend">{Object.entries(raciRoles).map(([role, label]) => <span key={role}><bdi>{role}</bdi> · {label}</span>)}</p>

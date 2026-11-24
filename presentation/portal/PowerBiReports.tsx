@@ -1,3 +1,4 @@
+import {Video} from 'lucide-react';
 import {useState, type FormEvent} from 'react';
 import {Modal} from './Modal';
 
@@ -24,9 +25,25 @@ function embedUrl(value: string) {
   return url?.origin === 'https://app.powerbi.com' && /^\/(reportEmbed|dashboardEmbed|view)\/?$/i.test(url.pathname) ? url.href : null;
 }
 
+export function guideVideo(value:string){
+ const url=parseHttps(value);
+ if(!url)return null;
+ if(url.origin==='https://drive.google.com'){
+  const id=url.pathname.match(/^\/file\/d\/([\w-]+)(?:\/|$)/)?.[1];
+  if(!id)return null;
+  const preview=new URL('/file/d/'+id+'/preview',url.origin);
+  const resourceKey=url.searchParams.get('resourcekey');
+  if(resourceKey)preview.searchParams.set('resourcekey',resourceKey);
+  return {url:preview.href,embed:true};
+ }
+ return /\.(mp4|webm|ogv)$/i.test(url.pathname)?{url:url.href,embed:false}:null;
+}
+
 export function PowerBiReports({reports, canManage, onAdd, reportId}: {
   reportId?: string; reports: PowerBiReport[]; canManage: boolean; onAdd: (report: PowerBiReport) => boolean;
 }) {
+  const [videoReport,setVideoReport]=useState<PowerBiReport|null>(null);
+  const [videoError,setVideoError]=useState('');
   const [adding, setAdding] = useState(false);
   const [selection, setSelection] = useState({route:reportId,id:reportId ?? ''});
   const selectedId = selection.route === reportId ? selection.id : reportId ?? '';
@@ -34,7 +51,7 @@ export function PowerBiReports({reports, canManage, onAdd, reportId}: {
   const [error, setError] = useState('');
   const selected = reports.find(report => report.id === selectedId);
   const source = selected && embedUrl(selected.embed);
-  const guide = selected && parseHttps(selected.guide);
+  const player=videoReport&&guideVideo(videoReport.guide);
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,8 +59,8 @@ export function PowerBiReports({reports, canManage, onAdd, reportId}: {
     const name = String(data.get('name') ?? '').trim();
     const embed = embedUrl(String(data.get('embed') ?? '').trim());
     const guide = String(data.get('guide') ?? '').trim();
-    if (!name || !embed || (guide && !parseHttps(guide))) {
-      setError('نام، نشانی جاسازی Power BI و نشانی HTTPS راهنما را بررسی کنید.');
+    if (!name || !embed || (guide && !guideVideo(guide))) {
+      setError('نام، نشانی جاسازی Power BI و لینک فایل ویدئویی یا Google Drive را بررسی کنید.');
       return;
     }
     const area = String(data.get('area') ?? '').trim();
@@ -66,19 +83,21 @@ export function PowerBiReports({reports, canManage, onAdd, reportId}: {
       <label>حوزه<input name="area" maxLength={60}/></label>
       <label>توضیح کوتاه<input name="description" maxLength={240}/></label>
       <label>لینک جاسازی Power BI<input type="url" dir="ltr" name="embed" required/></label>
-      <label>لینک راهنما یا ویدئوی آموزشی<input type="url" dir="ltr" name="guide"/></label>
+      <label>لینک ویدئوی راهنما (Google Drive یا MP4/WebM)<input type="url" dir="ltr" name="guide"/></label>
       <button className="primary">ذخیره داشبورد</button>
       {error && <p role="alert" className="alert error">{error}</p>}
     </form>}
     {reports.length ? <div className="power-bi-grid" aria-label="داشبوردهای Power BI">
       {reports.map(report => {
-        const help = parseHttps(report.guide);
+
         return <article key={report.id} className="panel power-bi-card">
           <button type="button" className="power-bi-open" aria-pressed={report.id === selectedId} onClick={() => setSelectedId(report.id)}>
             <span><PowerBiIcon size={23}/><small>{report.area ?? 'Power BI'}</small></span>
             <strong>{report.name}</strong>{report.description && <span className="power-bi-description">{report.description}</span>}
           </button>
-          {help && <a className="secondary power-bi-guide" href={help.href} target="_blank" rel="noopener noreferrer">راهنمای داشبورد</a>}
+          <button type="button" className="secondary power-bi-guide" onClick={()=>{setVideoError('');setVideoReport(report);}}>
+           <Video size={16}/>راهنمای داشبورد
+          </button>
         </article>;
       })}
     </div> : <p className="empty-inline">هنوز داشبوردی ثبت نشده است.</p>}
@@ -86,9 +105,28 @@ export function PowerBiReports({reports, canManage, onAdd, reportId}: {
     {selected && <Modal label={selected.name} className="panel power-bi-dialog" onClose={()=>setSelectedId('')}>
       <header><h2>{selected.name}</h2><button type="button" className="secondary" onClick={()=>setSelectedId('')}>بستن</button></header>
       {selected.description && <p>{selected.description}</p>}
-      {guide && <a className="secondary power-bi-guide" href={guide.href} target="_blank" rel="noopener noreferrer">راهنمای داشبورد</a>}
       {source ? <iframe className="power-bi-frame" src={source} title={selected.name} allow="fullscreen"/> :
         <small>نمونهٔ دمو</small>}
     </Modal>}
+    {videoReport && <Modal className="panel power-bi-dialog" label={'راهنمای '+videoReport.name} onClose={()=>setVideoReport(null)}>
+      <header><h2>راهنمای {videoReport.name}</h2><button type="button" className="secondary" onClick={()=>setVideoReport(null)}>بستن</button></header>
+      {player ? player.embed
+        ? <iframe className="power-bi-guide-player" src={player.url} title={'ویدئوی راهنمای '+videoReport.name} allow="autoplay; fullscreen" referrerPolicy="strict-origin-when-cross-origin"/>
+        : <video className="power-bi-guide-player" controls playsInline src={player.url}/>
+        : <p className="empty-inline">هنوز ویدئوی راهنما ثبت نشده است.</p>}
+      {player?.embed&&<a href={player.url} target="_blank" rel="noopener noreferrer">باز کردن ویدئو در Drive</a>}
+      {canManage&&<form className="kpi-form" onSubmit={event=>{
+        event.preventDefault();
+        const guide=String(new FormData(event.currentTarget).get('videoGuide')??'').trim();
+        if(guide&&!guideVideo(guide)){setVideoError('لینک فایل ویدئویی Google Drive، MP4 یا WebM را بررسی کنید.');return;}
+        const updated={...videoReport,guide};
+        if(onAdd(updated)){setVideoError('');setVideoReport(updated);}
+      }}>
+        <label>لینک ویدئوی Google Drive یا MP4/WebM<input dir="ltr" type="url" name="videoGuide" defaultValue={player?videoReport.guide:''}/></label>
+        <button className="primary">ذخیره راهنما</button>
+        {videoError&&<p role="alert" className="alert error">{videoError}</p>}
+      </form>}
+    </Modal>}
+
   </>;
 }

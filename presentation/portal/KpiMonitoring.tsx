@@ -76,7 +76,7 @@ const samplePowerBiReport: PowerBiReport = {
   area: 'پایداری',
   description: 'رصد تعهدات زیست‌محیطی، اجتماعی و حاکمیتی در سبد دارایی‌ها.',
   embed: 'https://app.powerbi.com/view?r=eyJrIjoiYjc2ZTEyZjItODI0Yi00NzY2LWJkNTMtODAwYjNlNWNjYTQ5IiwidCI6IjUwZDhjMTE1LWI3N2YtNDM5NS1hM2JhLTNiNDA3Y2FmMGQ4OCIsImMiOjh9',
-  guide: 'https://democracy.lbhf.gov.uk/documents/s120652/Appendix%201%20-%20Responsible%20Investment%20Statement%20LBHF%202022.pdf',
+  guide: '',
 };
 
 const reportSamples: PowerBiReport[] = [
@@ -92,7 +92,10 @@ const reportSamples: PowerBiReport[] = [
 ].map(([id,name,area,description])=>({id:'sample-'+id,name,area,description,embed:'',guide:''}));
 
 function visibleReports(reports: PowerBiReport[]) {
-  return config.demoManagement ? [samplePowerBiReport, ...reportSamples, ...reports] : reports;
+  if(!config.demoManagement)return reports;
+  const byId=new Map([samplePowerBiReport,...reportSamples].map(report=>[report.id,report]));
+  for(const report of reports)byId.set(report.id,report);
+  return [...byId.values()];
 }
 
 export function availablePowerBiReports(data: Data) {
@@ -314,6 +317,6 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
       </form></Modal>}
     </>}
     {tab === 'power-bi' && <PowerBiReports reportId={reportId} reports={visibleReports(model.reports)} canManage={admin}
-      onAdd={report => update(saved => ({...saved, reports: [...saved.reports, report]}), 'داشبورد ذخیره شد.')}/>}
+      onAdd={report => update(saved => ({...saved, reports: [...saved.reports.filter(item=>item.id!==report.id), report]}), 'داشبورد ذخیره شد.')}/>}
   </div>;
 }

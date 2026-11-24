@@ -1,20 +1,10 @@
+import {demoAdminActive} from './demo-auth';
 import {withDemoSamples} from "./demo-samples";
 import {apqcByCode} from './apqc-reference';
 import type {Data} from './types';
 import {emptyGovernance, raciRoles, sampleGovernance, type Governance} from './process-governance';
 
-const modeKey = 'nama-demo-admin';
 const editsKey = 'nama-demo-edits-v1';
-
-export function demoAdminActive() {
-  try { return sessionStorage.getItem(modeKey) === '1'; }
-  catch { return false; }
-}
-
-export function setDemoAdmin(active: boolean) {
-  if (active) sessionStorage.setItem(modeKey, '1');
-  else sessionStorage.removeItem(modeKey);
-}
 
 type EditableData = Pick<Data, 'organization' | 'units' | 'positions' | 'persons' |
   'assignments' | 'profiles' | 'trainingVideos' | 'governance'>;

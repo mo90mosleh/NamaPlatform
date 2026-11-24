@@ -202,7 +202,7 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
   return <li key={goal.id}>
    <button style={goalTone(goal)} type="button" className="okr-tree-goal" aria-label={'جزئیات هدف '+goal.title} onClick={()=>open(goal.id)}>
     <bdi>{goal.code}</bdi><strong>{goal.title}</strong><small>{owner(goal)}</small>
-    <span>{number.format(objectiveProgress(portfolio,goal.id))}٪</span><Status value={pace(goal).status}/>
+    <span className="okr-tree-progress"><Progress value={objectiveProgress(portfolio,goal.id)}/>{number.format(objectiveProgress(portfolio,goal.id))}٪</span><Status value={pace(goal).status}/>
    </button>
    {children.length>0&&<ul>{children.map(renderGoal)}</ul>}
   </li>;
@@ -254,8 +254,9 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
  const isExpanded = (goal:OkrObjective) => expandedResults[goal.id]??showAllResults;
  function resultBadge(goal:OkrObjective){
   const count=resultsFor(goal).length;
-  return count>0&&!isExpanded(goal)&&<button type="button" className="okr-kr-badge" aria-label={'نمایش '+number.format(count)+' نتیجهٔ کلیدی '+goal.title}
-    onClick={()=>setExpandedResults(old=>({...old,[goal.id]:true}))}><bdi>{count} KR</bdi></button>;
+  const expanded=isExpanded(goal);
+  return count>0&&<button aria-expanded={expanded} type="button" className="okr-kr-badge" aria-label={(expanded?'بستن':'نمایش')+' '+number.format(count)+' نتیجهٔ کلیدی '+goal.title}
+    onClick={()=>setExpandedResults(old=>({...old,[goal.id]:!expanded}))}><bdi>{count} KR</bdi><ChevronDown size={12}/></button>;
  }
  function inlineResults(goal:OkrObjective){
   const rows=resultsFor(goal);

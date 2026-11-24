@@ -296,3 +296,6 @@ button.okr-metric:hover, button.okr-info-row:hover { background: #eef6f4; }
  .okr-monitor-content { max-height:calc(100dvh - 150px); overflow:auto; }
  .okr-strategy-content { max-height:calc(100dvh - 265px); }
 }
+.okr-tree-progress { display:grid; grid-template-columns:minmax(40px,1fr) auto; align-items:center; gap:5px; min-width:82px; }
+.okr-kr-badge { display:inline-flex; align-items:center; gap:2px; }
+.okr-kr-badge[aria-expanded="true"] svg { transform:rotate(180deg); }

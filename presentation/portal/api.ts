@@ -1,3 +1,4 @@
+import {refreshDemoAdmin} from './demo-auth';
 import{applyDemoEdits,updateDemoData}from'./demo-store';
 import{loadLivePages,mutatePages}from'./pages-store';
 import type{Data,Config}from './types';
@@ -15,6 +16,7 @@ export async function loadInitialSnapshot():Promise<Data|null>{
  return d;
 }
 export async function loadData():Promise<Data>{
+ if(config.demoManagement)await refreshDemoAdmin();
  if(config.authEnabled){try{return normalize(await loadLivePages());}catch{if(!config.snapshotPath)throw Error('اتصال به اطلاعات زنده انجام نشد.');const r=await fetch(config.snapshotPath,{cache:'default',signal:AbortSignal.timeout(12000)});if(!r.ok)throw Error('اطلاعات در دسترس نیست.');const d=normalize(await r.json());d.user={name:'مشاهده‌گر',email:'',role:'VIEWER'};d.dataSource='snapshot';d.syncWarning='اتصال به اطلاعات زنده برقرار نیست؛ نسخهٔ ذخیره‌شده نمایش داده می‌شود و ویرایش غیرفعال است.';return d;}}
  if(config.snapshotPath&&config.url&&config.publishableKey){
   try {
