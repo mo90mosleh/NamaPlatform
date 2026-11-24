@@ -44,7 +44,7 @@ const moduleHints=[...initialModules].filter(path=>publicBuild.metafile.outputs[
 const snapshot=true;
 const demoConfig=JSON.parse(await readFile('pages-config.json','utf8'));
 function html(mode){
- const cfg=mode==='public'?{...demoConfig,mode,adminUrl:'',snapshotPath:'./nama-demo.json',feedbackEnabled:false,demoManagement:true}:{mode,adminUrl:'/login'};
+ const cfg=mode==='public'?{...demoConfig,mode,adminUrl:'',snapshotPath:'./nama-demo.json',feedbackEnabled:true,demoManagement:true}:{mode,adminUrl:'/login'};
  const styles=mode==='public'?moduleHints+(snapshot?'<link rel="preload" href="./nama-demo.json" as="fetch" type="application/json" crossorigin>':'')+'<link rel="stylesheet" href="'+publicCssHref+'">':'<style>'+css+'</style>';
  const scripts=mode==='public'?'<script type="module" src="'+publicJsHref+'"></script>':'<script>'+js+'</script>';
  return '<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#bd2739"><title>نما | مدیریت سازمان و عملکرد</title>'+styles+'</head><body><div id="app"></div><script>window.__ORGDEMO_HASH_ROUTING__='+(mode==='public')+';window.__PORTAL_CONFIG__='+JSON.stringify(cfg)+';</script>'+scripts+'</body></html>';
