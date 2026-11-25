@@ -11,9 +11,8 @@
 .flow-department-node > .node-select .position-node-text { flex:1; max-width:none; gap:0; }
 .flow-department-node > .node-select .position-node-text strong { color:#1e3552; line-height:1.18; }
 .flow-department-node .department-position-count { white-space:nowrap; font-size:10px; color:#3a526f; }
-.flow-department-node:has(> .node-toggle) > .node-select { padding-inline-end:40px; }
 .flow-department-node > .node-toggle {
- position:absolute; top:10px; inset-inline-end:5px; bottom:auto; border-radius:5px;
+ position:absolute; top:auto; inset-inline-end:5px; bottom:-12px; z-index:2; border-radius:5px;
  background:#f1f5fa; border:1px solid #c2cedc; color:#385477;
 }
 .interactive-chart .flow-department-node .node-analysis-count { display:block; line-height:1.15; }

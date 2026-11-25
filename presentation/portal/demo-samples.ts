@@ -7,29 +7,48 @@ export const demoValueChains = [
 ];
 
 const teams = [
-  ['d8dd58ea','عملیات فروش','کارشناس فروش',['آوا صادقی','آرمان نادری']],
-  ['e314bd6f','خط مونتاژ','اپراتور مونتاژ',['لیلا کریمی','پویا محمودی','رضا جعفری']],
-  ['273d3012','آزمایشگاه کیفیت','کارشناس آزمون',['مریم اسدی','فرهاد امینی']],
-  ['9422edd2','مرکز پاسخ‌گویی','کارشناس پشتیبانی',['سارا رفیعی','مانی یوسفی']],
+  ['e314bd6f','اپراتور مونتاژ',['لیلا کریمی','پویا محمودی','رضا جعفری']],
+  ['273d3012','کارشناس آزمون',['مریم اسدی','فرهاد امینی']],
+  ['9422edd2','کارشناس پشتیبانی',['سارا رفیعی','مانی یوسفی']],
 ] as const;
+
+const salesSupervisors = [
+  {name:'مهدی رستمی', specialists:['آوا صادقی','آرمان نادری','سارا محمودی']},
+  {name:'الهام موسوی', specialists:['حسین کریمی','نازنین حیدری','امیر رضایی']},
+];
 
 const sampleId = (group: number, index: number) =>
   'e97a4256-4600-43c8-9200-' + String(group * 1000 + index).padStart(12,'0');
 
 export function withDemoSamples(data: Data): Data {
-  const units = [...data.units], positions = [...data.positions], persons = [...data.persons], assignments = [...data.assignments];
-  teams.forEach(([managerPrefix, team, title, names], index) => {
+  const units = [...data.units], positions = data.positions.map(position=>({...position})), persons = [...data.persons], assignments = [...data.assignments];
+  function addPerson(display_name: string, position_id: string, index: number) {
+    const person_id = sampleId(3,index);
+    persons.push({id:person_id, display_name, email:null, phone:null});
+    assignments.push({id:sampleId(4,index), person_id, position_id});
+  }
+  teams.forEach(([managerPrefix, title, names], index) => {
     const manager = data.positions.find(position => position.id.startsWith(managerPrefix));
     if (!manager) return;
-    const unitId = sampleId(1,index), positionId = sampleId(2,index);
-    units.push({id:unitId, parent_id:manager.org_unit_id, name:team, code:'TEAM-'+(index+1), sort_order:index});
-    positions.push({id:positionId, org_unit_id:unitId, reports_to_position_id:manager.id, title});
-    names.forEach((display_name, seat) => {
-      const person_id = sampleId(3,index*10+seat);
-      persons.push({id:person_id, display_name, email:null, phone:null});
-      assignments.push({id:sampleId(4,index*10+seat), person_id, position_id:positionId});
-    });
+    const positionId = sampleId(2,index+1);
+    positions.push({id:positionId, org_unit_id:manager.org_unit_id, reports_to_position_id:manager.id, title});
+    names.forEach((name,seat) => addPerson(name,positionId,(index+1)*10+seat));
   });
+  const sales = positions.find(position => position.id.startsWith('d8dd58ea'));
+  if (sales) {
+    sales.title = 'مدیر فروش';
+    salesSupervisors.forEach(({name,specialists},index) => {
+      const supervisorId = sampleId(2,100+index);
+      positions.push({id:supervisorId,org_unit_id:sales.org_unit_id,reports_to_position_id:sales.id,title:'سرپرست فروش'});
+      addPerson(name,supervisorId,100+index);
+      specialists.forEach((name,seat) => {
+        const sampleIndex = 110+index*3+seat;
+        const specialistId = sampleId(2,sampleIndex);
+        positions.push({id:specialistId,org_unit_id:sales.org_unit_id,reports_to_position_id:supervisorId,title:'کارشناس فروش'});
+        addPerson(name,specialistId,sampleIndex);
+      });
+    });
+  }
   const byCode = new Map(data.nodes.filter(node => node.kind === 'PROCESS').map(node => [node.code,node.id]));
   const relations: ProcessRelation[] = [...(data.relations ?? [])];
   demoValueChains.forEach(({codes}, chain) => codes.slice(1).forEach((code,index) => {
