@@ -66,7 +66,7 @@
 @media(max-width:760px){ .dashboard-widgets{grid-template-columns:1fr} }
 @media (min-width: 961px) { .quick-link-grid { grid-template-columns:repeat(5,minmax(0,1fr)); } }
 
-.dashboard-tour .dashboard-view-link:hover { background:#172b42; color:#fff; }
+.dashboard-view-link:hover { background:#172b42; color:#fff; }
 .dashboard-search-results a>span,.dashboard-slide h2 { display:flex; align-items:center; gap:8px; }
 .dashboard-slide { display:grid; grid-template-columns:minmax(0,1fr) minmax(90px,40%); align-items:center; gap:12px; flex:1; }
 .dashboard-slide h2,.dashboard-slide p { margin:0 0 5px; }
