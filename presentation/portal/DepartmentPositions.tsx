@@ -16,7 +16,7 @@ export function DepartmentPositions({item, limit, onPosition, onPeople}: Props) 
  if (!positions?.length) return null;
  const rows = departmentPositionRows(positions);
  const rowById = new Map(rows.map(({position}, index) => [position.id,index]));
- return <ul className="flow-department-positions" aria-label={'سمت‌های '+item.label}>
+ return <ul className="flow-department-positions nowheel" aria-label={'سمت‌های '+item.label}>
   {rows.map(({position,depth},index) => {
    const parentIndex = position.parentId ? rowById.get(position.parentId) : undefined;
    const linked = depth > 0 && parentIndex !== undefined && parentIndex < index;

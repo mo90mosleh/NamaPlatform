@@ -4,7 +4,7 @@ export type DepartmentPosition={id:string;parentId:string|null;title:string;peop
 export type ChartItem={id:string;parentId:string|null;label:string;subtitle?:string;kind:'unit'|'position';closed:boolean;childCount:number;selected:boolean;seatCount?:number;mixed?:boolean;unitId?:string;descendantCount?:number;previewChildren?:string[];analysisValue?:number;analysisLabel?:string;tone?:string;people?:Person[];departmentPositions?:DepartmentPosition[]};
 export type ChartDirection='horizontal'|'vertical';
 export function chartNodeSize(item:ChartItem,admin:boolean) {
- if(item.departmentPositions) return {width:308,height:54+item.departmentPositions.length*56};
+ if(item.departmentPositions) return {width:308,height:222};
  return {width:212,height:(admin?124:104)+(item.people?.length?24:0)};
 }
 export function layoutChart(items:ChartItem[],admin=false,direction:ChartDirection='horizontal'){

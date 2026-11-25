@@ -21,3 +21,7 @@
 @media(max-width:760px){
  .app.chart-focus-mode .chart-layout-full .chart-insight-popover{top:var(--chart-popup-top,180px);bottom:auto;max-height:min(560px,max(150px,calc(100dvh - var(--chart-popup-top,180px) - 88px)))}
 }
+
+.react-flow .chart-minimap-toggle { z-index:8; margin:8px; }
+.react-flow .chart-minimap-toggle.is-open { margin-bottom:calc(var(--chart-minimap-height,120px) + 15px); }
+.react-flow__minimap { height:var(--chart-minimap-height,120px); }

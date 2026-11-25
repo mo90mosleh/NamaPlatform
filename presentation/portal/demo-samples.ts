@@ -22,9 +22,15 @@ const sampleId = (group: number, index: number) =>
 
 export function withDemoSamples(data: Data): Data {
   const units = [...data.units], positions = data.positions.map(position=>({...position})), persons = [...data.persons], assignments = [...data.assignments];
+  const femaleNames = new Set(['لیلا کریمی','مریم اسدی','سارا رفیعی','آوا صادقی','سارا محمودی','الهام موسوی','نازنین حیدری']);
+  const femaleAvatars = [1,3,5,7,9];
+  const maleAvatars = [0,2,4,6,8];
   function addPerson(display_name: string, position_id: string, index: number) {
     const person_id = sampleId(3,index);
-    persons.push({id:person_id, display_name, email:null, phone:null});
+    const portraits = femaleNames.has(display_name) ? femaleAvatars : maleAvatars;
+    const avatar_data_url = data.persons[portraits[index%portraits.length]]?.avatar_data_url;
+    persons.push({id:person_id, display_name, email:null, phone:'0900 000 '+(120+index).toString().padStart(4,'0'),
+      extension:String(400+index), avatar_data_url});
     assignments.push({id:sampleId(4,index), person_id, position_id});
   }
   teams.forEach(([managerPrefix, title, names], index) => {
