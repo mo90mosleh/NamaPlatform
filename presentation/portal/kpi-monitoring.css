@@ -94,3 +94,5 @@
  .kpi-workspace-fit .kpi-monitor-card header,.kpi-workspace-fit .kpi-chart-meta { flex:none; }
  .kpi-workspace-fit > .kpi-add-card { margin-block:6px 0; }
 }
+
+.kpi-clear-dates { align-self:center; padding:4px 8px; font-size:11px; min-height:32px; }

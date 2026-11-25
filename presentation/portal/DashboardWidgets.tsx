@@ -5,7 +5,7 @@ import okrArt from './assets/slide-okr.jpg';
 import {PowerBiIcon} from './PowerBiReports';
 import {groupPositions} from './position-groups';
 import {useEffect,useState} from 'react';
-import {Search,History,ChartNoAxesCombined,Target,Pause,Play,UserRound,BriefcaseBusiness,Building2,BookOpen,Files,ArrowLeft,CalendarDays} from 'lucide-react';
+import {Search,History,ChartNoAxesCombined,Target,Pause,Play,UserRound,BriefcaseBusiness,Building2,BookOpen,Files,ArrowLeft,CalendarDays,Clock3} from 'lucide-react';
 import {ProcessIcon} from './ProcessIcon';
 import {normalizeSearch} from './architecture-navigation';
 import {availablePowerBiReports} from './KpiMonitoring';
@@ -22,13 +22,17 @@ const modules = [
 const mainPaths=new Set(modules.map(module=>module.path));
 const todayFormat=new Intl.DateTimeFormat('fa-IR-u-ca-persian',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'Asia/Tehran'});
 
+const timeFormat=new Intl.DateTimeFormat('fa-IR',{hour:'2-digit',minute:'2-digit',hourCycle:'h23',timeZone:'Asia/Tehran'});
+
 export function DashboardDate(){
  const [date,setDate]=useState(()=>new Date());
- useEffect(()=>{const timer=setInterval(()=>setDate(new Date()),60000);return()=>clearInterval(timer);},[]);
+ useEffect(()=>{let timer:number;
+  function tick(){const now=new Date();setDate(now);timer=window.setTimeout(tick,60000-now.getTime()%60000);}
+  tick();return()=>clearTimeout(timer);},[]);
  const parts=new Map(todayFormat.formatToParts(date).map(part=>[part.type,part.value]));
  return <div className="dashboard-date" dir="rtl"><CalendarDays size={19}/><time dir="rtl" dateTime={date.toISOString()}>
   {parts.get('weekday')}، {parts.get('day')} {parts.get('month')} {parts.get('year')}
- </time></div>;
+ </time><span className="dashboard-clock"><Clock3 size={15} aria-hidden="true"/><time dir="ltr" dateTime={date.toISOString()}>{timeFormat.format(date)}</time></span></div>;
 }
 
 const searchIcons = {بخش:BookOpen, فرآیند:ProcessIcon, شاخص:ChartNoAxesCombined, هدف:Target, 'Power BI':PowerBiIcon,

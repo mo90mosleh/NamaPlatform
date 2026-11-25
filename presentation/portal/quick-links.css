@@ -91,3 +91,5 @@
 .dashboard-slide { grid-template-columns:minmax(0,1fr) minmax(90px,43%); }
 .dashboard-slide-art { max-width:220px; max-height:220px; }
 .dashboard-slide-copy p { text-align:start; }
+
+.dashboard-clock { display:inline-flex; align-items:center; gap:5px; padding-inline-start:8px; border-inline-start:1px solid #d5e3ef; font-variant-numeric:tabular-nums; }

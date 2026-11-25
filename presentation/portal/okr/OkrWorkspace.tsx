@@ -261,8 +261,10 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
  const isExpanded = (goal:OkrObjective) => expandedResults[goal.id]??showAllResults;
  function resultBadge(goal:OkrObjective){
   const count=resultsFor(goal).length;
-  return count>0&&!isExpanded(goal)&&<button aria-expanded={false} type="button" className="okr-kr-badge" aria-label={'نمایش '+number.format(count)+' نتیجهٔ کلیدی '+goal.title}
-    onClick={()=>setExpandedResults(old=>({...old,[goal.id]:true}))}><bdi>{number.format(count)} KR</bdi></button>;
+  const expanded=isExpanded(goal);
+  return count>0&&<button aria-expanded={expanded} type="button" className="okr-kr-badge"
+    aria-label={(expanded?'جمع کردن ':'نمایش ')+number.format(count)+' نتیجهٔ کلیدی '+goal.title}
+    onClick={()=>setExpandedResults(old=>({...old,[goal.id]:!expanded}))}><bdi>{number.format(count)} KR</bdi><ChevronDown size={12}/></button>;
  }
  function inlineResults(goal:OkrObjective){
   const rows=resultsFor(goal);
@@ -285,10 +287,10 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
    </div>
   </div>
   <section className="okr-panel">{filtered.length?listView==='tree'?<div className="okr-list">
-   {filtered.map(g=><div key={g.id} className="okr-goal-entry" style={goalTone(g)}><div className="okr-list-row">
-    <div className={'okr-list-title '+(g.parentId?'is-child':'')}><small>{g.code} · {g.level==='COMPANY'?'سازمانی':'دپارتمانی'}</small><div className="okr-goal-name"><button type="button" className="text-button" onClick={()=>open(g.id)}>{g.title}</button>{resultBadge(g)}</div><small>{owner(g)}</small></div>
+   {filtered.map(g=><div key={g.id} className="okr-goal-entry"><div className="okr-goal-row-wrap">{resultBadge(g)}<div className="okr-list-row" style={goalTone(g)}>
+    <div className={'okr-list-title '+(g.parentId?'is-child':'')}><small>{g.code} · {g.level==='COMPANY'?'سازمانی':'دپارتمانی'}</small><div className="okr-goal-name"><button type="button" className="text-button" onClick={()=>open(g.id)}>{g.title}</button></div><small>{owner(g)}</small></div>
     <div className="okr-list-progress"><Progress value={objectiveProgress(portfolio,g.id)}/><strong className="okr-objective-percent">{number.format(objectiveProgress(portfolio,g.id))}٪</strong></div><Status value={pace(g).status}/>
-   </div>{inlineResults(g)}</div>)}
+   </div></div>{inlineResults(g)}</div>)}
   </div>:<div className="okr-table-wrap"><table><thead><tr><th>هدف</th><th>مالک</th><th>نتایج کلیدی</th><th>تحقق</th><th>وضعیت</th></tr></thead><tbody>{filtered.map(g=><Fragment key={g.id}><tr style={goalTone(g)}><td><button type="button" className="text-button" onClick={()=>open(g.id)}>{g.title}</button><small>{g.code}</small></td><td>{owner(g)}</td><td>{resultBadge(g)}</td><td>{number.format(objectiveProgress(portfolio,g.id))}٪</td><td><Status value={pace(g).status}/></td></tr>{isExpanded(g)&&resultsFor(g).length>0&&<tr style={goalTone(g)}><td colSpan={5}>{inlineResults(g)}</td></tr>}</Fragment>)}</tbody></table></div>:<p className="okr-empty">هدفی با این شرایط پیدا نشد.</p>}</section>
  </div>;
  const monitoring=<div className="okr-monitor-content">

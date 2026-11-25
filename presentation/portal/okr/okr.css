@@ -337,3 +337,7 @@ button.okr-metric:hover, button.okr-info-row:hover { background: #eef6f4; }
  .okr-strategy-tree .okr-tree-list { min-height:0; max-height:none; overscroll-behavior:contain; }
  .okr-strategy-content .okr-bottom-grid { min-height:0; overflow:auto; overscroll-behavior:contain; }
 }
+
+.okr-goals-content .okr-goal-row-wrap { padding-inline:0; gap:6px; }
+.okr-goals-content .okr-kr-badge { white-space:nowrap; }
+.okr-goals-content .okr-kr-badge[aria-expanded="true"] svg { transform:rotate(180deg); }

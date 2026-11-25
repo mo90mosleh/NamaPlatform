@@ -120,17 +120,7 @@ export function latestKpiValue(data: Data, id: string) {
 
 function Chart({kpi, card, rows, targets}: {kpi: KPI; card: Card; rows: Measurement[]; targets:number[]}) {
   const points = latestPerPeriod(rows, kpi.frequency);
-  if (!points.length) return <>
-    {card.kind!=='pie'&&targets.length>0&&<svg className="kpi-plot" viewBox="0 0 345 142" role="img" aria-label="خطوط هدف نتایج کلیدی فعال">
-      {targets.map(target=>{
-        const min=Math.min(0,...targets),max=Math.max(1,...targets);
-        const y=110-82*(target-min)/(max-min);
-        return <g key={target}><line x1="24" x2="264" y1={y} y2={y} stroke="#9a5b2c" strokeDasharray="4 3"/>
-          <text x="274" y={y+3} fill="#875326" fontSize="11">{number.format(target)}</text></g>;
-      })}
-    </svg>}
-    <p className="empty-inline">در این بازه مقداری ثبت نشده است.</p>
-  </>;
+  if (!points.length) return <p className="empty-inline">در این بازه مقداری ثبت نشده است.</p>;
   const {kind, labels = true} = card;
   const colors = (themes[card.theme ?? 'ocean'] ?? themes.ocean).colors;
   const values = points.map(point => current(point.row).value);
@@ -216,6 +206,8 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
   const existing = model.measurements.find(row => row.kpiId === entryKpi && row.date === entryDate);
   const history = model.measurements.filter(row => row.kpiId === entryKpi).sort((a, b) => b.date.localeCompare(a.date));
   const dateError = Boolean(start && end && start > end);
+  const dashboardMeasurements = model.measurements.filter(({date}) =>
+    (!start || date >= start) && (!end || date <= end));
 
   useEffect(() => {
     const sync = (event: StorageEvent) => { if (event.key === key || event.key === null) setModel(read(key, initialModel(data))); };
@@ -272,6 +264,8 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
       {tab === 'dashboard' && <div className="kpi-date-filters">
         <JalaliDatePicker label="از تاریخ" value={start} onChange={setStart}/>
         <JalaliDatePicker label="تا تاریخ" value={end} onChange={setEnd}/>
+        <button type="button" className="secondary kpi-clear-dates" disabled={!start&&!end}
+          onClick={()=>{setStart('');setEnd('');}}>پاک کردن فیلتر تاریخ</button>
       </div>}
       {tab === 'profiles'&&<button type="button" className="secondary" aria-expanded={entryOpen}
         onClick={()=>setEntryOpen(!entryOpen)}><Save size={16}/>ثبت مقادیر</button>}
@@ -306,8 +300,7 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
       {!model.cards.length && <p className="panel empty-inline">برای ساخت داشبورد، اولین کارت را اضافه کنید.</p>}
       <div className={'kpi-card-grid'+(model.cards.length<=4?' kpi-card-grid-compact':'')}>{model.cards.map(card => {
         const kpi = data.kpis.find(item => item.id === card.kpiId);
-        const rows = dateError ? [] : model.measurements.filter(row => row.kpiId === card.kpiId &&
-          (!start || row.date >= start) && (!end || row.date <= end)).sort((a, b) => a.date.localeCompare(b.date));
+        const rows = dashboardMeasurements.filter(row => row.kpiId === card.kpiId);
         return <section className="panel kpi-monitor-card" key={card.id}>
           <header><div><h2>{kpi?.name ?? 'شاخص در دسترس نیست'}</h2><small>{charts[card.kind]}{kpi?.unit && ' · ' + kpi.unit}</small></div>
             <div className="kpi-actions"><button className="icon-button" type="button" title="ویرایش" aria-label="ویرایش" onClick={() => setCardDraft(card)}><Pencil size={16}/></button>
@@ -318,7 +311,7 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
           {kpi && !dateError && <Chart kpi={kpi} card={card} rows={rows} targets={targets.get(kpi.id)??[]}/>}
         </section>;
       })}</div>
-      <div className="kpi-actions kpi-add-card"><button type="button" className="secondary" disabled={!data.kpis.length}
+      <div className="kpi-actions kpi-add-card"><button type="button" className="primary" disabled={!data.kpis.length}
         onClick={() => setCardDraft({id: '', kpiId: '', kind: 'line'})}><Plus size={16}/>افزودن کارت</button></div>
       {cardDraft && <Modal className="kpi-card-settings panel" label={cardDraft.id?'ویرایش کارت':'افزودن کارت'} onClose={()=>setCardDraft(null)}>
         <h2>{cardDraft.id?'ویرایش کارت':'افزودن کارت'}</h2>
