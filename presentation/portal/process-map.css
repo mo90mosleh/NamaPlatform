@@ -67,4 +67,5 @@
 .pm-chain-extras { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
 .pm-chain-extras .secondary { padding:5px 8px; }
 @media(max-width:650px) { .pm-value-panel { max-height:none; } .pm-chain-grid { grid-template-columns:1fr; } }
-.process-map-tools .pm-unlinked-button { margin-inline-start:auto; }
+.process-map-toolbar-actions { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:6px; margin-inline-start:auto; }
+.process-map-toolbar-actions .pm-unlinked-button { white-space:nowrap; }
