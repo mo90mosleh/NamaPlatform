@@ -1,7 +1,7 @@
 import type{Person}from'./types';
 import dagre from '@dagrejs/dagre';
-export type DepartmentPosition={id:string;parentId:string|null;title:string;people:Person[]};
-export type ChartItem={id:string;parentId:string|null;label:string;subtitle?:string;kind:'unit'|'position';closed:boolean;childCount:number;selected:boolean;seatCount?:number;mixed?:boolean;unitId?:string;descendantCount?:number;previewChildren?:string[];analysisValue?:number;analysisLabel?:string;tone?:string;people?:Person[];departmentPositions?:DepartmentPosition[]};
+export type DepartmentPosition={id:string;roleId?:string;parentId:string|null;title:string;people:Person[]};
+export type ChartItem={id:string;parentId:string|null;label:string;subtitle?:string;kind:'unit'|'position';closed:boolean;childCount:number;selected:boolean;seatCount?:number;mixed?:boolean;unitId?:string;descendantCount?:number;previewChildren?:string[];analysisValue?:number;analysisLabel?:string;tone?:string;people?:Person[];departmentPositions?:DepartmentPosition[];departmentReveal?:{personId:string;nonce:number}};
 export type ChartDirection='horizontal'|'vertical';
 export function chartNodeSize(item:ChartItem,admin:boolean) {
  if(item.departmentPositions) return {width:308,height:222};
