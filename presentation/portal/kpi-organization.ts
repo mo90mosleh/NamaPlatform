@@ -6,8 +6,8 @@ export function kpiOrganization(data:Data,kpiId:string){
  const unitIds=new Set([...links.flatMap(l=>l.org_unit_id?[l.org_unit_id]:[]),...positions.map(p=>p.org_unit_id)]);
  const units=data.units.filter(u=>unitIds.has(u.id));
  const hasUnit=links.some(l=>l.org_unit_id),hasPosition=positions.length>0;
- const scope=hasUnit&&hasPosition?'SHARED':hasPosition?'POSITION':hasUnit?'DEPARTMENT':'UNASSIGNED';
- return{scope,label:scope==='POSITION'?'سمت سازمانی':scope==='DEPARTMENT'?'دپارتمان':scope==='SHARED'?'سمت و دپارتمان':'بدون ارتباط',units,positions,roles:groupPositions(positions)};
+ const scope=hasPosition?'POSITION':hasUnit?'DEPARTMENT':'ORGANIZATION';
+ return{scope,label:scope==='POSITION'?'سمت سازمانی':scope==='DEPARTMENT'?'دپارتمان':'سازمانی',units,positions,roles:groupPositions(positions)};
 }
 export function matchesKpiOrganization(data:Data,kpi:KPI,unitId='',positionId=''){
  const links=(data.kpiOrgLinks??[]).filter(l=>l.kpi_id===kpi.id);

@@ -5,7 +5,7 @@ import okrArt from './assets/slide-okr.jpg';
 import {PowerBiIcon} from './PowerBiReports';
 import {groupPositions} from './position-groups';
 import {useEffect,useState} from 'react';
-import {Search,History,ChartNoAxesCombined,Target,Pause,Play,UserRound,BriefcaseBusiness,Building2,BookOpen,Files,ArrowLeft} from 'lucide-react';
+import {Search,History,ChartNoAxesCombined,Target,Pause,Play,UserRound,BriefcaseBusiness,Building2,BookOpen,Files,ArrowLeft,CalendarDays} from 'lucide-react';
 import {ProcessIcon} from './ProcessIcon';
 import {normalizeSearch} from './architecture-navigation';
 import {availablePowerBiReports} from './KpiMonitoring';
@@ -14,11 +14,19 @@ import type {Data} from './types';
 import {Link} from './ui';
 
 const modules = [
- {path:'/organization/chart', name:'چارت سازمانی', detail:'واحدها، سمت‌ها و مسیرهای گزارش‌دهی را در ساختار سازمان پیدا کنید.', art:orgArt, hint:'از چارت شروع کنید تا افراد و مسیر گزارش‌دهی هر سمت را پیدا کنید.'},
- {path:'/architecture', name:'فرآیندها', detail:'طبقه‌بندی، زنجیره‌های ارزش و شناسنامهٔ فرآیندها را مرور کنید.', art:processArt, hint:'از نقشهٔ ارتباط‌ها تا ورودی‌ها، خروجی‌ها و مسئول هر فرآیند را یک‌جا ببینید.'},
- {path:'/kpis', name:'شاخص‌ها', detail:'روند عملکرد را در نمودارها دنبال کنید و تعریف و منبع دادهٔ شاخص‌ها را ببینید.', art:kpiArt, hint:'مقدار واقعی را با هدف مقایسه کنید و تغییرات هر دوره را زیر نظر بگیرید.'},
- {path:'/okr', name:'OKR', detail:'اهداف سازمان، نتایج کلیدی و پیشرفت هر دوره را دنبال کنید.', art:okrArt, hint:'پیشرفت اهداف سازمان و دپارتمان‌ها را از روی نتایج کلیدی بسنجید.'},
+ {path:'/organization/chart', name:'چارت سازمانی', detail:'دپارتمان‌ها، سمت‌ها و مسیرهای گزارش‌دهی را در چارت مرور کنید.', art:orgArt, hint:'افراد هر واحد و اطلاعات تماس همکاران را از روی کارت‌ها پیدا کنید.'},
+ {path:'/architecture', name:'فرآیندها', detail:'معماری، زنجیره‌های ارزش و شناسنامهٔ فرآیندها را مرور کنید.', art:processArt, hint:'مالک، ورودی‌ها و خروجی‌های هر فرآیند را در شناسنامهٔ آن ببینید.'},
+ {path:'/kpis', name:'شاخص‌ها', detail:'تعریف شاخص‌ها و روند ثبت مقادیر را در داشبورد پایش کنید.', art:kpiArt, hint:'مقادیر واقعی را در دوره‌های مختلف با اهداف نتایج کلیدی مقایسه کنید.'},
+ {path:'/okr', name:'OKR', detail:'اهداف، نتایج کلیدی و پیشرفت هر دوره را در نقشه مرور کنید.', art:okrArt, hint:'وضعیت اهداف سازمان و دپارتمان‌ها را در بخش پایش دنبال کنید.'},
 ];
+const mainPaths=new Set(modules.map(module=>module.path));
+const todayFormat=new Intl.DateTimeFormat('fa-IR-u-ca-persian',{dateStyle:'full',timeZone:'Asia/Tehran'});
+
+export function DashboardDate(){
+ const [date,setDate]=useState(()=>new Date());
+ useEffect(()=>{const timer=setInterval(()=>setDate(new Date()),60000);return()=>clearInterval(timer);},[]);
+ return <div className="dashboard-date"><CalendarDays size={19}/><time dateTime={date.toISOString()}>{todayFormat.format(date)}</time></div>;
+}
 
 const searchIcons = {بخش:BookOpen, فرآیند:ProcessIcon, شاخص:ChartNoAxesCombined, هدف:Target, 'Power BI':PowerBiIcon,
   شخص:UserRound, سمت:BriefcaseBusiness, دپارتمان:Building2, سند:Files};
@@ -31,6 +39,10 @@ function destinations(data:Data) {
   ...modules.map(({path,name})=>({path,name,type:'بخش'})),
   {path:'/process-map',name:'نقشه فرآیندها',type:'بخش'},
   {path:'/process-governance/apqc',name:'طبقه‌بندی APQC',type:'بخش'},
+  {path:'/kpis?tab=profiles',name:'شناسنامهٔ شاخص‌ها',type:'بخش'},
+  {path:'/kpis?tab=power-bi',name:'داشبوردهای Power BI',type:'بخش'},
+  {path:'/okr?tab=goals',name:'اهداف و نتایج کلیدی',type:'بخش'},
+  {path:'/okr?tab=monitor',name:'پایش و عملکرد',type:'بخش'},
   {path:'/processes',name:'شناسنامه فرآیندها',type:'بخش'},
   {path:'/documents',name:'مستندات',type:'بخش'},
   ...data.persons.map(person=>({path:chartPath('person',person.id),name:person.display_name,type:'شخص'})),
@@ -46,11 +58,11 @@ const historyKey=(data:Data)=>'nama-recent-v1:'+JSON.stringify([data.organizatio
 function recent(data:Data):string[]{
  try {
   const saved:unknown=JSON.parse(localStorage.getItem(historyKey(data))??'[]');
-  return Array.isArray(saved)?saved.filter((path):path is string=>typeof path==='string').slice(0,10):[];
+  return Array.isArray(saved)?saved.filter((path):path is string=>typeof path==='string'&&!mainPaths.has(path)).slice(0,10):[];
  }catch{return [];}
 }
 export function rememberVisit(data:Data,path:string){
- if(!destinations(data).some(item=>item.path===path))return;
+ if(mainPaths.has(path)||!destinations(data).some(item=>item.path===path))return;
  try{localStorage.setItem(historyKey(data),JSON.stringify([path,...recent(data).filter(item=>item!==path)].slice(0,10)));}catch{}
 }
 
@@ -84,7 +96,7 @@ export function DashboardWidgets({data}:{data:Data}){
   <section className="panel dashboard-tour" aria-label="آشنایی با بخش‌های نما">
    <div className="dashboard-slide" data-slide={index} key={active.path}>
     <div className="dashboard-slide-copy"><h2>{active.name}</h2><p>{active.detail}</p><p>{active.hint}</p></div>
-    <img className="dashboard-slide-art" src={active.art} width={300} height={300} alt=""/>
+    <img className="dashboard-slide-art" src={active.art} width={560} height={560} alt=""/>
    </div>
    <footer className="dashboard-slide-footer">
    <div className="dashboard-slide-controls">{modules.map((item,i)=><button type="button" key={item.path} aria-label={item.name} aria-pressed={i===index} onClick={()=>setIndex(i)}/>)}

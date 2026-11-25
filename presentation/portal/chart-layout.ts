@@ -1,19 +1,24 @@
+import {departmentPositionRows} from './department-position-rows';
 import type{Person}from'./types';
 import dagre from '@dagrejs/dagre';
 export type DepartmentPosition={id:string;parentId:string|null;title:string;people:Person[]};
 export type ChartItem={id:string;parentId:string|null;label:string;subtitle?:string;kind:'unit'|'position';closed:boolean;childCount:number;selected:boolean;seatCount?:number;mixed?:boolean;unitId?:string;descendantCount?:number;previewChildren?:string[];analysisValue?:number;analysisLabel?:string;tone?:string;people?:Person[];departmentPositions?:DepartmentPosition[]};
 export type ChartDirection='horizontal'|'vertical';
-export function chartNodeSize(item:ChartItem,admin:boolean) {
+export function chartNodeSize(item:ChartItem,admin:boolean,direction:ChartDirection='vertical') {
  if(item.departmentPositions){
-  const rows=item.departmentPositions.length;
-  return {width:rows?324:212,height:88+rows*65};
+  const levels=departmentPositionRows(item.departmentPositions);
+  if(!levels.length)return {width:212,height:88};
+  if(direction==='vertical')return {width:324,height:88+levels.length*65};
+  const depths=new Map<number,number>();
+  for(const {depth} of levels)depths.set(depth,(depths.get(depth)??0)+1);
+  return {width:Math.max(212,18+depths.size*166),height:88+Math.max(...depths.values())*65};
  }
  return {width:212,height:(admin?124:104)+(item.people?.length?24:0)};
 }
 export function layoutChart(items:ChartItem[],admin=false,direction:ChartDirection='horizontal'){
  const graph=new dagre.graphlib.Graph().setGraph({rankdir:direction==='vertical'?'TB':'RL',nodesep:18,ranksep:64,marginx:12,marginy:12}).setDefaultEdgeLabel(()=>({}));
  const ids=new Set(items.map(n=>n.id));
- for(const n of items)graph.setNode(n.id,chartNodeSize(n,admin));
+ for(const n of items)graph.setNode(n.id,chartNodeSize(n,admin,direction));
  for(const n of items)if(n.parentId&&ids.has(n.parentId))graph.setEdge(n.parentId,n.id);
  dagre.layout(graph);
  return items.map(n=>{const {x,y,width,height}=graph.node(n.id);return{...n,x:x-width/2,y:y-height/2,width,height};});

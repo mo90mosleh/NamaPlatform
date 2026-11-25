@@ -44,6 +44,54 @@
       "ownerUnitId": "b57e3eb1-c18c-50f8-9dfc-7c72dcfc26b0",
       "pillar": "تجربه مشتری",
       "confidence": "ON_TRACK"
+    },
+    {
+      "id": "c7f55c46-5fd5-5bd9-8c6b-f96cbf142376",
+      "code": "O-04",
+      "title": "تأمین مواد را قابل اتکا کنیم",
+      "description": "هدف نمونه برای دوره پاییز ۱۴۰۵",
+      "cycleId": "1405-fall",
+      "parentId": "a79d132c-8624-59de-a81b-2568f80456f2",
+      "level": "DEPARTMENT",
+      "ownerUnitId": "d48e88db-f22b-5918-b477-26fb8fb755e2",
+      "pillar": "عملیات",
+      "confidence": "ON_TRACK"
+    },
+    {
+      "id": "aadd86c4-72f1-59ea-9919-64580ab9d97b",
+      "code": "O-05",
+      "title": "وصول مطالبات را به برنامه برگردانیم",
+      "description": "هدف نمونه برای دوره پاییز ۱۴۰۵",
+      "cycleId": "1405-fall",
+      "parentId": "a79d132c-8624-59de-a81b-2568f80456f2",
+      "level": "DEPARTMENT",
+      "ownerUnitId": "b3d659c7-0a73-5d99-8485-a6622a07d856",
+      "pillar": "عملیات",
+      "confidence": "OFF_TRACK"
+    },
+    {
+      "id": "bfcab68e-ccde-5da7-9863-c472cd4e1bf0",
+      "code": "O-06",
+      "title": "پوشش آموزش ایستگاه‌ها را افزایش دهیم",
+      "description": "هدف نمونه برای دوره پاییز ۱۴۰۵",
+      "cycleId": "1405-fall",
+      "parentId": "a79d132c-8624-59de-a81b-2568f80456f2",
+      "level": "DEPARTMENT",
+      "ownerUnitId": "5c919c22-8daf-5f69-a2f4-74272b42660f",
+      "pillar": "عملیات",
+      "confidence": "ON_TRACK"
+    },
+    {
+      "id": "0d4a5cd0-6d71-5d0e-878f-a3ceefd72e0c",
+      "code": "O-07",
+      "title": "چرخهٔ بهبود کیفیت را کامل کنیم",
+      "description": "هدف نمونه برای دوره پاییز ۱۴۰۵",
+      "cycleId": "1405-fall",
+      "parentId": "a79d132c-8624-59de-a81b-2568f80456f2",
+      "level": "DEPARTMENT",
+      "ownerUnitId": "2956bd7c-8d59-536d-80f6-b63665553c1b",
+      "pillar": "عملیات",
+      "confidence": "OFF_TRACK"
     }
   ],
   "keyResults": [
@@ -111,6 +159,39 @@
       "current": 3,
       "unit": "روز",
       "kpiId": "186c1675-9bcd-5b39-8ec4-26bad5b866e8",
+      "weight": 1
+    },
+    {
+      "id": "a36384eb-1c0a-5051-9d6c-4bd1ec34dd5e",
+      "objectiveId": "c7f55c46-5fd5-5bd9-8c6b-f96cbf142376",
+      "title": "تحویل به‌موقع تأمین‌کننده",
+      "baseline": 75,
+      "target": 95,
+      "current": 92,
+      "unit": "درصد",
+      "kpiId": "9200c64b-4118-5d92-86a1-e9109f11dfb3",
+      "weight": 1
+    },
+    {
+      "id": "0dc67bb6-9afa-5085-8887-2f0329bf45bc",
+      "objectiveId": "aadd86c4-72f1-59ea-9919-64580ab9d97b",
+      "title": "وصول به‌موقع فاکتور",
+      "baseline": 65,
+      "target": 92,
+      "current": 71,
+      "unit": "درصد",
+      "kpiId": "50072f9e-c294-54c1-a299-2814b9e30a45",
+      "weight": 1
+    },
+    {
+      "id": "54998a2d-1ff2-5bf7-8db4-0de25a4e616e",
+      "objectiveId": "bfcab68e-ccde-5da7-9863-c472cd4e1bf0",
+      "title": "پوشش آموزش ایستگاه‌ها",
+      "baseline": 55,
+      "target": 95,
+      "current": 93,
+      "unit": "درصد",
+      "kpiId": "1de66b50-b5a5-5d99-95b0-4553029e132b",
       "weight": 1
     }
   ],

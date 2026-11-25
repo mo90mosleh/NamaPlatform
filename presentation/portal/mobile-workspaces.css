@@ -43,8 +43,7 @@
  .okr-goal-toolbar { gap:6px; }
  .okr-goal-toolbar .okr-search { flex-basis:100%; min-width:0; }
  .okr-view-toggle { flex-wrap:wrap; max-width:100%; }
- .okr-inline-results li { grid-template-columns:minmax(0,1fr) auto; }
- .okr-inline-results li>strong { grid-column:1/-1; }
+ .okr-inline-results li { grid-template-columns:minmax(0,1fr) 86px; }
  .okr-monitor-content,.okr-strategy-content { max-height:none; overflow:visible; }
  .okr-table-wrap { max-width:100%; overflow-x:auto; }
  .clickable-table-row .code { white-space:nowrap; }

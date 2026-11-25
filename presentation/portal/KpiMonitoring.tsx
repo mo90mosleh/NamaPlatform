@@ -1,3 +1,5 @@
+import {loadPortfolio} from './okr/portfolio-storage';
+import {activeKpiTargets} from './okr/kpi-targets';
 import {useEffect, useState, type FormEvent, type ReactNode} from 'react';
 import {LayoutDashboard, ClipboardList, Plus, Save, Pencil, Trash2} from 'lucide-react';
 import type {Data, KPI} from './types';
@@ -108,9 +110,19 @@ export function latestKpiValue(data: Data, id: string) {
   return latest && current(latest);
 }
 
-function Chart({kpi, card, rows}: {kpi: KPI; card: Card; rows: Measurement[]}) {
+function Chart({kpi, card, rows, targets}: {kpi: KPI; card: Card; rows: Measurement[]; targets:number[]}) {
   const points = latestPerPeriod(rows, kpi.frequency);
-  if (!points.length) return <p className="empty-inline">در این بازه مقداری ثبت نشده است.</p>;
+  if (!points.length) return <>
+    {card.kind!=='pie'&&targets.length>0&&<svg className="kpi-plot" viewBox="0 0 345 142" role="img" aria-label="خطوط هدف نتایج کلیدی فعال">
+      {targets.map(target=>{
+        const min=Math.min(0,...targets),max=Math.max(1,...targets);
+        const y=110-82*(target-min)/(max-min);
+        return <g key={target}><line x1="24" x2="264" y1={y} y2={y} stroke="#9a5b2c" strokeDasharray="4 3"/>
+          <text x="274" y={y+3} fill="#875326" fontSize="11">{number.format(target)}</text></g>;
+      })}
+    </svg>}
+    <p className="empty-inline">در این بازه مقداری ثبت نشده است.</p>
+  </>;
   const {kind, labels = true} = card;
   const colors = (themes[card.theme ?? 'ocean'] ?? themes.ocean).colors;
   const values = points.map(point => current(point.row).value);
@@ -124,9 +136,8 @@ function Chart({kpi, card, rows}: {kpi: KPI; card: Card; rows: Measurement[]}) {
     cumulative += value / total * 100;
     return colors[index % colors.length] + ' ' + start + '% ' + cumulative + '%';
   }) : [];
-  const target = typeof kpi.target_value === 'number' && Number.isFinite(kpi.target_value) ? kpi.target_value : null;
-  const low = Math.min(0, target ?? 0, ...values);
-  const high = Math.max(0, target ?? 0, ...values) || (low===0?1:0);
+  const low = Math.min(0, ...targets, ...values);
+  const high = Math.max(0, ...targets, ...values) || (low===0?1:0);
   const scale = Math.max(Math.abs(low), Math.abs(high)) || 1;
   const range = high / scale - low / scale || 1;
   const y = (value: number) => 110 - (value / scale - low / scale) / range * 82;
@@ -150,7 +161,7 @@ function Chart({kpi, card, rows}: {kpi: KPI; card: Card; rows: Measurement[]}) {
         })}
         {!labels && <line x1={left} x2={left} y1={y(low)} y2={28} stroke="currentColor" opacity=".4"/>}
         <line x1={left} y1={y(0)} x2="320" y2={y(0)} stroke="currentColor" opacity=".25"/>
-        {target !== null && <line x1={left} x2="320" y1={y(target)} y2={y(target)} stroke="#9a5b2c" strokeDasharray="4 3"/>}
+        {targets.map(target=><line key={target} x1={left} x2="320" y1={y(target)} y2={y(target)} stroke="#9a5b2c" strokeDasharray="4 3"/>)}
         {kind === 'line' && <polyline points={values.map((value, index) => x(index)+','+y(value)).join(' ')} fill="none" stroke="currentColor" strokeWidth="2"/>}
         {values.map((value, index) => <g key={points[index].index}>
           <title>{points[index].label} · {number.format(value)}</title>
@@ -162,7 +173,7 @@ function Chart({kpi, card, rows}: {kpi: KPI; card: Card; rows: Measurement[]}) {
         </g>)}
       </svg>}
     <div className="kpi-chart-meta">
-    {kind !== 'pie' && target !== null && <small className="kpi-chart-target">هدف {number.format(target)} {kpi.unit}</small>}
+    {kind !== 'pie' && targets.map(target=><small key={target} className="kpi-chart-target">هدف KR {number.format(target)} {kpi.unit}</small>)}
     <details className="kpi-chart-values"><summary>مقادیر نمودار {kpi.unit && '(' + kpi.unit + ')'}</summary>
       <ul>{points.map((point, index) => <li key={point.index}>
         {point.label} · {number.format(values[index])}
@@ -172,6 +183,7 @@ function Chart({kpi, card, rows}: {kpi: KPI; card: Card; rows: Measurement[]}) {
 }
 
 export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?: string; profiles: (values: ReadonlyMap<string, number>) => ReactNode}) {
+  const targets=activeKpiTargets(loadPortfolio(data.organization.id,data.organization.name,data.user.role==='ADMIN'));
   const key = storageKey(data);
   const [model, setModel] = useState(() => read(key, initialModel(data)));
   const tabFromUrl = () => reportId ? 'power-bi' : tabs.find(([id])=>id===routeQuery().get('tab'))?.[0] ?? 'dashboard';
@@ -295,7 +307,7 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
                 if (update(model => ({...model, cards: model.cards.filter(item => item.id !== card.id)}), 'کارت حذف شد.') && cardDraft?.id === card.id) setCardDraft(null);
               }}><Trash2 size={16}/></button></div>
           </header>
-          {kpi && !dateError && <Chart kpi={kpi} card={card} rows={rows}/>}
+          {kpi && !dateError && <Chart kpi={kpi} card={card} rows={rows} targets={targets.get(kpi.id)??[]}/>}
         </section>;
       })}</div>
       <div className="kpi-actions kpi-add-card"><button type="button" className="secondary" disabled={!data.kpis.length}

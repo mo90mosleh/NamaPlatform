@@ -8,7 +8,11 @@ await mkdir('pages',{recursive:true});
 const publicBuild=await build({
  plugins:[{name:'document-relative-images',setup(builder){
   builder.onLoad({filter:/\.(png|jpg)$/},async({path})=>{
-   const bytes=await readFile(path),name=path.split('/').pop().replace(/\.(png|jpg)$/,'')+'-'+createHash('sha256').update(bytes).digest('hex').slice(0,12)+'.'+path.split('.').pop();
+   const bytes=await readFile(path);
+   if(/[/\\]slide-(org|process|kpi|okr)\.jpg$/.test(path)){
+    return {loader:'js',contents:'export default '+JSON.stringify('data:image/jpeg;base64,'+bytes.toString('base64'))+';'};
+   }
+   const name=path.split('/').pop().replace(/\.(png|jpg)$/,'')+'-'+createHash('sha256').update(bytes).digest('hex').slice(0,12)+'.'+path.split('.').pop();
    await mkdir('pages/assets/media',{recursive:true});
    await writeFile('pages/assets/media/'+name,bytes);
    // Image src resolves against the document, unlike an ESM import.
