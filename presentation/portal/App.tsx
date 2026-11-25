@@ -13,8 +13,6 @@ import{kpiOrganization}from'./kpi-organization';
 import{PageContextProvider}from'./namayar/PageContextProvider';import{Namayar}from'./namayar/Namayar';
 import{useOrganizationFilters,OrganizationFilters,OrganizationFilterNote}from'./OrganizationFilters';
 import{Shell}from'./Shell';
-import loadingAnimation from './assets/namayar-loading.gif';
-import loadingStill from './assets/namayar-loading.png';
 import{Login}from'./Login';import{authClient,signOut}from'./auth';
 import{Documents,Requirements}from'./References';import{ProcessProfile}from'./ProcessDetail';
 import{lazy,Suspense,useEffect,useState,type FormEvent}from'react';import{LayoutDashboard,Network,ClipboardList,ChartNoAxesCombined,Settings as SettingsIcon,ChevronLeft,ChevronDown,ArrowLeft,UserRound,ShieldCheck,Save,LogIn,Menu,X}from'lucide-react';
@@ -29,10 +27,23 @@ function Badge({value}:{value:string}){return <span className={'badge status-'+v
 function Skeleton(){
  return <div className="loading nama-loading" role="status">
   <span>در حال دریافت اطلاعات…</span>
-  <picture>
-   <source media="(prefers-reduced-motion: reduce)" srcSet={loadingStill}/>
-   <img src={loadingAnimation} width={224} height={144} alt=""/>
-  </picture>
+  <svg className="nama-loading-art" viewBox="0 0 224 144" width="224" height="144" aria-hidden="true">
+   <rect width="224" height="144" rx="16" fill="#fff"/>
+   <ellipse cx="112" cy="126" rx="97" ry="10" fill="#eaf2ed"/>
+   <path d="M62 88v23m39-23v23M55 112h16m24 0h16" fill="none" stroke="#303030" strokeWidth="11" strokeLinecap="round"/>
+   <g className="nama-loading-head">
+    <rect x="38" y="16" width="92" height="74" rx="23" fill="#303030"/>
+    <path className="nama-loading-eyes" d="M73 48v12m27-12v12" stroke="#faf5ed" strokeWidth="9" strokeLinecap="round"/>
+   </g>
+   <path d="M130 59h54l-13 43h-55z" fill="#267e68"/>
+   <path d="M135 65h41l-9 29h-42z" fill="#dcefe5"/>
+   <path className="nama-loading-data" d="M135 74h24m-26 7h15m-17 7h22M196 32h14m-14 22h14m-14 22h14" fill="none" stroke="#62a18a" strokeWidth="3" strokeLinecap="round"/>
+   <rect x="95" y="102" width="78" height="11" rx="4" fill="#405853"/>
+   <g fill="none" stroke="#303030" strokeWidth="8" strokeLinecap="round">
+    <path className="nama-loading-hand" d="m79 78 23 19"/>
+    <path className="nama-loading-hand" d="m103 77 19 20"/>
+   </g>
+  </svg>
  </div>;
 }
 function Dashboard({data}:{data:Data}) {
