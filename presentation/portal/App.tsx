@@ -13,6 +13,8 @@ import{kpiOrganization}from'./kpi-organization';
 import{PageContextProvider}from'./namayar/PageContextProvider';import{Namayar}from'./namayar/Namayar';
 import{useOrganizationFilters,OrganizationFilters,OrganizationFilterNote}from'./OrganizationFilters';
 import{Shell}from'./Shell';
+import loadingAnimation from './assets/namayar-loading.gif';
+import loadingStill from './assets/namayar-loading.png';
 import{Login}from'./Login';import{authClient,signOut}from'./auth';
 import{Documents,Requirements}from'./References';import{ProcessProfile}from'./ProcessDetail';
 import{lazy,Suspense,useEffect,useState,type FormEvent}from'react';import{LayoutDashboard,Network,ClipboardList,ChartNoAxesCombined,Settings as SettingsIcon,ChevronLeft,ChevronDown,ArrowLeft,UserRound,ShieldCheck,Save,LogIn,Menu,X}from'lucide-react';
@@ -24,7 +26,15 @@ const OkrWorkspace=lazy(()=>import('./okr/OkrWorkspace').then(module=>({default:
 const readiness:Record<string,string>={UNASSESSED:'بررسی‌نشده',DEFINED:'تعریف‌شده',GAP:'نیازمند داده',READY:'آمادهٔ پایش'};
 
 function Badge({value}:{value:string}){return <span className={'badge status-'+value.toLowerCase()}>{readiness[value]??value}</span>;}
-function Skeleton(){return <div className="loading" role="status">در حال دریافت اطلاعات…</div>;}
+function Skeleton(){
+ return <div className="loading nama-loading" role="status">
+  <span>در حال دریافت اطلاعات…</span>
+  <picture>
+   <source media="(prefers-reduced-motion: reduce)" srcSet={loadingStill}/>
+   <img src={loadingAnimation} width={224} height={144} alt=""/>
+  </picture>
+ </div>;
+}
 function Dashboard({data}:{data:Data}) {
  return <><div className="dashboard-top"><DashboardDate/><DashboardSearch data={data}/></div><QuickLinks data={data}/><DashboardWidgets data={data}/></>;
 }

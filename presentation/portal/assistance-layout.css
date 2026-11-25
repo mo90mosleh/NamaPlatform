@@ -89,3 +89,6 @@ body:has(.feedback-root) .namayar-launcher{bottom:calc(var(--navigation-height) 
 .chart-menu-open .side .nav a{justify-content:flex-start;padding:12px;gap:10px;font-size:13px;min-height:46px}
 .chart-menu-open .side .nav svg{width:19px;height:19px}
 .chart-menu-open .chart-menu-close{align-self:flex-end;min-width:40px;min-height:40px;margin-bottom:12px}
+
+.nama-loading picture { display:block; width:min(224px,100%); margin:8px auto 0; }
+.nama-loading img { display:block; width:100%; height:auto; border-radius:16px; }
