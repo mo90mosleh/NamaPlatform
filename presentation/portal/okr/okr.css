@@ -289,18 +289,27 @@ button.okr-metric:hover, button.okr-info-row:hover { background: #eef6f4; }
 .okr-kr-badge { flex:none; padding:2px 5px; border:1px solid var(--line); border-radius:6px; color:var(--ink); background:#ffffffb5; font-size:10px; }
 .okr-inline-results { margin:0; padding:2px 12px 5px; }
 .okr-inline-results li { display:grid; grid-template-columns:minmax(0,2fr) minmax(45px,1fr) auto; align-items:center; gap:8px; padding:3px 0; }
-.okr-monitor-content { display:grid; gap:8px; }
+.okr-workspace-monitor { height:100%; display:flex; flex-direction:column; }
+.okr-workspace-monitor > :not(.okr-monitor-content) { flex-shrink:0; }
+.okr-monitor-content { flex:1; min-height:0; display:grid; grid-template-rows:minmax(0,1fr) minmax(0,1fr); gap:8px; }
+.okr-monitor-content .okr-panel { min-height:0; margin:0; padding:8px 12px; display:flex; flex-direction:column; }
+.okr-monitor-grid { min-height:0; gap:8px; }
+.okr-monitor-content .okr-panel-head { flex:none; }
+.okr-monitor-list { min-height:0; overflow:auto; overscroll-behavior:contain; }
+@media(max-width:1100px) {
+ .okr-monitor-content { grid-template-rows:minmax(0,2fr) minmax(0,1fr); }
+ .okr-monitor-grid { grid-template-rows:repeat(2,minmax(0,1fr)); }
+}
 .okr-monitor-content .okr-monitor-row,.okr-monitor-content .okr-risk-row,.okr-monitor-content .okr-checkin-row { padding-block:4px; }
 .okr-monitor-content .okr-panel-head { padding-block:6px; }
 @media(min-width:761px) {
- .okr-monitor-content { max-height:calc(100dvh - 150px); overflow:auto; }
  .okr-strategy-content { max-height:calc(100dvh - 265px); }
 }
 .okr-tree-progress { display:grid; grid-template-columns:minmax(40px,1fr) auto; align-items:center; gap:5px; min-width:82px; }
 .okr-kr-badge { display:inline-flex; align-items:center; gap:2px; }
 .okr-kr-badge[aria-expanded="true"] svg { transform:rotate(180deg); }
-.okr-progress:has(.okr-bar-value) { position:relative; height:17px; min-width:48px; }
-.okr-bar-value { position:absolute; inset:0; margin:auto; width:max-content; height:fit-content; padding:1px 5px; border-radius:4px; font-size:12px; line-height:1.15; font-weight:800; color:#102139; background:#fff; }
+.okr-kr-progress { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:6px; }
+.okr-kr-progress b { font-size:12px; color:var(--ink); }
 .okr-objective-percent { display:block; font-size:16px; font-weight:800; line-height:1.4; color:#102139; }
 .okr-inline-results li { grid-template-columns:minmax(0,1fr) minmax(84px,28%); }
 .okr-inline-results .okr-progress { width:100%; }

@@ -32,7 +32,7 @@ const paceExplanation:Record<OkrPaceStatus,string>={
  NO_DATA:'دادهٔ کافی برای سنجش پیشرفت ثبت نشده است',
 };
 function Status({value}:{value:OkrPaceStatus}){const tone=value==='ON_TRACK'?'is-good':value==='AT_RISK'?'is-risk':value==='OFF_TRACK'?'is-bad':'is-neutral';return <span className={'okr-status '+tone} title="وضعیت خودکار بر اساس پیشرفت و زمان سپری‌شده از دوره">{paceStatusLabels[value]}</span>;}
-function Progress({value,showValue=false}:{value:number;showValue?:boolean}){const band=progressBand(value);return <div className={'okr-progress okr-progress-'+band} role="progressbar" aria-label="درصد پیشرفت" aria-valuemin={0} aria-valuemax={100} aria-valuenow={value}><span style={{width:value+'%'}}/>{showValue&&<b className="okr-bar-value">{number.format(value)}٪</b>}</div>;}
+function Progress({value}:{value:number}){const band=progressBand(value);return <div className={'okr-progress okr-progress-'+band} role="progressbar" aria-label="درصد پیشرفت" aria-valuemin={0} aria-valuemax={100} aria-valuenow={value}><span style={{width:value+'%'}}/></div>;}
 export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string}){
  const [portfolio,setPortfolio]=useState<OkrPortfolio>(()=>loadPortfolio(data.organization.id,data.organization.name,data.user.role==='ADMIN'));
  const linkedObjective=portfolio.objectives.find(goal=>goal.id===objectiveId);
@@ -269,7 +269,7 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
   const rows=resultsFor(goal);
   if(!isExpanded(goal)||!rows.length)return null;
   return <ul className="okr-inline-results">{rows.map(result=><li key={result.id}>
-   <div className="okr-kr-caption"><strong>{result.title}</strong> <small>(مبنا: {number.format(result.baseline)}، فعلی: {number.format(result.current)}، هدف: {number.format(result.target)}{result.unit?' '+result.unit:''})</small></div><Progress value={keyResultProgress(result)} showValue/>
+   <div className="okr-kr-caption"><strong>{result.title}</strong> <small>(مبنا: {number.format(result.baseline)}، فعلی: {number.format(result.current)}، هدف: {number.format(result.target)}{result.unit?' '+result.unit:''})</small></div><div className="okr-kr-progress"><Progress value={keyResultProgress(result)}/><b>{number.format(keyResultProgress(result))}٪</b></div>
   </li>)}</ul>;
  }
  function goalTone(goal:OkrObjective){
@@ -287,28 +287,34 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
   </div>
   <section className="okr-panel">{filtered.length?listView==='tree'?<div className="okr-list">
    {filtered.map(g=><div key={g.id} className="okr-goal-entry" style={goalTone(g)}><div className="okr-goal-row-wrap"><button className="okr-list-row" onClick={()=>open(g.id)}>
-    <div className={'okr-list-title '+(g.parentId?'is-child':'')}><small>{g.code} · {g.level==='COMPANY'?'سازمانی':'دپارتمانی'}</small><strong>{g.parentId?'↳ ':''}{g.title}</strong><small>{owner(g)}</small></div>
+    <div className={'okr-list-title '+(g.parentId?'is-child':'')}><small>{g.code} · {g.level==='COMPANY'?'سازمانی':'دپارتمانی'}</small><strong>{g.title}</strong><small>{owner(g)}</small></div>
     <div className="okr-list-progress"><Progress value={objectiveProgress(portfolio,g.id)}/><strong className="okr-objective-percent">{number.format(objectiveProgress(portfolio,g.id))}٪</strong></div><Status value={pace(g).status}/>
    </button>{resultBadge(g)}</div>{inlineResults(g)}</div>)}
   </div>:<div className="okr-table-wrap"><table><thead><tr><th>هدف</th><th>مالک</th><th>نتایج کلیدی</th><th>تحقق</th><th>وضعیت</th></tr></thead><tbody>{filtered.map(g=><Fragment key={g.id}><tr style={goalTone(g)}><td><button type="button" className="text-button" onClick={()=>open(g.id)}>{g.title}</button><small>{g.code}</small></td><td>{owner(g)}</td><td>{resultBadge(g)}</td><td>{number.format(objectiveProgress(portfolio,g.id))}٪</td><td><Status value={pace(g).status}/></td></tr>{isExpanded(g)&&resultsFor(g).length>0&&<tr style={goalTone(g)}><td colSpan={5}>{inlineResults(g)}</td></tr>}</Fragment>)}</tbody></table></div>:<p className="okr-empty">هدفی با این شرایط پیدا نشد.</p>}</section>
  </>;
  const monitoring=<div className="okr-monitor-content">
   <div className="okr-monitor-grid">
-   <section className="okr-panel"><div className="okr-panel-head"><div><h3>تحقق اهداف به تفکیک دپارتمان</h3><small>درصد پیشرفت واقعی اهداف</small></div></div>
+   <section className="okr-panel"><div className="okr-panel-head"><div><h3 id="okr-department-progress-title">تحقق اهداف به تفکیک دپارتمان</h3><small>درصد پیشرفت واقعی اهداف</small></div></div>
+    <div className="okr-monitor-list" role="region" aria-labelledby="okr-department-progress-title" tabIndex={0}>
     {objectives.map(g=><button className="okr-monitor-row" key={g.id} onClick={()=>open(g.id)}><strong>{owner(g)}</strong><Progress value={objectiveProgress(portfolio,g.id)}/><b>{number.format(objectiveProgress(portfolio,g.id))}٪</b></button>)}
     {!objectives.length&&<p className="okr-empty">هنوز هدفی ثبت نشده است.</p>}
+    </div>
    </section>
-   <section className="okr-panel"><div className="okr-panel-head"><h3>اهداف نیازمند اقدام</h3><small>ریسک و انحراف</small></div>
+   <section className="okr-panel"><div className="okr-panel-head"><h3 id="okr-risk-title">اهداف نیازمند اقدام</h3><small>ریسک و انحراف</small></div>
+    <div className="okr-monitor-list" role="region" aria-labelledby="okr-risk-title" tabIndex={0}>
     {objectives.filter(g=>['AT_RISK','OFF_TRACK'].includes(pace(g).status)).map(g=><button className="okr-risk-row" key={g.id} onClick={()=>open(g.id)}><span><strong>{g.title}</strong><small>{owner(g)} · تحقق {number.format(pace(g).actual)}٪</small></span><Status value={pace(g).status}/></button>)}
     {!riskCount&&<p className="okr-empty">هدف پرریسکی در این دوره ثبت نشده است.</p>}
+    </div>
    </section>
   </div>
-  <section className="okr-panel okr-checkins"><div className="okr-panel-head"><h3>آخرین Check-inها</h3><small>پیشرفت و توضیحات ثبت‌شده</small></div>
-   {checkins.slice(0,6).map(c=>{const kr=portfolio.keyResults.find(k=>k.id===c.keyResultId);return <div className="okr-checkin-row" key={c.id}><div><strong>{kr?.title??'نتیجه کلیدی'}</strong><small>{c.note||'بدون توضیح'} · {new Intl.DateTimeFormat('fa-IR-u-ca-persian',{dateStyle:'medium'}).format(new Date(c.createdAt))}</small></div><span><b>{number.format(c.value)} {kr?.unit}</b><Status value={objectivePace(portfolio,c.objectiveId,today).status}/></span></div>;})}
+  <section className="okr-panel okr-checkins"><div className="okr-panel-head"><h3 id="okr-checkins-title">آخرین Check-inها</h3><small>پیشرفت و توضیحات ثبت‌شده</small></div>
+   <div className="okr-monitor-list" role="region" aria-labelledby="okr-checkins-title" tabIndex={0}>
+   {checkins.map(c=>{const kr=portfolio.keyResults.find(k=>k.id===c.keyResultId);return <div className="okr-checkin-row" key={c.id}><div><strong>{kr?.title??'نتیجه کلیدی'}</strong><small>{c.note||'بدون توضیح'} · {new Intl.DateTimeFormat('fa-IR-u-ca-persian',{dateStyle:'medium'}).format(new Date(c.createdAt))}</small></div><span><b>{number.format(c.value)} {kr?.unit}</b><Status value={objectivePace(portfolio,c.objectiveId,today).status}/></span></div>;})}
    {!checkins.length&&<p className="okr-empty">Check-in برای این دوره ثبت نشده است. از جزئیات هر هدف می‌توانید مقدار جدید ثبت کنید.</p>}
+   </div>
   </section>
  </div>;
- return <div ref={ref} className="okr-workspace">
+ return <div ref={ref} className={tab==='monitor'?'okr-workspace okr-workspace-monitor':'okr-workspace'}>
   <div className="module-toolbar">
    <nav className="process-workspace-tabs" aria-label="بخش‌های مدیریت OKR">{(['strategy','goals','monitor']as Tab[]).map((t,i)=><button key={t} className={tab===t?'active':''} aria-current={tab===t?'page':undefined} onClick={()=>go(t==='strategy'?'/okr':'/okr?tab='+t)}>{i===0?<Network size={17}/>:i===1?<Target size={17}/>:<ChartColumnIncreasing size={17}/>}<span>{titleByTab[t]}</span></button>)}</nav>
    <div className="okr-heading-actions"><label className="okr-cycle-control"><CalendarDays size={16}/><select aria-label="دوره OKR" value={cycle?.id??''} onChange={e=>{setActiveCycle(e.target.value);setSelectedId(null);setSelectedPillars([]);}}>{!portfolio.cycles.length&&<option value="">دوره‌ای تعریف نشده</option>}{portfolio.cycles.map(c=><option key={c.id} value={c.id}>{c.title} {c.status==='PLANNING'?'· برنامه‌ریزی':''}</option>)}</select><ChevronDown size={13}/></label>
@@ -346,7 +352,7 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
    <div className="okr-detail-summary"><span>پیشرفت واقعی هدف</span><strong>{number.format(objectiveProgress(portfolio,selected.id))}٪</strong><Progress value={objectiveProgress(portfolio,selected.id)}/><div><Status value={pace(selected).status}/><small>({paceExplanation[pace(selected).status]})</small></div></div>
    {selected.description&&<p className="okr-description">{selected.description}</p>}
    <div className="okr-detail-tabs" role="tablist" aria-label="اطلاعات هدف">{(['results','links','history']as DetailTab[]).map((key,i)=><button role="tab" aria-selected={detailTab===key} className={detailTab===key?'active':''} key={key} onClick={()=>setDetailTab(key)}>{['نتایج کلیدی','ارتباطات','تاریخچه'][i]}</button>)}</div>
-   {detailTab==='results'&&<div className="okr-detail-body">{selectedResults.map(kr=><div className="okr-result" key={kr.id}><div className="okr-result-head"><strong>{kr.title}</strong><span>{number.format(keyResultProgress(kr))}٪</span></div><Progress value={keyResultProgress(kr)} showValue/><div className="okr-value-row"><span>مبنا: <b>{number.format(kr.baseline)}</b></span><span>فعلی: <b>{number.format(kr.current)}</b></span><span>هدف: <b>{number.format(kr.target)} {kr.unit}</b></span></div>{canEdit&&<button className="okr-button okr-button-muted" onClick={()=>showForm('checkin',{keyResultId:kr.id})}><Activity size={15}/>ثبت Check-in</button>}</div>)}
+   {detailTab==='results'&&<div className="okr-detail-body">{selectedResults.map(kr=><div className="okr-result" key={kr.id}><div className="okr-result-head"><strong>{kr.title}</strong><span>{number.format(keyResultProgress(kr))}٪</span></div><Progress value={keyResultProgress(kr)}/><div className="okr-value-row"><span>مبنا: <b>{number.format(kr.baseline)}</b></span><span>فعلی: <b>{number.format(kr.current)}</b></span><span>هدف: <b>{number.format(kr.target)} {kr.unit}</b></span></div>{canEdit&&<button className="okr-button okr-button-muted" onClick={()=>showForm('checkin',{keyResultId:kr.id})}><Activity size={15}/>ثبت Check-in</button>}</div>)}
     {!selectedResults.length&&<p className="okr-empty">نتیجه کلیدی برای این هدف تعریف نشده است.</p>}
     {canEdit&&<button className="okr-button okr-add-kr" onClick={()=>showForm('kr',{objectiveId:selected.id})}><Plus size={16}/>تعریف نتیجه کلیدی</button>}
    </div>}

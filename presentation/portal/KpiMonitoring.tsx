@@ -38,13 +38,13 @@ function storageKey(data: Data) { return 'nama-kpi-monitoring-v1:' + data.organi
 
 // Synthetic operating history for the four dashboard examples.
 const sampleSeries = [
-  {code:'K-01',kind:'line',values:[24,21,19,16]},
-  {code:'K-02',kind:'bar',values:[78,83,81,88]},
+  {code:'K-01',kind:'line',values:[16,13,11,10]},
+  {code:'K-02',kind:'bar',values:[90,93,96,97]},
   {code:'K-03',kind:'bar',values:[75,82,89,92]},
-  {code:'K-07',kind:'line',values:[5,4.5,4,3]},
+  {code:'K-07',kind:'line',values:[3,2.4,1.8,1.6]},
 ] as const;
 const sampleDates=['2026-08-15','2026-09-15','2026-10-15','2026-11-15'];
-const sampleVersion=4;
+const sampleVersion=5;
 
 function initialModel(data:Data):Model {
  if(!config.demoManagement)return empty;
@@ -72,7 +72,7 @@ function read(key: string, initial = empty): Model {
         return revisions.length?[{...row,revisions}]:[];
       });
       const occupied=new Set(measurements.map(row=>row.kpiId+':'+row.date));
-      const merged={...initial,reports,measurements:[...measurements,...initial.measurements.filter(row=>!occupied.has(row.kpiId+':'+row.date))]};
+      const merged={...initial,cards:saved.sampleVersion===4?saved.cards:initial.cards,reports,measurements:[...measurements,...initial.measurements.filter(row=>!occupied.has(row.kpiId+':'+row.date))]};
       try{localStorage.setItem(key,JSON.stringify(merged));}catch{}
       return merged;
     }
