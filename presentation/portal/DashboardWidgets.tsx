@@ -14,10 +14,10 @@ import type {Data} from './types';
 import {Link} from './ui';
 
 const modules = [
- {path:'/organization/chart',name:'چارت سازمانی',art:orgArt,detail:'ساختار سازمان را از سطح دپارتمان‌ تا سمت‌های هر واحد مرور کنید و ببینید هر سمت به کدام جایگاه گزارش می‌دهد.',hint:'برای پیدا کردن یک همکار، نام یا سمت او را جست‌وجو کنید و از روی کارت، اطلاعات فرد و واحدش را ببینید.'},
- {path:'/architecture',name:'فرآیندها',art:processArt,detail:'از معماری سازمان وارد گروه‌های فرآیندی شوید و در نقشه ببینید هر فرآیند چگونه به زنجیرهٔ ارزش وصل می‌شود.',hint:'شناسنامهٔ هر فرآیند، مالک و مراحل اجرا را کنار ورودی‌ها، خروجی‌ها، مستندات و شاخص‌های مرتبط نشان می‌دهد.'},
- {path:'/kpis',name:'شاخص‌ها',art:kpiArt,detail:'تعریف، تناوب و منبع دادهٔ هر شاخص را در شناسنامه ببینید و روند مقادیر ثبت‌شده را در داشبورد دنبال کنید.',hint:'بازهٔ زمانی را تغییر دهید و عملکرد ثبت‌شده را با هدفی مقایسه کنید که در نتیجهٔ کلیدی دورهٔ فعال تعریف شده است.'},
- {path:'/okr',name:'OKR',art:okrArt,detail:'در نقشهٔ استراتژی ببینید اهداف دپارتمان‌ها چگونه به اهداف سازمان وصل می‌شوند و هر هدف چه نتایج کلیدی دارد.',hint:'در بخش پایش، پیشرفت دوره را بررسی کنید و ببینید کدام اهداف مطابق برنامه پیش می‌روند و کدام به اقدام نیاز دارند.'},
+ {path:'/organization/chart',name:'چارت سازمانی',art:orgArt,detail:['دپارتمان‌ها و سمت‌ها را','در چارت سازمان ببینید.'],hint:['همکاران را پیدا کنید و','اطلاعات تماسشان را ببینید.']},
+ {path:'/architecture',name:'فرآیندها',art:processArt,detail:['جریان کار و ارتباط‌ها را','در نقشهٔ فرآیندها ببینید.'],hint:['مراحل، مالک و مستندات را','در شناسنامه مرور کنید.']},
+ {path:'/kpis',name:'شاخص‌ها',art:kpiArt,detail:['تعریف و تناوب سنجش را','در شناسنامهٔ شاخص ببینید.'],hint:['روند شاخص را در بازهٔ','دلخواه با هدف مقایسه کنید.']},
+ {path:'/okr',name:'OKR',art:okrArt,detail:['اهداف سازمان و واحدها را','در نقشهٔ استراتژی ببینید.'],hint:['پیشرفت نتایج کلیدی را','طی دوره دنبال کنید.']},
 ];
 const mainPaths=new Set(modules.map(module=>module.path));
 const todayFormat=new Intl.DateTimeFormat('fa-IR-u-ca-persian',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'Asia/Tehran'});
@@ -106,7 +106,7 @@ export function DashboardWidgets({data}:{data:Data}){
  return <div className="dashboard-widgets">
   <section className="panel dashboard-tour" aria-label="آشنایی با بخش‌های نما">
    <div className="dashboard-slide" data-slide={index} key={active.path}>
-    <div className="dashboard-slide-copy"><h2>{active.name}</h2><p>{active.detail}</p><p>{active.hint}</p></div>
+    <div className="dashboard-slide-copy"><h2>{active.name}</h2>{[active.detail,active.hint].map(lines=><p key={lines[0]}>{lines.map(line=><span key={line}>{line}{' '}</span>)}</p>)}</div>
     <img className="dashboard-slide-art" src={active.art} width={560} height={560} alt=""/>
    </div>
    <footer className="dashboard-slide-footer">

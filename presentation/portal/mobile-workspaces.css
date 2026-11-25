@@ -8,7 +8,7 @@
  .dashboard-widgets { gap:10px; }
  .dashboard-tour,.dashboard-recent { height:auto; min-height:0; padding:12px; }
  .dashboard-slide { grid-template-columns:minmax(0,1fr) minmax(74px,32%); gap:8px; }
- .dashboard-slide-copy p { font-size:12px; }
+ .dashboard-slide-copy { font-size:12px; }
  .dashboard-recent ol { max-height:175px; }
  .quick-link-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
  .quick-link-grid li { min-height:55px; }
