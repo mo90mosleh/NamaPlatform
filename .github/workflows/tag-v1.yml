@@ -1,0 +1,28 @@
+name: Register Nama v1.0.0
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/tag-v1.yml'
+permissions:
+  contents: write
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Register the approved demo baseline
+        env:
+          BASELINE: 3f5cc564c4b6a94ce5aee745480be62ecd428fe2
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$BASELINE" HEAD
+          if git show-ref --verify --quiet refs/tags/v1.0.0; then
+            test "$(git rev-parse 'v1.0.0^{commit}')" = "$BASELINE"
+          else
+            git tag v1.0.0 "$BASELINE"
+            git push origin refs/tags/v1.0.0
+          fi
