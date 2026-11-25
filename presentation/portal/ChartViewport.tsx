@@ -3,7 +3,7 @@ import './department-chart.css';
 import{PeopleAvatars}from'./PersonContacts';
 import{useCallback,useEffect,useMemo,useRef,useState,memo,useId,type ReactNode}from'react';
 import{ReactFlow,ReactFlowProvider,Handle,Position,MarkerType,MiniMap,Panel,Background,BackgroundVariant,useReactFlow,useStore,type Node,type NodeProps}from'@xyflow/react';
-import{ZoomIn,ZoomOut,Maximize,Map,ScanLine,GitFork,BriefcaseBusiness,Building2,ChevronLeft,ChevronDown}from'lucide-react';
+import{ZoomIn,ZoomOut,Maximize,Minus,Plus,ScanLine,GitFork,BriefcaseBusiness,Building2,ChevronLeft,ChevronDown}from'lucide-react';
 import{number}from'./ui';import{layoutChart,chartNodeSize,type ChartItem,type ChartDirection,type DepartmentPosition}from'./chart-layout';import'@xyflow/react/dist/style.css';
 type ItemData=Record<string,unknown>&{item:ChartItem;admin:boolean;direction:ChartDirection;select:(id:string)=>void;toggle:(id:string)=>void;onPath:boolean;position:(id:string)=>void;departmentPerson:(department:ChartItem,role:DepartmentPosition,id?:string)=>void;people:(item:ChartItem,personId?:string)=>void};
 type ItemNode=Node<ItemData,'organization'>;
@@ -22,7 +22,7 @@ function InteractiveChart({items,admin,direction,focusId,selectedId,trailIds,cen
  const layout=useMemo(()=>layoutChart(items,admin,direction),[items,admin,direction]);
  const pathKey=trailIds.join('|'),pathIds=new Set(trailIds);
  const nodes=useMemo(()=>layout.map(n=>({id:n.id,className:'organization-flow-node',type:'organization' as const,position:{x:n.x,y:n.y},width:n.width,height:n.height,data:{item:n,admin,direction,select:onSelect,toggle:onToggle,people:onPeople,position:onPosition,departmentPerson:onDepartmentPerson,onPath:pathIds.has(n.id)}})),[layout,admin,direction,onSelect,onToggle,onPeople,onPosition,onDepartmentPerson,pathKey]);
- const edges=useMemo(()=>{const ids=new Set(items.map(n=>n.id));return items.filter(n=>n.id!==focusId&&n.parentId&&ids.has(n.parentId)).map(n=>({id:n.parentId+'->'+n.id,source:n.parentId!,target:n.id,type:'smoothstep',pathOptions:{borderRadius:n.departmentPositions?0:8,offset:n.departmentPositions?0:30,stepPosition:.5},markerEnd:n.departmentPositions?{type:MarkerType.ArrowClosed,color:'#507093',width:14,height:14}:undefined,style:{stroke:pathIds.has(n.id)&&pathIds.has(n.parentId!)?'#568cae':n.departmentPositions?'#507093':'#526e62',strokeWidth:pathIds.has(n.id)&&pathIds.has(n.parentId!)?3.8:n.departmentPositions?2:2.5},interactionWidth:16,focusable:false}));},[items,focusId,pathKey]);
+ const edges=useMemo(()=>{const ids=new Set(items.map(n=>n.id));return items.filter(n=>n.id!==focusId&&n.parentId&&ids.has(n.parentId)).map(n=>({id:n.parentId+'->'+n.id,source:n.parentId!,target:n.id,type:'smoothstep',pathOptions:{borderRadius:0,offset:0,stepPosition:.5},markerEnd:n.departmentPositions?{type:MarkerType.ArrowClosed,color:'#507093',width:14,height:14}:undefined,style:{stroke:pathIds.has(n.id)&&pathIds.has(n.parentId!)?'#568cae':n.departmentPositions?'#507093':'#526e62',strokeWidth:pathIds.has(n.id)&&pathIds.has(n.parentId!)?3.8:n.departmentPositions?2:2.5},interactionWidth:16,focusable:false}));},[items,focusId,pathKey]);
  const fit=useCallback(()=>void flow.fitView({...fitOptions,duration:180}),[flow]);
  const structure=items.map(n=>n.id).join('|'),previousStructure=useRef(structure);
  const center=useCallback((id:string)=>{const n=flow.getNode(id);if(n)void flow.setCenter(n.position.x+(n.width??212)/2,n.position.y+(n.height??104)/2,{zoom:1,duration:200});},[flow]);
@@ -40,7 +40,14 @@ function InteractiveChart({items,admin,direction,focusId,selectedId,trailIds,cen
  <CanvasTool label="کوچک‌نمایی چارت" disabled={zoom<=MIN} onClick={()=>void flow.zoomOut({duration:120})}><ZoomOut size={17}/></CanvasTool>
  <CanvasTool label={focusId?'نمایش همهٔ شاخه‌ها':'تمرکز روی شاخهٔ انتخاب‌شده'} disabled={!focusId&&!selectedId} pressed={Boolean(focusId)} onClick={()=>onFocus(focusId?null:selectedId)}>{focusId?<GitFork size={17}/>:<ScanLine size={17}/>}</CanvasTool>
  <CanvasTool label="نمایش کل چارت" onClick={fit}><Maximize size={17}/></CanvasTool>
- </Panel><Background variant={BackgroundVariant.Dots} gap={22} size={1} color="#d3ded7"/><Panel position="bottom-right" className={'chart-minimap-toggle'+(miniMapOpen?' is-open':'')}><button type="button" className="icon-button" aria-expanded={miniMapOpen} aria-label={miniMapOpen?'جمع کردن نقشهٔ کلی چارت':'نمایش نقشهٔ کلی چارت'} title={miniMapOpen?'جمع کردن نقشهٔ کلی چارت':'نمایش نقشهٔ کلی چارت'} onClick={()=>setMiniMapOpen(open=>!open)}><Map size={16}/></button></Panel>{miniMapOpen&&<MiniMap<ItemNode> pannable zoomable nodeColor={n=>n.data.item.selected?'#b92737':n.data.item.tone??(n.data.onPath?'#568cae':'#769584')} maskColor="#f5f7f5c9" position="bottom-right"/>}</ReactFlow></div></section>;
+ </Panel><Background variant={BackgroundVariant.Dots} gap={22} size={1} color="#d3ded7"/><Panel position="bottom-right" className="chart-minimap-panel">
+  {miniMapOpen&&<MiniMap<ItemNode> pannable zoomable nodeColor={n=>n.data.item.selected?'#b92737':n.data.item.tone??(n.data.onPath?'#568cae':'#769584')} maskColor="#f5f7f5c9" position="bottom-right"/>}
+  <button type="button" className={'icon-button chart-minimap-toggle'+(miniMapOpen?' is-open':'')} aria-expanded={miniMapOpen}
+   aria-label={miniMapOpen?'جمع کردن نقشهٔ کلی چارت':'نمایش نقشهٔ کلی چارت'}
+   title={miniMapOpen?'جمع کردن نقشهٔ کلی چارت':'نمایش نقشهٔ کلی چارت'} onClick={()=>setMiniMapOpen(open=>!open)}>
+   {miniMapOpen?<Minus size={16}/>:<Plus size={16}/>}
+  </button>
+ </Panel></ReactFlow></div></section>;
 }
 
 function CanvasTool({label,children,onClick,disabled,pressed}:{label:string;children:ReactNode;onClick:()=>void;disabled?:boolean;pressed?:boolean}){

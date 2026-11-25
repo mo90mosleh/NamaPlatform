@@ -5,7 +5,7 @@ export type ChartItem={id:string;parentId:string|null;label:string;subtitle?:str
 export type ChartDirection='horizontal'|'vertical';
 export function chartNodeSize(item:ChartItem,admin:boolean) {
  if(item.departmentPositions) return {width:308,height:222};
- return {width:212,height:(admin?124:104)+(item.people?.length?24:0)};
+ return {width:212,height:(admin?124:104)+(item.kind==='position'||item.people?.length?24:0)};
 }
 export function layoutChart(items:ChartItem[],admin=false,direction:ChartDirection='horizontal'){
  const departments=items.some(item=>item.departmentPositions);
