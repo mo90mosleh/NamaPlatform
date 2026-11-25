@@ -41,7 +41,6 @@
 @media(max-width:1100px) { .quick-link-grid { grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr)); } }
 @media(max-width:760px) { .dashboard-modules { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 
-.quick-link-add { background:#e7f2fb; border-color:#cbdff0; color:#235b85; }
 .quick-link-grid li { position:relative; }
 .quick-link-grid .quick-link-target { padding-inline-end:29px; }
 .quick-link-grid .icon-button { position:absolute; inset-inline-end:4px; top:4px; padding:3px; margin:0; min-width:24px; min-height:24px; }
@@ -67,8 +66,7 @@
 @media(max-width:760px){ .dashboard-widgets{grid-template-columns:1fr} }
 @media (min-width: 961px) { .quick-link-grid { grid-template-columns:repeat(5,minmax(0,1fr)); } }
 
-.secondary.quick-link-add,.dashboard-view-link { background:#233b55; color:#fff; border-color:#233b55; }
-.secondary.quick-link-add:hover,.dashboard-view-link:hover { background:#172b42; color:#fff; }
+.dashboard-tour .dashboard-view-link:hover { background:#172b42; color:#fff; }
 .dashboard-search-results a>span,.dashboard-slide h2 { display:flex; align-items:center; gap:8px; }
 .dashboard-slide { display:grid; grid-template-columns:minmax(0,1fr) minmax(90px,40%); align-items:center; gap:12px; flex:1; }
 .dashboard-slide h2,.dashboard-slide p { margin:0 0 5px; }
@@ -87,7 +85,9 @@
 .dashboard-slide-copy p+p { margin-block-start:8px; }
 #main-sidebar nav[aria-label="منوی اصلی"] a>svg { width:23px; height:23px; flex:0 0 23px; }
 
-.quick-links .quick-link-add, .dashboard-tour .dashboard-view-link { background:#1e344c; border-color:#1e344c; color:white; }
+.quick-links .secondary.quick-link-add,
+.quick-links .secondary.quick-link-add:hover,
+.dashboard-tour .dashboard-view-link { background:#1e344c; border-color:#1e344c; color:white; }
 .dashboard-slide { grid-template-columns:minmax(0,1fr) minmax(90px,43%); }
 .dashboard-slide-art { max-width:220px; max-height:220px; }
 .dashboard-slide-copy p { text-align:start; }
