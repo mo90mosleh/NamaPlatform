@@ -1,12 +1,12 @@
 import {createPortal} from 'react-dom';
 import {SegmentedControl} from './SegmentedControl';
 import translations from './apqc-fa.json';
-import {useState} from 'react';
-import {ChevronLeft, ArrowRight, Layers3} from 'lucide-react';
+import {useEffect,useState} from 'react';
+import {ChevronLeft, ArrowRight, Languages, Layers3} from 'lucide-react';
 import {apqcByCode, apqcChildren, apqcContains, apqcParent, apqcTrail} from './apqc-reference';
 import {apqcSource, categories} from './process-governance';
 import type {Data} from './types';
-import {Link, number} from './ui';
+import {go, Link, number, routeQuery} from './ui';
 
 export function ApqcExplorer({data, controls}: {data: Data; controls?: HTMLElement|null}) {
   const [language, setLanguage] = useState<'fa' | 'en'>('fa');
@@ -15,7 +15,23 @@ export function ApqcExplorer({data, controls}: {data: Data; controls?: HTMLEleme
     return categories.find(([key]) => key === code)?.[1] ??
       (translations as Record<string, string>)[code] ?? 'نیازمند بررسی';
   };
-  const [branch, setBranch] = useState('');
+  function currentBranch() {
+    const code = routeQuery().get('branch') ?? '';
+    return code === 'unmapped' || apqcByCode.has(code) ? code : '';
+  }
+  const [branch, setSelectedBranch] = useState(currentBranch);
+  useEffect(() => {
+    const sync = () => setSelectedBranch(currentBranch());
+    window.addEventListener('popstate', sync);
+    window.addEventListener('hashchange', sync);
+    return () => {
+      window.removeEventListener('popstate', sync);
+      window.removeEventListener('hashchange', sync);
+    };
+  }, []);
+  function setBranch(code: string) {
+    go('/process-governance/apqc' + (code ? '?branch=' + encodeURIComponent(code) : ''));
+  }
   const processes = data.nodes.filter(node => node.kind === 'PROCESS');
   const categoryFor = (id: string) => data.governance?.[id]?.apqc ?? '';
   const isMapped = (id: string) => apqcByCode.has(categoryFor(id));
@@ -31,7 +47,7 @@ export function ApqcExplorer({data, controls}: {data: Data; controls?: HTMLEleme
   ))}</div>;
 
   const languageSwitch = <SegmentedControl className="apqc-language" label="زبان دسته‌بندی" value={language} onChange={setLanguage}
-      options={[{value:'fa',label:'فارسی',icon:null},{value:'en',label:'English',icon:null}]}/>;
+      options={[{value:'fa',label:'فارسی',icon:<Languages size={15}/>},{value:'en',label:'English',icon:<Languages size={15}/>}]}/>;
   return <section className="panel governance-panel apqc-explorer">
     <header className="apqc-heading"><h2>{language === 'fa' ? 'طبقه‌بندی APQC' : 'APQC classification'}</h2>
     {controls ? createPortal(languageSwitch,controls) : languageSwitch}<a href={apqcSource} target="_blank" rel="noreferrer">مرجع میان‌صنعتی ۷٫۴</a></header>

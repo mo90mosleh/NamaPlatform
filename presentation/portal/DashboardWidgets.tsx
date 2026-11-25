@@ -73,12 +73,16 @@ export function DashboardSearch({data}:{data:Data}){
  const [query,setQuery]=useState('');
  const [open,setOpen]=useState(false);
  const term=normalizeSearch(query.trim());
- const matches=term?destinations(data).filter(item=>normalizeSearch([item.name,item.type,'code' in item?item.code:''].join(' ')).includes(term))
+ const terms=term.split(/\s+/);
+ const matches=term?destinations(data).filter(item=>{
+  const searchable=normalizeSearch([item.name,item.type,'code' in item?item.code:''].join(' '));
+  return terms.every(word=>searchable.includes(word));
+ })
   .sort((a,b)=>Number(normalizeSearch(b.name)===term)-Number(normalizeSearch(a.name)===term)).slice(0,12):[];
  return <div className="dashboard-search" onBlur={e=>{if(!e.currentTarget.contains(e.relatedTarget))setOpen(false);}} onKeyDown={e=>{if(e.key==='Escape')setOpen(false);}}>
-  <label><Search size={21}/><input type="search" aria-label="جست‌وجو در نما" placeholder="جست‌وجو در نما…" value={query} onFocus={()=>setOpen(true)} onChange={e=>{setQuery(e.target.value);setOpen(true);}}/></label>
+  <label><Search size={21}/><input type="search" aria-label="جست‌وجو در نما" placeholder="جست‌وجوی شخص، سمت، دپارتمان و محتوای نما…" value={query} onFocus={()=>setOpen(true)} onChange={e=>{setQuery(e.target.value);setOpen(true);}}/></label>
   {open&&term&&<div className="panel dashboard-search-results" aria-label="نتایج جست‌وجو">
-   {matches.map(item=>{const Icon=searchIcons[item.type as keyof typeof searchIcons];return <Link key={item.path} to={item.path}><span><Icon size={17}/>{item.name}</span><small>{item.type}</small></Link>;})}
+   {matches.map(item=>{const Icon=searchIcons[item.type as keyof typeof searchIcons];return <Link key={item.path} to={item.path}><span><Icon size={17} aria-hidden="true"/>{item.name}</span><small>{item.type}</small></Link>;})}
    {!matches.length&&<p className="empty-inline">نتیجه‌ای پیدا نشد.</p>}
   </div>}
  </div>;
@@ -89,7 +93,7 @@ export function DashboardWidgets({data}:{data:Data}){
  const [playing,setPlaying]=useState(()=>!matchMedia('(prefers-reduced-motion: reduce)').matches);
  useEffect(()=>{
   if(!playing)return;
-  const timer=window.setInterval(()=>setIndex(value=>(value+1)%modules.length),5000);
+  const timer=window.setInterval(()=>setIndex(value=>(value+1)%modules.length),8000);
   return ()=>window.clearInterval(timer);
  },[playing,index]);
  const active=modules[index];

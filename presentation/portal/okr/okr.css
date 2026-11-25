@@ -316,3 +316,24 @@ button.okr-metric:hover, button.okr-info-row:hover { background: #eef6f4; }
 .okr-kr-caption { min-width:0; overflow-wrap:anywhere; }
 .okr-kr-caption small { color:var(--muted); font-weight:normal; }
 .okr-detail-summary>div:last-child { justify-content:flex-start; flex-wrap:wrap; gap:5px; }
+
+
+.okr-goals-content { display:flex; flex-direction:column; min-height:0; }
+.okr-goals-content > .okr-panel { min-height:0; margin:0; padding:6px 8px; overflow:auto; overscroll-behavior:contain; }
+.okr-goals-content .okr-inline-results { margin:0; padding-block:0 3px; }
+.okr-goals-content .okr-inline-results li { padding-block:2px; }
+.okr-goals-content .okr-list-row { padding-block:5px; }
+.okr-goals-content .okr-list-row { background:transparent; }
+.okr-goal-name { display:flex; flex-wrap:wrap; align-items:center; gap:3px 8px; }
+.okr-goal-name .text-button { font-size:12px; font-weight:700; text-align:start; }
+.okr-goal-name .okr-kr-badge { white-space:nowrap; }
+.okr-goals-content .okr-goal-toolbar { flex:none; }
+@media(min-width:761px) {
+ .okr-workspace-goals,.okr-workspace-strategy { height:100%; display:flex; flex-direction:column; }
+ .okr-workspace-goals > :not(.okr-goals-content),.okr-workspace-strategy > :not(.okr-strategy-content) { flex:none; }
+ .okr-goals-content,.okr-strategy-content { flex:1; min-height:0; }
+ .okr-strategy-content { max-height:none; overflow:hidden; }
+ .okr-strategy-tree { display:flex; flex-direction:column; min-height:0; margin-bottom:0; }
+ .okr-strategy-tree .okr-tree-list { min-height:0; max-height:none; overscroll-behavior:contain; }
+ .okr-strategy-content .okr-bottom-grid { min-height:0; overflow:auto; overscroll-behavior:contain; }
+}

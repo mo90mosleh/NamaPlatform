@@ -19,7 +19,8 @@ export function go(path:string){
 }
 export function BackButton(){
  return <button className="secondary global-back" aria-label="بازگشت به صفحهٔ قبل" title="بازگشت به صفحهٔ قبل"
-  onClick={()=>{if(history.length>1)history.back();else if(currentPath()!=='/dashboard')location.replace(config.mode==='public'?'#/dashboard':'/dashboard');}}>
+  onClick={()=>{if(history.state?.namaDepth>0){history.back();return;}
+   if(currentPath()!=='/dashboard'){const target=config.mode==='public'?'#/dashboard':'/dashboard';history.replaceState({...history.state,namaDepth:0},'',target);window.dispatchEvent(new PopStateEvent('popstate'));window.dispatchEvent(new Event('orgdocs:route'));scrollPage(0,0);}}}>
   <ArrowRight size={16}/><span>بازگشت</span></button>;
 }
 export function Link({to,children,className,ariaLabel}:{to:string;children:ReactNode;className?:string;ariaLabel?:string}){return <a href={config.mode==='public'?'#'+to:to} className={className} aria-label={ariaLabel} title={ariaLabel} onPointerEnter={()=>preloadRoute(to)} onFocus={()=>preloadRoute(to)} onClick={(e:MouseEvent)=>{if(e.button||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();go(to);}}>{children}</a>;}

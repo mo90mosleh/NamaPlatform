@@ -32,3 +32,12 @@
  .process-sections.process-detail-sections:not(:has(>.process-section[open])) { flex:1; grid-auto-rows:minmax(46px,1fr); }
  .process-detail-sections:not(:has(>.process-section[open]))>.process-section>summary { height:100%; }
 }
+
+.process-detail-header { margin-block:0 6px; gap:4px 10px; }
+.process-detail-header h1 { font-size:clamp(15px,1.45vw,19px); }
+.process-detail-header .process-meta { font-size:11px; }
+.process-detail-header .process-expand-toggle button { min-height:30px; }
+.process-toolbar-controls .apqc-language { display:inline-flex; }
+@media(min-width:761px) {
+ .process-sections.process-detail-sections:not(:has(>.process-section[open])) { flex:0 0 auto; grid-auto-rows:auto; }
+}

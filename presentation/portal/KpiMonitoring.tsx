@@ -5,7 +5,7 @@ import {LayoutDashboard, ClipboardList, Plus, Save, Pencil, Trash2} from 'lucide
 import type {Data, KPI} from './types';
 import {latestPerPeriod} from './kpi-periods';
 import {Modal} from './Modal';
-import {go, number, routeQuery} from './ui';
+import {currentPath, go, number, routeQuery} from './ui';
 import {JalaliDatePicker} from './JalaliDatePicker';
 import {PowerBiIcon, PowerBiReports, type PowerBiReport} from './PowerBiReports';
 import './kpi-monitoring.css';
@@ -38,13 +38,13 @@ function storageKey(data: Data) { return 'nama-kpi-monitoring-v1:' + data.organi
 
 // Synthetic operating history for the four dashboard examples.
 const sampleSeries = [
-  {code:'K-01',kind:'line',values:[16,13,11,10]},
-  {code:'K-02',kind:'bar',values:[90,93,96,97]},
-  {code:'K-03',kind:'bar',values:[75,82,89,92]},
-  {code:'K-07',kind:'line',values:[3,2.4,1.8,1.6]},
+  {code:'K-01',kind:'line',values:[23,21,18,16,13,11,10]},
+  {code:'K-02',kind:'bar',values:[81,85,88,90,93,96,97]},
+  {code:'K-03',kind:'bar',values:[69,73,77,81,86,89,92]},
+  {code:'K-07',kind:'line',values:[5.2,4.7,3.8,3,2.4,1.8,1.6]},
 ] as const;
-const sampleDates=['2026-08-15','2026-09-15','2026-10-15','2026-11-15'];
-const sampleVersion=5;
+const sampleDates=['2026-05-15','2026-06-15','2026-07-15','2026-08-15','2026-09-15','2026-10-15','2026-11-15'];
+const sampleVersion=6;
 
 function initialModel(data:Data):Model {
  if(!config.demoManagement)return empty;
@@ -72,7 +72,7 @@ function read(key: string, initial = empty): Model {
         return revisions.length?[{...row,revisions}]:[];
       });
       const occupied=new Set(measurements.map(row=>row.kpiId+':'+row.date));
-      const merged={...initial,cards:saved.sampleVersion===4?saved.cards:initial.cards,reports,measurements:[...measurements,...initial.measurements.filter(row=>!occupied.has(row.kpiId+':'+row.date))]};
+      const merged={...initial,cards:saved.samplesInitialized?saved.cards:initial.cards,reports,measurements:[...measurements,...initial.measurements.filter(row=>!occupied.has(row.kpiId+':'+row.date))]};
       try{localStorage.setItem(key,JSON.stringify(merged));}catch{}
       return merged;
     }
@@ -150,7 +150,7 @@ function Chart({kpi, card, rows, targets}: {kpi: KPI; card: Card; rows: Measurem
   const range = high / scale - low / scale || 1;
   const y = (value: number) => 110 - (value / scale - low / scale) / range * 82;
   const span = points[points.length - 1].index - points[0].index + 1;
-  const left = labels ? 24 : 45;
+  const left = labels ? 24 : 49;
   const spacing = (320-left) / span;
   const x = (index: number) => left + (points[index].index - points[0].index + .5) * spacing;
   const stride = Math.ceil(points.length / 8);
@@ -159,7 +159,7 @@ function Chart({kpi, card, rows, targets}: {kpi: KPI; card: Card; rows: Measurem
     {kind === 'pie' ? <div className="kpi-pie-layout"><div className="kpi-pie" aria-hidden="true" style={{background:'conic-gradient('+segments.join(',')+')'}}/>
       {labels&&<ul className="kpi-pie-labels">{points.map((point,index)=><li key={point.index}><i style={{background:colors[index%colors.length]}}/>{point.label} · {number.format(Math.round(values[index]/total*100))}٪</li>)}</ul>}
     </div> :
-      <svg className="kpi-plot" viewBox="0 0 345 142" aria-hidden="true" style={{color:colors[0]}}>
+      <svg className="kpi-plot" viewBox="0 0 345 142" aria-hidden="true" direction="ltr" style={{color:colors[0]}}>
         {!labels && [0,.25,.5,.75,1].map(fraction=>{
           const value=low+(high-low)*fraction;
           return <g key={fraction} className="kpi-y-tick">
@@ -194,14 +194,14 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
   const targets=activeKpiTargets(loadPortfolio(data.organization.id,data.organization.name,data.user.role==='ADMIN'));
   const key = storageKey(data);
   const [model, setModel] = useState(() => read(key, initialModel(data)));
-  const tabFromUrl = () => reportId ? 'power-bi' : tabs.find(([id])=>id===routeQuery().get('tab'))?.[0] ?? 'dashboard';
+  const tabFromUrl = () => currentPath().startsWith('/kpis/power-bi/') ? 'power-bi' : tabs.find(([id])=>id===routeQuery().get('tab'))?.[0] ?? 'dashboard';
   const [tab, setTab] = useState(tabFromUrl);
   useEffect(()=>{
     const sync=()=>{setTab(tabFromUrl());setMessage(null);};
     window.addEventListener('popstate',sync);
     window.addEventListener('hashchange',sync);
     return ()=>{window.removeEventListener('popstate',sync);window.removeEventListener('hashchange',sync);};
-  },[reportId]);
+  },[]);
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
   const [entryOpen, setEntryOpen] = useState(false);
@@ -263,7 +263,7 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
     {data.kpis.map(kpi => <option key={kpi.id} value={kpi.id}>{kpi.name} ({kpi.code})</option>)}
   </select>;
 
-  return <div className="kpi-workspace">
+  return <div className={'kpi-workspace'+(tab==='dashboard'&&model.cards.length>0&&model.cards.length<=4?' kpi-workspace-fit':'')}>
     <div className="module-toolbar">
       <nav className="process-workspace-tabs" aria-label="بخش‌های شاخص‌های عملکرد">
         {tabs.map(([id, title, Icon]) => <button key={id} type="button" className={tab === id ? 'active' : ''}

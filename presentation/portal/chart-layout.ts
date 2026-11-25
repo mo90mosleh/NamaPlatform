@@ -16,7 +16,7 @@ export function chartNodeSize(item:ChartItem,admin:boolean,direction:ChartDirect
  return {width:212,height:(admin?124:104)+(item.people?.length?24:0)};
 }
 export function layoutChart(items:ChartItem[],admin=false,direction:ChartDirection='horizontal'){
- const graph=new dagre.graphlib.Graph().setGraph({rankdir:direction==='vertical'?'TB':'RL',nodesep:18,ranksep:64,marginx:12,marginy:12}).setDefaultEdgeLabel(()=>({}));
+ const graph=new dagre.graphlib.Graph().setGraph({rankdir:direction==='vertical'?'TB':'RL',nodesep:10,ranksep:42,marginx:0,marginy:0}).setDefaultEdgeLabel(()=>({}));
  const ids=new Set(items.map(n=>n.id));
  for(const n of items)graph.setNode(n.id,chartNodeSize(n,admin,direction));
  for(const n of items)if(n.parentId&&ids.has(n.parentId))graph.setEdge(n.parentId,n.id);

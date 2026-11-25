@@ -86,3 +86,8 @@
 .dashboard-tour { background:#fff; }
 .dashboard-slide-copy p+p { margin-block-start:8px; }
 #main-sidebar nav[aria-label="منوی اصلی"] a>svg { width:23px; height:23px; flex:0 0 23px; }
+
+.quick-links .quick-link-add, .dashboard-tour .dashboard-view-link { background:#1e344c; border-color:#1e344c; color:white; }
+.dashboard-slide { grid-template-columns:minmax(0,1fr) minmax(90px,43%); }
+.dashboard-slide-art { max-width:220px; max-height:220px; }
+.dashboard-slide-copy p { text-align:start; }

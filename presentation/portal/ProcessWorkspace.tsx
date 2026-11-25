@@ -26,7 +26,7 @@ export function ProcessWorkspace({data,section,refresh,detailId}:{data:Data;sect
   </nav><div className="process-toolbar-controls" ref={setControls}/>
   </div>
   <section className="process-workspace-body" aria-label={section==='catalog'?'شناسنامه فرآیندها':tabs.find(x=>x[0]===section)?.[1]}>
-   <Suspense fallback={<p className="loading" role="status">در حال دریافت بخش فرآیندها…</p>}>{section==='architecture'?<Architecture data={data} embedded/>:section==='map'?<ProcessMap data={data} refresh={refresh}/>:section==='apqc'?<GovernanceOverview key={section} data={data} section={section} controls={controls}/>:detailId?<ProcessProfile key={detailId} data={data} id={detailId} refresh={refresh} controls={controls}/>:<ProcessCatalog data={data} embedded/>}</Suspense>
+   <Suspense fallback={<p className="loading" role="status">در حال دریافت بخش فرآیندها…</p>}>{section==='architecture'?<Architecture data={data} embedded/>:section==='map'?<ProcessMap data={data} refresh={refresh}/>:section==='apqc'?<GovernanceOverview key={section} data={data} section={section} controls={controls}/>:detailId?<ProcessProfile key={detailId} data={data} id={detailId} refresh={refresh}/>:<ProcessCatalog data={data} embedded/>}</Suspense>
   </section>
  </div>;
 }

@@ -261,9 +261,8 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
  const isExpanded = (goal:OkrObjective) => expandedResults[goal.id]??showAllResults;
  function resultBadge(goal:OkrObjective){
   const count=resultsFor(goal).length;
-  const expanded=isExpanded(goal);
-  return count>0&&<button aria-expanded={expanded} type="button" className="okr-kr-badge" aria-label={(expanded?'بستن':'نمایش')+' '+number.format(count)+' نتیجهٔ کلیدی '+goal.title}
-    onClick={()=>setExpandedResults(old=>({...old,[goal.id]:!expanded}))}><bdi>{count} KR</bdi><ChevronDown size={12}/></button>;
+  return count>0&&!isExpanded(goal)&&<button aria-expanded={false} type="button" className="okr-kr-badge" aria-label={'نمایش '+number.format(count)+' نتیجهٔ کلیدی '+goal.title}
+    onClick={()=>setExpandedResults(old=>({...old,[goal.id]:true}))}><bdi>{number.format(count)} KR</bdi></button>;
  }
  function inlineResults(goal:OkrObjective){
   const rows=resultsFor(goal);
@@ -276,7 +275,7 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
   const index=data.units.findIndex(unit=>unit.id===goal.ownerUnitId);
   return index<0?undefined:{backgroundColor:'hsl('+((index*137.508)%360)+' 51% 95%)'};
  }
- const goals=<>
+ const goals=<div className="okr-goals-content">
   <div className="okr-goal-toolbar"><label className="okr-search"><Search size={17}/><input value={search} placeholder="جست‌وجو در نام هدف، کد و دپارتمان…" onChange={e=>setSearch(e.target.value)} aria-label="جست‌وجوی اهداف"/></label>
    <select aria-label="سطح اهداف" value={scope} onChange={e=>setScope(e.target.value)}><option value="ALL">همه سطوح</option><option value="COMPANY">سازمانی</option><option value="DEPARTMENT">دپارتمانی</option></select>
    <div className="okr-view-toggle" role="group" aria-label="نمایش اهداف"><button className={listView==='tree'?'active':''} onClick={()=>setListView('tree')} aria-pressed={listView==='tree'}><LayoutList size={16}/>درختی</button><button className={listView==='table'?'active':''} onClick={()=>setListView('table')} aria-pressed={listView==='table'}><Table2 size={16}/>جدولی</button></div>
@@ -286,12 +285,12 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
    </div>
   </div>
   <section className="okr-panel">{filtered.length?listView==='tree'?<div className="okr-list">
-   {filtered.map(g=><div key={g.id} className="okr-goal-entry" style={goalTone(g)}><div className="okr-goal-row-wrap"><button className="okr-list-row" onClick={()=>open(g.id)}>
-    <div className={'okr-list-title '+(g.parentId?'is-child':'')}><small>{g.code} · {g.level==='COMPANY'?'سازمانی':'دپارتمانی'}</small><strong>{g.title}</strong><small>{owner(g)}</small></div>
+   {filtered.map(g=><div key={g.id} className="okr-goal-entry" style={goalTone(g)}><div className="okr-list-row">
+    <div className={'okr-list-title '+(g.parentId?'is-child':'')}><small>{g.code} · {g.level==='COMPANY'?'سازمانی':'دپارتمانی'}</small><div className="okr-goal-name"><button type="button" className="text-button" onClick={()=>open(g.id)}>{g.title}</button>{resultBadge(g)}</div><small>{owner(g)}</small></div>
     <div className="okr-list-progress"><Progress value={objectiveProgress(portfolio,g.id)}/><strong className="okr-objective-percent">{number.format(objectiveProgress(portfolio,g.id))}٪</strong></div><Status value={pace(g).status}/>
-   </button>{resultBadge(g)}</div>{inlineResults(g)}</div>)}
+   </div>{inlineResults(g)}</div>)}
   </div>:<div className="okr-table-wrap"><table><thead><tr><th>هدف</th><th>مالک</th><th>نتایج کلیدی</th><th>تحقق</th><th>وضعیت</th></tr></thead><tbody>{filtered.map(g=><Fragment key={g.id}><tr style={goalTone(g)}><td><button type="button" className="text-button" onClick={()=>open(g.id)}>{g.title}</button><small>{g.code}</small></td><td>{owner(g)}</td><td>{resultBadge(g)}</td><td>{number.format(objectiveProgress(portfolio,g.id))}٪</td><td><Status value={pace(g).status}/></td></tr>{isExpanded(g)&&resultsFor(g).length>0&&<tr style={goalTone(g)}><td colSpan={5}>{inlineResults(g)}</td></tr>}</Fragment>)}</tbody></table></div>:<p className="okr-empty">هدفی با این شرایط پیدا نشد.</p>}</section>
- </>;
+ </div>;
  const monitoring=<div className="okr-monitor-content">
   <div className="okr-monitor-grid">
    <section className="okr-panel"><div className="okr-panel-head"><div><h3 id="okr-department-progress-title">تحقق اهداف به تفکیک دپارتمان</h3><small>درصد پیشرفت واقعی اهداف</small></div></div>
@@ -314,7 +313,7 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
    </div>
   </section>
  </div>;
- return <div ref={ref} className={tab==='monitor'?'okr-workspace okr-workspace-monitor':'okr-workspace'}>
+ return <div ref={ref} className={'okr-workspace okr-workspace-'+tab}>
   <div className="module-toolbar">
    <nav className="process-workspace-tabs" aria-label="بخش‌های مدیریت OKR">{(['strategy','goals','monitor']as Tab[]).map((t,i)=><button key={t} className={tab===t?'active':''} aria-current={tab===t?'page':undefined} onClick={()=>go(t==='strategy'?'/okr':'/okr?tab='+t)}>{i===0?<Network size={17}/>:i===1?<Target size={17}/>:<ChartColumnIncreasing size={17}/>}<span>{titleByTab[t]}</span></button>)}</nav>
    <div className="okr-heading-actions"><label className="okr-cycle-control"><CalendarDays size={16}/><select aria-label="دوره OKR" value={cycle?.id??''} onChange={e=>{setActiveCycle(e.target.value);setSelectedId(null);setSelectedPillars([]);}}>{!portfolio.cycles.length&&<option value="">دوره‌ای تعریف نشده</option>}{portfolio.cycles.map(c=><option key={c.id} value={c.id}>{c.title} {c.status==='PLANNING'?'· برنامه‌ریزی':''}</option>)}</select><ChevronDown size={13}/></label>
