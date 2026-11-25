@@ -1,7 +1,7 @@
 import {loadPortfolio} from './okr/portfolio-storage';
 import {activeKpiTargets} from './okr/kpi-targets';
 import {useEffect, useState, type FormEvent, type ReactNode} from 'react';
-import {LayoutDashboard, ClipboardList, Plus, Save, Pencil, Trash2} from 'lucide-react';
+import {LayoutDashboard, ClipboardList, Plus, Save, Pencil, Trash2, X} from 'lucide-react';
 import type {Data, KPI} from './types';
 import {latestPerPeriod} from './kpi-periods';
 import {Modal} from './Modal';
@@ -262,10 +262,11 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
           aria-current={tab === id ? 'page' : undefined} onClick={() => go(id==='dashboard'?'/kpis':'/kpis?tab='+id)}><Icon size={17}/>{title}</button>)}
       </nav>
       {tab === 'dashboard' && <div className="kpi-date-filters">
-        <JalaliDatePicker label="از تاریخ" value={start} onChange={setStart}/>
-        <JalaliDatePicker label="تا تاریخ" value={end} onChange={setEnd}/>
+        <JalaliDatePicker label="از تاریخ" shortLabel="از" value={start} onChange={setStart}/>
+        <JalaliDatePicker label="تا تاریخ" shortLabel="تا" value={end} onChange={setEnd}/>
         <button type="button" className="secondary kpi-clear-dates" disabled={!start&&!end}
-          onClick={()=>{setStart('');setEnd('');}}>پاک کردن فیلتر تاریخ</button>
+          aria-label="پاک کردن فیلتر تاریخ" title="پاک کردن فیلتر تاریخ"
+          onClick={()=>{setStart('');setEnd('');}}><X size={16} aria-hidden="true"/><span>پاک کردن فیلتر تاریخ</span></button>
       </div>}
       {tab === 'profiles'&&<button type="button" className="secondary" aria-expanded={entryOpen}
         onClick={()=>setEntryOpen(!entryOpen)}><Save size={16}/>ثبت مقادیر</button>}

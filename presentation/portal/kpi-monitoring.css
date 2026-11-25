@@ -96,3 +96,22 @@
 }
 
 .kpi-clear-dates { align-self:center; padding:4px 8px; font-size:11px; min-height:32px; }
+
+.kpi-date-short-label, .kpi-clear-dates > svg { display: none; }
+
+@media (max-width: 760px) {
+  .kpi-date-filters { flex-wrap: nowrap; align-items: center; }
+  .kpi-date-filters .kpi-date-picker summary {
+    gap: 4px;
+    padding-inline: 6px;
+    white-space: nowrap;
+  }
+  .kpi-date-filters summary > svg { flex: none; }
+  .kpi-date-filters .kpi-date-label, .kpi-clear-dates > span { display: none; }
+  .kpi-date-filters .kpi-date-short-label, .kpi-clear-dates > svg { display: block; }
+  .kpi-date-filters .kpi-clear-dates {
+    flex: 0 0 44px;
+    min-height: 44px;
+    padding: 0;
+  }
+}

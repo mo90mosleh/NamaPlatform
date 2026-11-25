@@ -13,8 +13,8 @@ function calendarMonth(value: string) {
   return {year, month};
 }
 
-export function JalaliDatePicker({label, value, onChange}: {
-  label: string; value: string; onChange: (value: string) => void;
+export function JalaliDatePicker({label, shortLabel, value, onChange}: {
+  label: string; shortLabel?: string; value: string; onChange: (value: string) => void;
 }) {
   const [month, setMonth] = useState(() => calendarMonth(value));
   const details = useRef<HTMLDetailsElement>(null);
@@ -28,13 +28,19 @@ export function JalaliDatePicker({label, value, onChange}: {
     trigger.current?.focus();
   }
 
+  const formattedDate = isoToJalaliInput(value);
+
   return <details ref={details} className="kpi-date-picker"
     onBlur={event => {
       if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) event.currentTarget.open = false;
     }}
     onKeyDown={event => { if (event.key === 'Escape') close(); }}>
-    <summary ref={trigger} onClick={() => setMonth(calendarMonth(value))}>
-      <CalendarDays size={16}/>{label}<bdi className={value?'':'kpi-date-empty'} aria-label={value?undefined:'بدون تاریخ'}>{isoToJalaliInput(value) || 'ــــ/ــ/ــ'}</bdi>
+    <summary ref={trigger} onClick={() => setMonth(calendarMonth(value))}
+      aria-label={shortLabel ? [label, formattedDate || 'بدون تاریخ'].join('، ') : undefined}>
+      <CalendarDays size={16}/>
+      <span className="kpi-date-label">{label}</span>
+      {shortLabel && <span className="kpi-date-short-label" aria-hidden="true">{shortLabel}</span>}
+      <bdi className={value?'':'kpi-date-empty'} aria-label={value?undefined:'بدون تاریخ'}>{formattedDate || 'ــــ/ــ/ــ'}</bdi>
     </summary>
     <div className="panel jalali-calendar" aria-label={label}>
       <div className="jalali-calendar-month">
