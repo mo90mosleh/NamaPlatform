@@ -300,7 +300,8 @@ button.okr-metric:hover, button.okr-info-row:hover { background: #eef6f4; }
 .okr-kr-badge { display:inline-flex; align-items:center; gap:2px; }
 .okr-kr-badge[aria-expanded="true"] svg { transform:rotate(180deg); }
 .okr-progress:has(.okr-bar-value) { position:relative; height:17px; min-width:48px; }
-.okr-bar-value { position:absolute; inset:0; display:grid; place-items:center; font-size:10px; line-height:1; color:#152438; text-shadow:0 0 3px white,0 0 4px white; }
+.okr-bar-value { position:absolute; inset:0; margin:auto; width:max-content; height:fit-content; padding:1px 5px; border-radius:4px; font-size:12px; line-height:1.15; font-weight:800; color:#102139; background:#fff; }
+.okr-objective-percent { display:block; font-size:16px; font-weight:800; line-height:1.4; color:#102139; }
 .okr-inline-results li { grid-template-columns:minmax(0,1fr) minmax(84px,28%); }
 .okr-inline-results .okr-progress { width:100%; }
 .okr-kr-caption { min-width:0; overflow-wrap:anywhere; }

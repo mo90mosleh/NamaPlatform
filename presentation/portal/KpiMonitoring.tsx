@@ -36,21 +36,29 @@ const labelDate = (date: string) => dates.format(new Date(date + 'T12:00:00Z'));
 const current = (measurement: Measurement) => measurement.revisions[measurement.revisions.length - 1];
 function storageKey(data: Data) { return 'nama-kpi-monitoring-v1:' + data.organization.id; }
 
+// Synthetic operating history for the four dashboard examples.
 const sampleSeries = [
-  {code: 'K-01', kind: 'line'},
-  {code: 'K-02', kind: 'bar'},
-  {code: 'K-03', kind: 'bar'},
-  {code: 'K-07', kind: 'line'},
+  {code:'K-01',kind:'line',values:[24,21,19,16]},
+  {code:'K-02',kind:'bar',values:[78,83,81,88]},
+  {code:'K-03',kind:'bar',values:[75,82,89,92]},
+  {code:'K-07',kind:'line',values:[5,4.5,4,3]},
 ] as const;
+const sampleDates=['2026-08-15','2026-09-15','2026-10-15','2026-11-15'];
+const sampleVersion=4;
 
-const sampleVersion = 3;
-function initialModel(data: Data): Model {
-  if (!config.demoManagement) return empty;
-  const cards = sampleSeries.flatMap(({code,kind})=>{
-    const kpi=data.kpis.find(item=>item.code===code);
-    return kpi?[{id:'sample-'+code,kpiId:kpi.id,kind}]:[];
+function initialModel(data:Data):Model {
+ if(!config.demoManagement)return empty;
+ const cards:Card[]=[],measurements:Measurement[]=[];
+ for(const {code,kind,values} of sampleSeries){
+  const kpi=data.kpis.find(item=>item.code===code);
+  if(!kpi)continue;
+  cards.push({id:'sample-'+code,kpiId:kpi.id,kind});
+  values.forEach((value,index)=>{
+   const date=sampleDates[index];
+   measurements.push({kpiId:kpi.id,date,revisions:[{value,actor:'دمو',note:'داده نمونه دمو',savedAt:date+'T12:00:00Z'}]});
   });
-  return {cards, measurements:[], reports:[], samplesInitialized:true, sampleVersion};
+ }
+ return {cards,measurements,reports:[],samplesInitialized:true,sampleVersion};
 }
 
 function read(key: string, initial = empty): Model {
@@ -59,14 +67,14 @@ function read(key: string, initial = empty): Model {
     if (Array.isArray(saved?.cards) && Array.isArray(saved.measurements)) {
       const reports = Array.isArray(saved.reports) ? saved.reports : [];
       if (!initial.sampleVersion || saved.sampleVersion===initial.sampleVersion) return {...saved,reports};
-      return {
-        cards: saved.samplesInitialized ? saved.cards : [...saved.cards,...initial.cards.filter(sample=>!saved.cards.some(card=>card.kpiId===sample.kpiId))],
-        measurements:saved.measurements.flatMap(row=>{
-          const revisions=row.revisions.filter(revision=>revision.actor!=='دمو'||revision.note!=='داده نمونه دمو');
-          return revisions.length?[{...row,revisions}]:[];
-        }),
-        reports,samplesInitialized:true,sampleVersion:initial.sampleVersion,
-      };
+      const measurements=saved.measurements.flatMap(row=>{
+        const revisions=row.revisions.filter(revision=>revision.actor!=='دمو'||revision.note!=='داده نمونه دمو');
+        return revisions.length?[{...row,revisions}]:[];
+      });
+      const occupied=new Set(measurements.map(row=>row.kpiId+':'+row.date));
+      const merged={...initial,reports,measurements:[...measurements,...initial.measurements.filter(row=>!occupied.has(row.kpiId+':'+row.date))]};
+      try{localStorage.setItem(key,JSON.stringify(merged));}catch{}
+      return merged;
     }
   } catch {}
   return initial;

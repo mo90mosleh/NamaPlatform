@@ -14,18 +14,21 @@ import type {Data} from './types';
 import {Link} from './ui';
 
 const modules = [
- {path:'/organization/chart', name:'چارت سازمانی', detail:'دپارتمان‌ها، سمت‌ها و مسیرهای گزارش‌دهی را در چارت مرور کنید.', art:orgArt, hint:'افراد هر واحد و اطلاعات تماس همکاران را از روی کارت‌ها پیدا کنید.'},
- {path:'/architecture', name:'فرآیندها', detail:'معماری، زنجیره‌های ارزش و شناسنامهٔ فرآیندها را مرور کنید.', art:processArt, hint:'مالک، ورودی‌ها و خروجی‌های هر فرآیند را در شناسنامهٔ آن ببینید.'},
- {path:'/kpis', name:'شاخص‌ها', detail:'تعریف شاخص‌ها و روند ثبت مقادیر را در داشبورد پایش کنید.', art:kpiArt, hint:'مقادیر واقعی را در دوره‌های مختلف با اهداف نتایج کلیدی مقایسه کنید.'},
- {path:'/okr', name:'OKR', detail:'اهداف، نتایج کلیدی و پیشرفت هر دوره را در نقشه مرور کنید.', art:okrArt, hint:'وضعیت اهداف سازمان و دپارتمان‌ها را در بخش پایش دنبال کنید.'},
+ {path:'/organization/chart',name:'چارت سازمانی',art:orgArt,detail:'ساختار سازمان را از سطح دپارتمان‌ تا سمت‌های هر واحد مرور کنید و ببینید هر سمت به کدام جایگاه گزارش می‌دهد.',hint:'برای پیدا کردن یک همکار، نام یا سمت او را جست‌وجو کنید و از روی کارت، اطلاعات فرد و واحدش را ببینید.'},
+ {path:'/architecture',name:'فرآیندها',art:processArt,detail:'از معماری سازمان وارد گروه‌های فرآیندی شوید و در نقشه ببینید هر فرآیند چگونه به زنجیرهٔ ارزش وصل می‌شود.',hint:'شناسنامهٔ هر فرآیند، مالک و مراحل اجرا را کنار ورودی‌ها، خروجی‌ها، مستندات و شاخص‌های مرتبط نشان می‌دهد.'},
+ {path:'/kpis',name:'شاخص‌ها',art:kpiArt,detail:'تعریف، تناوب و منبع دادهٔ هر شاخص را در شناسنامه ببینید و روند مقادیر ثبت‌شده را در داشبورد دنبال کنید.',hint:'بازهٔ زمانی را تغییر دهید و عملکرد ثبت‌شده را با هدفی مقایسه کنید که در نتیجهٔ کلیدی دورهٔ فعال تعریف شده است.'},
+ {path:'/okr',name:'OKR',art:okrArt,detail:'در نقشهٔ استراتژی ببینید اهداف دپارتمان‌ها چگونه به اهداف سازمان وصل می‌شوند و هر هدف چه نتایج کلیدی دارد.',hint:'در بخش پایش، پیشرفت دوره را بررسی کنید و ببینید کدام اهداف مطابق برنامه پیش می‌روند و کدام به اقدام نیاز دارند.'},
 ];
 const mainPaths=new Set(modules.map(module=>module.path));
-const todayFormat=new Intl.DateTimeFormat('fa-IR-u-ca-persian',{dateStyle:'full',timeZone:'Asia/Tehran'});
+const todayFormat=new Intl.DateTimeFormat('fa-IR-u-ca-persian',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'Asia/Tehran'});
 
 export function DashboardDate(){
  const [date,setDate]=useState(()=>new Date());
  useEffect(()=>{const timer=setInterval(()=>setDate(new Date()),60000);return()=>clearInterval(timer);},[]);
- return <div className="dashboard-date"><CalendarDays size={19}/><time dateTime={date.toISOString()}>{todayFormat.format(date)}</time></div>;
+ const parts=new Map(todayFormat.formatToParts(date).map(part=>[part.type,part.value]));
+ return <div className="dashboard-date" dir="rtl"><CalendarDays size={19}/><time dir="rtl" dateTime={date.toISOString()}>
+  {parts.get('weekday')}، {parts.get('day')} {parts.get('month')} {parts.get('year')}
+ </time></div>;
 }
 
 const searchIcons = {بخش:BookOpen, فرآیند:ProcessIcon, شاخص:ChartNoAxesCombined, هدف:Target, 'Power BI':PowerBiIcon,

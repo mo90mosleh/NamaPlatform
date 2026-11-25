@@ -288,7 +288,7 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
   <section className="okr-panel">{filtered.length?listView==='tree'?<div className="okr-list">
    {filtered.map(g=><div key={g.id} className="okr-goal-entry" style={goalTone(g)}><div className="okr-goal-row-wrap"><button className="okr-list-row" onClick={()=>open(g.id)}>
     <div className={'okr-list-title '+(g.parentId?'is-child':'')}><small>{g.code} · {g.level==='COMPANY'?'سازمانی':'دپارتمانی'}</small><strong>{g.parentId?'↳ ':''}{g.title}</strong><small>{owner(g)}</small></div>
-    <div className="okr-list-progress"><Progress value={objectiveProgress(portfolio,g.id)}/><small>واقعی {number.format(objectiveProgress(portfolio,g.id))}٪</small></div><Status value={pace(g).status}/>
+    <div className="okr-list-progress"><Progress value={objectiveProgress(portfolio,g.id)}/><strong className="okr-objective-percent">{number.format(objectiveProgress(portfolio,g.id))}٪</strong></div><Status value={pace(g).status}/>
    </button>{resultBadge(g)}</div>{inlineResults(g)}</div>)}
   </div>:<div className="okr-table-wrap"><table><thead><tr><th>هدف</th><th>مالک</th><th>نتایج کلیدی</th><th>تحقق</th><th>وضعیت</th></tr></thead><tbody>{filtered.map(g=><Fragment key={g.id}><tr style={goalTone(g)}><td><button type="button" className="text-button" onClick={()=>open(g.id)}>{g.title}</button><small>{g.code}</small></td><td>{owner(g)}</td><td>{resultBadge(g)}</td><td>{number.format(objectiveProgress(portfolio,g.id))}٪</td><td><Status value={pace(g).status}/></td></tr>{isExpanded(g)&&resultsFor(g).length>0&&<tr style={goalTone(g)}><td colSpan={5}>{inlineResults(g)}</td></tr>}</Fragment>)}</tbody></table></div>:<p className="okr-empty">هدفی با این شرایط پیدا نشد.</p>}</section>
  </>;

@@ -55,7 +55,7 @@
 .dashboard-search-results a:hover,.dashboard-recent a:hover { background:#eef5f8; }
 .dashboard-widgets { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
 .dashboard-tour,.dashboard-recent { padding:14px; min-width:0; height:clamp(200px,35dvh,345px); }
-.dashboard-tour { display:flex; flex-direction:column; justify-content:space-between; color:#173c4d; background:linear-gradient(155deg,#edf7f8,#dbe9fb); }
+.dashboard-tour { display:flex; flex-direction:column; justify-content:space-between; color:#173c4d; background:#fff; }
 .dashboard-slide { display:grid; gap:6px; justify-items:start; animation:nama-slide-in .25s ease-out; }
 @keyframes nama-slide-in { from{opacity:.45;transform:translateX(6px)} to{opacity:1;transform:none} }
 .dashboard-slide-controls { display:flex; align-items:center; gap:8px; }
@@ -80,9 +80,9 @@
 .dashboard-date { min-height:42px; display:flex; align-items:center; gap:8px; padding:7px 12px; border:1px solid #d5e3ef; border-radius:11px; color:#234761; background:#f2f7fc; font-size:12px; }
 .dashboard-search label { padding-block:5px; }
 .dashboard-slide-copy p { text-align:justify; text-align-last:start; line-height:1.7; min-height:3.4em; }
-.dashboard-tour:has([data-slide="0"]) { background:#edf5ff; }
-.dashboard-tour:has([data-slide="1"]) { background:#eff9f4; }
-.dashboard-tour:has([data-slide="2"]) { background:#fff9e9; }
-.dashboard-tour:has([data-slide="3"]) { background:#f7f2ff; }
 .quick-link-grid [data-kind="kpi"] { --shortcut-bg:#fff6da; --shortcut-ink:#855a0c; }
 @media(max-width:600px){.dashboard-top{grid-template-columns:1fr;gap:5px}.dashboard-date{min-height:32px;padding:4px 8px;width:fit-content}.dashboard-slide-copy p{min-height:0;}}
+
+.dashboard-tour { background:#fff; }
+.dashboard-slide-copy p+p { margin-block-start:8px; }
+#main-sidebar nav[aria-label="منوی اصلی"] a>svg { width:23px; height:23px; flex:0 0 23px; }
