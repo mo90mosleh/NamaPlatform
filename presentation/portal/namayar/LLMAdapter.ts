@@ -2,10 +2,15 @@ import{withinScope,refusalReply}from'./scope';
 import type{AllowedData,PageContext,Reply,AssistantLink}from'./types';
 import{validateReplyLinks,validInternalRoute}from'./router';
 
-const ENDPOINT='/api/namayar';
+const demoEndpoint=window.__PORTAL_CONFIG__.namayarEndpoint;
+const demoKey=window.__PORTAL_CONFIG__.namayarAnonKey;
+const ENDPOINT=demoEndpoint??'/api/namayar';
+const gatewayHeaders=demoEndpoint&&demoKey
+  ? {apikey:demoKey,Authorization:'Bearer '+demoKey}
+  : undefined;
 export async function fetchSharedQuota():Promise<number|null>{
   try{
-    const res=await fetch(ENDPOINT,{cache:'no-store'});
+    const res=await fetch(ENDPOINT,{cache:'no-store',headers:gatewayHeaders});
     if(!res.ok)return null;
     const data=await res.json();
     return typeof data.remaining_percent==='number'?Math.max(0,Math.min(100,data.remaining_percent)):null;
@@ -20,7 +25,7 @@ export class DisabledLLMAdapter implements LLMAdapter{
   readonly enabled=false;
   async answer():Promise<Reply>{throw Error('اتصال مدل زبانی پیکربندی نشده است.');}
 }
-export class GroqPilotAdapter implements LLMAdapter{
+export class GatewayLLMAdapter implements LLMAdapter{
   readonly enabled=true;
   async answer(question:string,context:PageContext,data:AllowedData,signal:AbortSignal,history:HistoryMessage[]=[],onDelta?:(text:string)=>void):Promise<Reply>{
     if(!withinScope(data,context,question))return refusalReply();
@@ -28,7 +33,7 @@ export class GroqPilotAdapter implements LLMAdapter{
     try{
       result=await fetch(ENDPOINT,{
         method:'POST',mode:'cors',credentials:'omit',
-        headers:{'Content-Type':'application/json'},
+        headers:{...gatewayHeaders,'Content-Type':'application/json'},
         body:JSON.stringify({
           question:question.slice(0,1200),
           context:{path:context.path,pageType:context.pageType,title:context.title,entity:context.entity},
@@ -81,7 +86,7 @@ export class GroqPilotAdapter implements LLMAdapter{
   }
 }
 
-// Retained backward-compatible, same-origin adapter; not used by the public Groq pilot.
+// Retained backward-compatible, same-origin adapter; available for same-origin backends.
 export class BackendLLMAdapter implements LLMAdapter{
   readonly enabled=true;
   constructor(private endpoint:string,private fetcher:typeof fetch=fetch){
@@ -102,6 +107,6 @@ export class BackendLLMAdapter implements LLMAdapter{
   }
 }
 
-export const llmAdapter:LLMAdapter=window.__PORTAL_CONFIG__.demoManagement
+export const llmAdapter:LLMAdapter=window.__PORTAL_CONFIG__.demoManagement&&!demoEndpoint
   ? new DisabledLLMAdapter()
-  : new GroqPilotAdapter();
+  : new GatewayLLMAdapter();

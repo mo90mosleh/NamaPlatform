@@ -1,1 +1,4 @@
-{}
+{
+  "namayarEndpoint": "https://fntidoyddwhwncplocno.supabase.co/functions/v1/namayar-gemini",
+  "namayarAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZudGlkb3lkZHdod25jcGxvY25vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ5ODA4ODgsImV4cCI6MjExMDU1Njg4OH0.M5P43iE_mnNGAiLLaswJvFGQcJutwdBptX2V_ossJGI"
+}
