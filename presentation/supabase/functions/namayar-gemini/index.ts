@@ -1,5 +1,5 @@
 const demoOrigin = 'https://mo90mosleh.github.io';
-const model = Deno.env.get('GEMINI_MODEL') || 'gemini-3.5-flash';
+const model = Deno.env.get('GEMINI_MODEL') || 'gemini-3.5-flash-lite';
 const headers = {
   'Access-Control-Allow-Origin': demoOrigin,
   'Access-Control-Allow-Headers': 'apikey, authorization, content-type',
@@ -9,6 +9,42 @@ const headers = {
 };
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers });
+
+function answerText(result: { candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] } }[] }) {
+  return (result.candidates?.[0]?.content?.parts ?? [])
+    .filter(part => !part.thought).map(part => part.text ?? '').join('');
+}
+
+function streamAnswer(body: ReadableStream<Uint8Array>) {
+  let buffer = '';
+  let hasText = false;
+  const encoder = new TextEncoder();
+  const stream = body.pipeThrough(new TextDecoderStream()).pipeThrough(new TransformStream<string, Uint8Array>({
+    transform(chunk, controller) {
+      buffer += chunk;
+      const events = buffer.split(/\r?\n\r?\n/);
+      buffer = events.pop() ?? '';
+      for (const event of events) {
+        const data = event.split(/\r?\n/).filter(line => line.startsWith('data:'))
+          .map(line => line.slice(5).trimStart()).join('\n');
+        if (!data || data === '[DONE]') continue;
+        const result = JSON.parse(data);
+        if (result.error) throw Error('Gemini stream failed');
+        const text = answerText(result);
+        if (!text) continue;
+        hasText ||= Boolean(text.trim());
+        controller.enqueue(encoder.encode(JSON.stringify({ type: 'delta', text }) + '\n'));
+      }
+    },
+    flush(controller) {
+      const last = hasText
+        ? { type: 'done', links: [] }
+        : { type: 'error', message: 'پاسخی از مدل دریافت نشد. دوباره امتحان کن.' };
+      controller.enqueue(encoder.encode(JSON.stringify(last) + '\n'));
+    },
+  }));
+  return new Response(stream, { headers: { ...headers, 'Content-Type': 'application/x-ndjson; charset=utf-8' } });
+}
 
 async function remaining(consume: boolean): Promise<number> {
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
@@ -67,33 +103,38 @@ Deno.serve(async (request) => {
       contents,
       generationConfig: { maxOutputTokens: 1024 },
     });
+    const streaming = body.stream === true;
+    const method = streaming ? ':streamGenerateContent?alt=sse' : ':generateContent';
     async function generate(modelId: string) {
+      const opening = new AbortController();
+      const timer = setTimeout(() => opening.abort(), 6500);
       try {
         return await fetch(
-          'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(modelId) + ':generateContent',
+          'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(modelId) + method,
           {
             method: 'POST',
             headers: { 'x-goog-api-key': key!, 'Content-Type': 'application/json' },
             body: payload,
-            signal: AbortSignal.timeout(12000),
+            signal: AbortSignal.any([request.signal, opening.signal, AbortSignal.timeout(25000)]),
           },
         );
       } catch {
         return new Response(null, { status: 503 });
+      } finally {
+        clearTimeout(timer);
       }
     }
     let response = await generate(model);
-    if (response.status >= 500) {
+    if (response.status >= 500 && !request.signal.aborted) {
       await response.body?.cancel();
-      response = await generate('gemini-3.5-flash-lite');
+      response = await generate(model === 'gemini-3.5-flash-lite' ? 'gemini-3.5-flash' : 'gemini-3.5-flash-lite');
     }
     if (!response.ok) {
       console.error('Gemini request failed', response.status);
       return json({ error: 'provider' }, response.status === 429 ? 429 : 502);
     }
-    const result = await response.json();
-    const parts: { text?: string; thought?: boolean }[] = result.candidates?.[0]?.content?.parts ?? [];
-    const answer = parts.filter(part => !part.thought).map(part => part.text ?? '').join('').trim();
+    if (streaming && response.body) return streamAnswer(response.body);
+    const answer = answerText(await response.json()).trim();
     if (!answer) return json({ error: 'empty_response' }, 502);
     return json({ paragraphs: [answer.slice(0, 4000)], links: [] });
   } catch (error) {
