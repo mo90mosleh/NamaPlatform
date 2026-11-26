@@ -1,3 +1,5 @@
+.chart-query-controls { display:contents; }
+
 @media (max-width:760px) {
  .app > .workspace > .workspace-content {
   padding-block-end:calc(var(--mobile-nav-height,64px) + var(--mobile-safe-bottom,0px) + 68px);
@@ -14,22 +16,24 @@
  .quick-link-copy strong { overflow-wrap:anywhere; }
  .quick-link-form>label,.quick-destination { min-width:0; max-width:100%; }
  .dashboard-search-results { max-height:min(245px,40dvh); }
- .process-toolbar-row { gap:5px; }
+ .process-toolbar-row { gap:4px; margin-block-end:6px; }
+ .architecture-page .architecture-tools { gap:5px; margin-block:4px 6px; }
+ .architecture-page .architecture-tools .architecture-search { min-height:42px; padding-block:0; }
  .process-toolbar-row .process-workspace-tabs,.module-toolbar .process-workspace-tabs { width:100%; min-width:0; flex:1 1 100%; }
  .process-toolbar-row .process-workspace-tabs a,.module-toolbar .process-workspace-tabs button { min-height:44px; flex-shrink:0; }
  .process-toolbar-controls { margin-block-end:4px; }
  .process-detail-header .process-meta { flex-basis:100%; }
  .process-detail-sections>.process-section>summary { min-height:48px; }
  .mobile-process-tabs { top:0; }
- .process-map-tools { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:center; }
- .process-map-tools .process-map-search-wrap { grid-column:1/-1; min-width:0; width:100%; }
+ .process-map-tools { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:center; gap:5px; }
+ .process-map-tools .process-map-search-wrap { grid-column:auto; min-width:0; width:100%; }
  .process-map-tools :is(select,button) { min-width:0; max-width:100%; min-height:40px; }
  .process-map-toolbar-actions .pm-unlinked-button { white-space:normal; }
  .apqc-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
  .apqc-card { min-width:0; padding:8px; overflow-wrap:anywhere; }
  .apqc-trail { flex-wrap:nowrap; overflow:auto; }
  .apqc-trail > * { flex-shrink:0; }
- .kpi-date-filters { width:100%; gap:6px; }
+ .kpi-date-filters { width:100%; gap:4px; }
  .kpi-date-filters .kpi-date-picker { flex:1; min-width:0; }
  .kpi-date-picker summary { min-height:44px; }
  .jalali-calendar { max-width:100%; }
@@ -39,8 +43,9 @@
  .power-bi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
  .power-bi-card { min-height:0; padding:9px; overflow-wrap:anywhere; }
  .power-bi-frame { min-height:220px; height:54dvh; }
- .okr-goal-toolbar { gap:6px; }
- .okr-goal-toolbar .okr-search { flex-basis:100%; min-width:0; }
+ .okr-goal-toolbar { gap:5px; margin-block-end:6px; }
+ .okr-goal-toolbar .okr-search { flex:1 1 135px; min-width:0; }
+ .okr-goal-toolbar select { min-width:0; max-width:100%; padding-block:6px; }
  .okr-view-toggle { flex-wrap:wrap; max-width:100%; }
  .okr-inline-results li { grid-template-columns:minmax(0,1fr) 86px; }
  .okr-monitor-content,.okr-strategy-content { max-height:none; overflow:visible; }
@@ -49,6 +54,34 @@
  .mobile-sort-picker { display:flex; align-items:center; gap:8px; margin:0 0 8px; }
  .mobile-sort-picker select { min-width:0; flex:1; min-height:42px; }
  .reference-panel .document-card,.detail-grid .facts>div { min-width:0; overflow-wrap:anywhere; }
+ .chart-focus-mode .chart-header.chart-focus-controls { gap:5px; padding-block-end:6px; }
+ .chart-header .chart-query-controls {
+  display:flex;
+  flex:1 0 100%;
+  align-items:center;
+  gap:5px;
+  order:-1;
+  min-width:0;
+ }
+ .chart-header .chart-query-controls .chart-search {
+  flex:1 1 0;
+  width:auto;
+  min-height:44px;
+  margin-block:0;
+  padding:0 7px;
+ }
+ .chart-header .chart-query-controls .chart-analysis-select {
+  gap:4px;
+  margin-inline-start:0;
+ }
+ .chart-header .chart-query-controls select {
+  width:clamp(78px, 24vw, 124px);
+  min-width:0;
+  height:44px;
+  min-height:44px;
+  padding-inline:4px;
+  text-overflow:ellipsis;
+ }
  .app.chart-focus-mode .workspace-content:has(.chart-viewport) { padding-block-end:var(--mobile-nav-height,64px); }
  .app.chart-focus-mode .interactive-chart { min-height:240px; }
  .app.chart-focus-mode .chart-content:has(.chart-viewport) { min-height:240px; }
