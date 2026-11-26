@@ -1,4 +1,5 @@
-import {findProductHelp} from '../../supabase/functions/namayar-groq-test/product-guide';
+import {normalizedHelpQuestion} from '../../supabase/functions/namayar-groq-test/product-guide';
+import {namedEntities} from './retrieval';
 import{withinScope,refusalReply}from'./scope';
 import{useEffect,useRef,useState,type FormEvent}from'react';import{createPortal}from'react-dom';import{X,Send,BrushCleaning,ArrowUpLeft,ExternalLink,BookOpen,Route,Sparkles}from'lucide-react';import{Link,go}from'../ui';import{usePageContext}from'./PageContextProvider';import{NamayarAvatar}from'./NamayarAvatar';import type{ConversationState}from'./conversation';import{llmAdapter,fetchSharedQuota,type HistoryMessage}from'./LLMAdapter';import type{PageContext,Reply,AssistantLink}from'./types';import'./style.css';
 const idleMessages = [
@@ -83,8 +84,15 @@ export function Namayar(){const{data,context,requestSelection}=usePageContext(),
       message.role==='user'&&message.text?[{role:'user',content:message.text}]:
       message.role==='assistant'&&message.reply?[{role:'assistant',content:message.reply.paragraphs.join(' ').slice(0,650)}]:[]);
     let receivedDelta=false;
-    // Use the current product guide for feature questions, even when AI is enabled.
-    const localHelp=Boolean(findProductHelp(question))||/تور|راهنمای این صفحه|راهنمای صفحه/.test(question);
+    const normalized=normalizedHelpQuestion(question);
+    const tourRequest=/^(?:تور(?: صفحه)?|(?:تور|راهنمای) (?:این )?صفحه(?: رو| را)?(?: شروع کن| باز کن)?)$/.test(normalized);
+    const exactShortcut=/^(?:داشبورد (?:power )?bi|(?:power )?bi داشبورد|(?:power )?bi)$/.test(normalized);
+    const recordRequest=/مالک|متولی|دیاگرام|فرمول|مستند|ورودی|خروجی|تناوب|منبع داده|گزارش به|نقش|مرحله|ارتباط/.test(normalized);
+    const recordFollowUp=/^(?:این|همین|اون|آن) |(?:مالکش|فرمولش|دیاگرامش|مراحلش|لینکش)/.test(normalized);
+    const namedRecord=recordRequest&&namedEntities(data,normalized).length===1;
+    const navigation=/^(?:برو|ببر|باز کن|بریم)(?: |$)/.test(normalized);
+    const localHelp=tourRequest||exactShortcut||navigation||namedRecord||
+      (recordRequest&&recordFollowUp&&Boolean(origin.entity||conversation.current.entity));
     const reply=!withinScope(data,origin,question)?refusalReply():
       aiEnabled&&!localHelp?await llmAdapter.answer(question,origin,data,controller.signal,history,(fragment)=>{
         if(controller.signal.aborted)return;

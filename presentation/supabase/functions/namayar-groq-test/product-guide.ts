@@ -14,7 +14,7 @@ export function normalizedHelpQuestion(value:string):string{
   .replace(/[\u200c\u200f\u200e]/g,' ').toLowerCase()
   .replace(/[؟?!،؛:,.()«»]/g,' ').replace(/\s+/g,' ').trim();
 }
-const topics:ProductHelpTopic[]=[
+export const topics:ProductHelpTopic[]=[
  {id:'dashboard-search-shortcuts',test:/لینک سریع|میان ?بر|بازدیدهای اخیر|آخرین بازدید|جست و جوی سراسری|جستجوی سراسری|جست و جو در نما|اسلایدر/,
   paragraphs:['جست‌وجوی داشبورد در بخش‌ها، فرآیندها، شاخص‌ها، اهداف، گزارش‌های Power BI، افراد، سمت‌ها و دپارتمان‌ها نتیجه می‌دهد. آیکون کنار هر نتیجه نوع آن را مشخص می‌کند.',
   'از «افزودن لینک»، مقصد و عنوان دلخواه را انتخاب کنید. گزینهٔ URL برای نشانی وب است. در آخرین بازدیدها تا ده مقصد دیده می‌شود و معرفی تصویری چهار بخش در اسلایدر است.'],route:'/dashboard'},
