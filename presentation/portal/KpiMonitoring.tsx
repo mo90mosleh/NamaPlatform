@@ -34,7 +34,7 @@ const dates = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {year: 'numeric', mo
 const timestamps = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Tehran'});
 const labelDate = (date: string) => dates.format(new Date(date + 'T12:00:00Z'));
 const current = (measurement: Measurement) => measurement.revisions[measurement.revisions.length - 1];
-function storageKey(data: Data) { return 'nama-kpi-monitoring-v1:' + data.organization.id; }
+export function storageKey(data: Data) { return 'nama-kpi-monitoring-v1:' + data.organization.id; }
 
 // Synthetic operating history for the four dashboard examples.
 const sampleSeries = [
@@ -46,7 +46,7 @@ const sampleSeries = [
 const sampleDates=['2026-05-15','2026-06-15','2026-07-15','2026-08-15','2026-09-15','2026-10-15','2026-11-15'];
 const sampleVersion=6;
 
-function initialModel(data:Data):Model {
+export function initialModel(data:Data):Model {
  if(!config.demoManagement)return empty;
  const cards:Card[]=[],measurements:Measurement[]=[];
  for(const {code,kind,values} of sampleSeries){
@@ -61,7 +61,7 @@ function initialModel(data:Data):Model {
  return {cards,measurements,reports:[],samplesInitialized:true,sampleVersion};
 }
 
-function read(key: string, initial = empty): Model {
+export function readMonitoring(key: string, initial = empty, persistMigration = true): Model {
   try {
     const saved: Model | null = JSON.parse(localStorage.getItem(key) ?? 'null');
     if (Array.isArray(saved?.cards) && Array.isArray(saved.measurements)) {
@@ -73,7 +73,9 @@ function read(key: string, initial = empty): Model {
       });
       const occupied=new Set(measurements.map(row=>row.kpiId+':'+row.date));
       const merged={...initial,cards:saved.samplesInitialized?saved.cards:initial.cards,reports,measurements:[...measurements,...initial.measurements.filter(row=>!occupied.has(row.kpiId+':'+row.date))]};
-      try{localStorage.setItem(key,JSON.stringify(merged));}catch{}
+      if (persistMigration) {
+        try{localStorage.setItem(key,JSON.stringify(merged));}catch{}
+      }
       return merged;
     }
   } catch {}
@@ -109,11 +111,11 @@ function visibleReports(reports: PowerBiReport[]) {
 }
 
 export function availablePowerBiReports(data: Data) {
-  return visibleReports(read(storageKey(data)).reports);
+  return visibleReports(readMonitoring(storageKey(data)).reports);
 }
 
 export function latestKpiValue(data: Data, id: string) {
-  const latest = read(storageKey(data), initialModel(data)).measurements.filter(row => row.kpiId === id)
+  const latest = readMonitoring(storageKey(data), initialModel(data)).measurements.filter(row => row.kpiId === id)
     .sort((a, b) => b.date.localeCompare(a.date))[0];
   return latest && current(latest);
 }
@@ -183,7 +185,7 @@ function Chart({kpi, card, rows, targets}: {kpi: KPI; card: Card; rows: Measurem
 export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?: string; profiles: (values: ReadonlyMap<string, number>) => ReactNode}) {
   const targets=activeKpiTargets(loadPortfolio(data.organization.id,data.organization.name,data.user.role==='ADMIN'));
   const key = storageKey(data);
-  const [model, setModel] = useState(() => read(key, initialModel(data)));
+  const [model, setModel] = useState(() => readMonitoring(key, initialModel(data)));
   const tabFromUrl = () => currentPath().startsWith('/kpis/power-bi/') ? 'power-bi' : tabs.find(([id])=>id===routeQuery().get('tab'))?.[0] ?? 'dashboard';
   const [tab, setTab] = useState(tabFromUrl);
   useEffect(()=>{
@@ -210,14 +212,14 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
     (!start || date >= start) && (!end || date <= end));
 
   useEffect(() => {
-    const sync = (event: StorageEvent) => { if (event.key === key || event.key === null) setModel(read(key, initialModel(data))); };
+    const sync = (event: StorageEvent) => { if (event.key === key || event.key === null) setModel(readMonitoring(key, initialModel(data))); };
     window.addEventListener('storage', sync);
     return () => window.removeEventListener('storage', sync);
   }, [key]);
 
   function update(change: (saved: Model) => Model, success: string) {
     try {
-      const next = change(read(key, initialModel(data)));
+      const next = change(readMonitoring(key, initialModel(data)));
       localStorage.setItem(key, JSON.stringify(next));
       setModel(next);
       setMessage({text: success});

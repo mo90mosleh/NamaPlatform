@@ -102,3 +102,13 @@ export function NamayarAvatar({state='idle',small=false}:{state?:AvatarState;sma
     </g>
   </svg>;
 }
+
+
+export function NamasazIcon() {
+  return <svg className="namasaz-menu-icon" width="21" height="21" viewBox="0 0 64 64" aria-hidden="true">
+    <Feet/><Body/><Eyes/>
+    <path d="M10 17C13 9 18 4 26 3H38C46 4 51 9 54 17Z" fill="#ffbf17"/>
+    <path d="M27 4L24 14M37 4L40 14" stroke="#d58c00" strokeWidth="2.4" strokeLinecap="round"/>
+    <rect x="5" y="15" width="54" height="6" rx="3" fill="#e7a000"/>
+  </svg>;
+}

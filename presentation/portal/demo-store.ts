@@ -4,12 +4,12 @@ import {apqcByCode} from './apqc-reference';
 import type {Data} from './types';
 import {emptyGovernance, raciRoles, sampleGovernance, type Governance} from './process-governance';
 
-const editsKey = 'nama-demo-edits-v1';
+export const editsKey = 'nama-demo-edits-v1';
 
-type EditableData = Pick<Data, 'organization' | 'units' | 'positions' | 'persons' |
-  'assignments' | 'profiles' | 'trainingVideos' | 'governance'>;
+export type EditableData = Pick<Data, 'organization' | 'units' | 'positions' | 'persons' |
+  'nodes' | 'kpis' | 'kpiOrgLinks' | 'assignments' | 'profiles' | 'trainingVideos' | 'governance'>;
 
-function readEdits(): Partial<EditableData> {
+export function readEdits(): Partial<EditableData> {
   try { return JSON.parse(localStorage.getItem(editsKey) ?? '{}') ?? {}; }
   catch { return {}; }
 }
@@ -51,7 +51,7 @@ export function updateDemoData(data: Data, path: string, method: string, value?:
   if (!demoAdminActive()) throw Error('ابتدا فضای مدیریت دمو را باز کنید.');
   const [kind, id] = path.split('/');
   const {organization, units, positions, persons, assignments, profiles, trainingVideos} = data;
-  const currentData: EditableData = {organization, units, positions, persons, assignments, profiles, trainingVideos};
+  const currentData = {organization, units, positions, persons, assignments, profiles, trainingVideos};
   const edits = readEdits();
   if (kind === 'organization' && method === 'PATCH') {
     edits.organization = {...organization, ...fields(value, ['name', 'display_name', 'primary_color', 'logo_data_url'])};
