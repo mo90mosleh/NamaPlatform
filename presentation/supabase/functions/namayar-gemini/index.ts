@@ -28,7 +28,7 @@ Deno.serve(async (request) => {
   if (request.headers.get('origin') !== demoOrigin) return json({ error: 'origin' }, 403);
   if (request.method === 'OPTIONS') return new Response(null, { headers });
   if (request.method !== 'GET' && request.method !== 'POST') return json({ error: 'method' }, 405);
-  const key = Deno.env.get('GEMINI_API_KEY');
+  const key = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('Gemini') || Deno.env.get('GEMINI');
   if (!key) return json({ error: 'configuration' }, 503);
 
   try {
