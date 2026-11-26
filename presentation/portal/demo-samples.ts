@@ -1,4 +1,19 @@
 import type {Data, ProcessRelation} from './types';
+import portrait10 from '../data/avatars/sample-10.webp';
+import portrait11 from '../data/avatars/sample-11.webp';
+import portrait12 from '../data/avatars/sample-12.webp';
+import portrait20 from '../data/avatars/sample-20.webp';
+import portrait21 from '../data/avatars/sample-21.webp';
+import portrait30 from '../data/avatars/sample-30.webp';
+import portrait31 from '../data/avatars/sample-31.webp';
+import portrait100 from '../data/avatars/sample-100.webp';
+import portrait101 from '../data/avatars/sample-101.webp';
+import portrait110 from '../data/avatars/sample-110.webp';
+import portrait111 from '../data/avatars/sample-111.webp';
+import portrait112 from '../data/avatars/sample-112.webp';
+import portrait113 from '../data/avatars/sample-113.webp';
+import portrait114 from '../data/avatars/sample-114.webp';
+import portrait115 from '../data/avatars/sample-115.webp';
 
 export const demoValueChains = [
   {title:'سفارش تا تحویل', codes:['P-11','P-01','P-02','P-23','P-06']},
@@ -20,15 +35,29 @@ const salesSupervisors = [
 const sampleId = (group: number, index: number) =>
   'e97a4256-4600-43c8-9200-' + String(group * 1000 + index).padStart(12,'0');
 
+const samplePortraits: Record<number, string> = {
+  10: portrait10,
+  11: portrait11,
+  12: portrait12,
+  20: portrait20,
+  21: portrait21,
+  30: portrait30,
+  31: portrait31,
+  100: portrait100,
+  101: portrait101,
+  110: portrait110,
+  111: portrait111,
+  112: portrait112,
+  113: portrait113,
+  114: portrait114,
+  115: portrait115,
+};
+
 export function withDemoSamples(data: Data): Data {
   const units = [...data.units], positions = data.positions.map(position=>({...position})), persons = [...data.persons], assignments = [...data.assignments];
-  const femaleNames = new Set(['لیلا کریمی','مریم اسدی','سارا رفیعی','آوا صادقی','سارا محمودی','الهام موسوی','نازنین حیدری']);
-  const femaleAvatars = [1,3,5,7,9];
-  const maleAvatars = [0,2,4,6,8];
   function addPerson(display_name: string, position_id: string, index: number) {
     const person_id = sampleId(3,index);
-    const portraits = femaleNames.has(display_name) ? femaleAvatars : maleAvatars;
-    const avatar_data_url = data.persons[portraits[index%portraits.length]]?.avatar_data_url;
+    const avatar_data_url = samplePortraits[index];
     persons.push({id:person_id, display_name, email:null, phone:'0900 000 '+(120+index).toString().padStart(4,'0'),
       extension:String(400+index), avatar_data_url});
     assignments.push({id:sampleId(4,index), person_id, position_id});
@@ -37,6 +66,7 @@ export function withDemoSamples(data: Data): Data {
     const manager = data.positions.find(position => position.id.startsWith(managerPrefix));
     if (!manager) return;
     const positionId = sampleId(2,index+1);
+    if (positions.some(position => position.id === positionId)) return;
     positions.push({id:positionId, org_unit_id:manager.org_unit_id, reports_to_position_id:manager.id, title});
     names.forEach((name,seat) => addPerson(name,positionId,(index+1)*10+seat));
   });
@@ -45,6 +75,7 @@ export function withDemoSamples(data: Data): Data {
     sales.title = 'مدیر فروش';
     salesSupervisors.forEach(({name,specialists},index) => {
       const supervisorId = sampleId(2,100+index);
+      if (positions.some(position => position.id === supervisorId)) return;
       positions.push({id:supervisorId,org_unit_id:sales.org_unit_id,reports_to_position_id:sales.id,title:'سرپرست فروش'});
       addPerson(name,supervisorId,100+index);
       specialists.forEach((name,seat) => {
