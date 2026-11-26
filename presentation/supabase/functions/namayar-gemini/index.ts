@@ -62,19 +62,31 @@ Deno.serve(async (request) => {
     contents.push({ role: 'user', parts: [{ text: question }] });
 
     if (await remaining(true) < 0) return json({ error: 'daily_limit' }, 429);
-    const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent',
-      {
-        method: 'POST',
-        headers: { 'x-goog-api-key': key, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: 'شما نمایار، دستیار نسخهٔ دموی نما هستید. به فارسی و مختصر پاسخ دهید. اطلاعات سازمانی یا مسیرهای داخلی را حدس نزنید.' }] },
-          contents,
-          generationConfig: { maxOutputTokens: 1024 },
-        }),
-        signal: AbortSignal.timeout(25000),
-      },
-    );
+    const payload = JSON.stringify({
+      systemInstruction: { parts: [{ text: 'شما نمایار، دستیار نسخهٔ دموی نما هستید. به فارسی و مختصر پاسخ دهید. اطلاعات سازمانی یا مسیرهای داخلی را حدس نزنید.' }] },
+      contents,
+      generationConfig: { maxOutputTokens: 1024 },
+    });
+    async function generate(modelId: string) {
+      try {
+        return await fetch(
+          'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(modelId) + ':generateContent',
+          {
+            method: 'POST',
+            headers: { 'x-goog-api-key': key!, 'Content-Type': 'application/json' },
+            body: payload,
+            signal: AbortSignal.timeout(12000),
+          },
+        );
+      } catch {
+        return new Response(null, { status: 503 });
+      }
+    }
+    let response = await generate(model);
+    if (response.status >= 500) {
+      await response.body?.cancel();
+      response = await generate('gemini-3.5-flash-lite');
+    }
     if (!response.ok) {
       console.error('Gemini request failed', response.status);
       return json({ error: 'provider' }, response.status === 429 ? 429 : 502);
