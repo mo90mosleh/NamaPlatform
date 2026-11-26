@@ -17,12 +17,13 @@ const tabs:[ProcessWorkspaceSection,string,string,typeof Layers3][]=[
  ['map','نقشه فرآیندها','/process-map',GitBranch],
  ['catalog','شناسنامه فرآیندها','/processes',ClipboardList],
 ];
+const mobileTabLabels: Record<ProcessWorkspaceSection,string> = {architecture:'معماری', apqc:'APQC', map:'نقشه', catalog:'شناسنامه'};
 export function ProcessWorkspace({data,section,refresh,detailId}:{data:Data;section:ProcessWorkspaceSection;refresh:()=>Promise<void>;detailId?:string}){
  const [controls,setControls]=useState<HTMLDivElement|null>(null);
  return <div className="process-workspace">
   <div className="process-toolbar-row">
   <nav className="process-workspace-tabs" aria-label="بخش‌های مدیریت فرآیندها">
-   {tabs.map(([id,label,to,Icon])=><Link key={id} to={to} className={section===id?'active':''} ariaLabel={label}><Icon size={17}/><span>{label}</span></Link>)}
+   {tabs.map(([id,label,to,Icon])=><Link key={id} to={to} className={section===id?'active':''} ariaLabel={label}><Icon size={17}/><span className="workspace-tab-label">{label}</span><span className="workspace-tab-label-short" aria-hidden="true">{mobileTabLabels[id]}</span></Link>)}
   </nav><div className="process-toolbar-controls" ref={setControls}/>
   </div>
   <section className="process-workspace-body" aria-label={section==='catalog'?'شناسنامه فرآیندها':tabs.find(x=>x[0]===section)?.[1]}>

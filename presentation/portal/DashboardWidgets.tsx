@@ -84,7 +84,7 @@ export function DashboardSearch({data}:{data:Data}){
  })
   .sort((a,b)=>Number(normalizeSearch(b.name)===term)-Number(normalizeSearch(a.name)===term)).slice(0,12):[];
  return <div className="dashboard-search" onBlur={e=>{if(!e.currentTarget.contains(e.relatedTarget))setOpen(false);}} onKeyDown={e=>{if(e.key==='Escape')setOpen(false);}}>
-  <label><Search size={21}/><input type="search" aria-label="جست‌وجو در نما" placeholder="جست‌وجوی شخص، سمت، دپارتمان و محتوای نما…" value={query} onFocus={()=>setOpen(true)} onChange={e=>{setQuery(e.target.value);setOpen(true);}}/></label>
+  <label><Search size={21}/><input type="search" aria-label="جست‌وجو در نما" placeholder="جست‌وجو در نما" value={query} onFocus={()=>setOpen(true)} onChange={e=>{setQuery(e.target.value);setOpen(true);}}/></label>
   {open&&term&&<div className="panel dashboard-search-results" aria-label="نتایج جست‌وجو">
    {matches.map(item=>{const Icon=searchIcons[item.type as keyof typeof searchIcons];return <Link key={item.path} to={item.path}><span><Icon size={17} aria-hidden="true"/>{item.name}</span><small>{item.type}</small></Link>;})}
    {!matches.length&&<p className="empty-inline">نتیجه‌ای پیدا نشد.</p>}

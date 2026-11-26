@@ -278,12 +278,12 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
   return index<0?undefined:{backgroundColor:'hsl('+((index*137.508)%360)+' 51% 95%)'};
  }
  const goals=<div className="okr-goals-content">
-  <div className="okr-goal-toolbar"><label className="okr-search"><Search size={17}/><input value={search} placeholder="جست‌وجو در نام هدف، کد و دپارتمان…" onChange={e=>setSearch(e.target.value)} aria-label="جست‌وجوی اهداف"/></label>
+  <div className="okr-goal-toolbar"><label className="okr-search"><Search size={17}/><input value={search} placeholder="نام یا کد هدف" onChange={e=>setSearch(e.target.value)} aria-label="جست‌وجوی اهداف"/></label>
    <select aria-label="سطح اهداف" value={scope} onChange={e=>setScope(e.target.value)}><option value="ALL">همه سطوح</option><option value="COMPANY">سازمانی</option><option value="DEPARTMENT">دپارتمانی</option></select>
-   <div className="okr-view-toggle" role="group" aria-label="نمایش اهداف"><button className={listView==='tree'?'active':''} onClick={()=>setListView('tree')} aria-pressed={listView==='tree'}><LayoutList size={16}/>درختی</button><button className={listView==='table'?'active':''} onClick={()=>setListView('table')} aria-pressed={listView==='table'}><Table2 size={16}/>جدولی</button></div>
+   <div className="okr-view-toggle" role="group" aria-label="نمایش اهداف"><button type="button" className={listView==='tree'?'active':''} aria-label="درختی" title="درختی" onClick={()=>setListView('tree')} aria-pressed={listView==='tree'}><LayoutList size={16}/><span>درختی</span></button><button type="button" className={listView==='table'?'active':''} aria-label="جدولی" title="جدولی" onClick={()=>setListView('table')} aria-pressed={listView==='table'}><Table2 size={16}/><span>جدولی</span></button></div>
    <div className="okr-view-toggle" role="group" aria-label="نمایش نتایج کلیدی">
-    <button type="button" aria-label="فقط اهداف" aria-pressed={!showAllResults} className={!showAllResults?'active':''} onClick={()=>{setShowAllResults(false);setExpandedResults({});}}><Target size={16}/>فقط اهداف</button>
-    <button type="button" aria-label="اهداف و نتایج کلیدی" aria-pressed={showAllResults} className={showAllResults?'active':''} onClick={()=>{setShowAllResults(true);setExpandedResults({});}}><ListTree size={16}/>اهداف و نتایج کلیدی</button>
+    <button type="button" aria-label="فقط اهداف" title="فقط اهداف" aria-pressed={!showAllResults} className={!showAllResults?'active':''} onClick={()=>{setShowAllResults(false);setExpandedResults({});}}><Target size={16}/><span>فقط اهداف</span></button>
+    <button type="button" aria-label="اهداف و نتایج کلیدی" title="اهداف و نتایج کلیدی" aria-pressed={showAllResults} className={showAllResults?'active':''} onClick={()=>{setShowAllResults(true);setExpandedResults({});}}><ListTree size={16}/><span>اهداف و نتایج کلیدی</span></button>
    </div>
   </div>
   <section className="okr-panel">{filtered.length?listView==='tree'?<div className="okr-list">
@@ -317,7 +317,7 @@ export function OkrWorkspace({data,objectiveId}:{data:Data;objectiveId?:string})
  </div>;
  return <div ref={ref} className={'okr-workspace okr-workspace-'+tab}>
   <div className="module-toolbar">
-   <nav className="process-workspace-tabs" aria-label="بخش‌های مدیریت OKR">{(['strategy','goals','monitor']as Tab[]).map((t,i)=><button key={t} className={tab===t?'active':''} aria-current={tab===t?'page':undefined} onClick={()=>go(t==='strategy'?'/okr':'/okr?tab='+t)}>{i===0?<Network size={17}/>:i===1?<Target size={17}/>:<ChartColumnIncreasing size={17}/>}<span>{titleByTab[t]}</span></button>)}</nav>
+   <nav className="process-workspace-tabs" aria-label="بخش‌های مدیریت OKR">{(['strategy','goals','monitor']as Tab[]).map((t,i)=><button key={t} className={tab===t?'active':''} aria-label={titleByTab[t]} aria-current={tab===t?'page':undefined} onClick={()=>go(t==='strategy'?'/okr':'/okr?tab='+t)}>{i===0?<Network size={17}/>:i===1?<Target size={17}/>:<ChartColumnIncreasing size={17}/>}<span className="workspace-tab-label">{titleByTab[t]}</span><span className="workspace-tab-label-short" aria-hidden="true">{['استراتژی','اهداف','پایش'][i]}</span></button>)}</nav>
    <div className="okr-heading-actions"><label className="okr-cycle-control"><CalendarDays size={16}/><select aria-label="دوره OKR" value={cycle?.id??''} onChange={e=>{setActiveCycle(e.target.value);setSelectedId(null);setSelectedPillars([]);}}>{!portfolio.cycles.length&&<option value="">دوره‌ای تعریف نشده</option>}{portfolio.cycles.map(c=><option key={c.id} value={c.id}>{c.title} {c.status==='PLANNING'?'· برنامه‌ریزی':''}</option>)}</select><ChevronDown size={13}/></label>
     {canEdit&&<button className="okr-button okr-button-muted" onClick={()=>{setSelectedId(null);setCycleManagerOpen(true);setError('');setFeedback('');}}><CalendarDays size={15}/>مدیریت دوره‌ها</button>}
     {canEdit&&<button className="okr-button okr-button-primary" onClick={()=>showForm('objective')}><Plus size={17}/>هدف جدید</button>}

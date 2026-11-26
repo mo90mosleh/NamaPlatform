@@ -21,9 +21,9 @@ type Model = {cards: Card[]; measurements: Measurement[]; reports: PowerBiReport
 const empty: Model = {cards: [], measurements: [], reports: [], samplesInitialized: true};
 const charts = {line: 'خطی', bar: 'میله‌ای', pie: 'دایره‌ای'} as const;
 const tabs = [
-  ['dashboard', 'داشبورد شاخص‌ها', LayoutDashboard],
-  ['profiles', 'شناسنامه شاخص‌ها', ClipboardList],
-  ['power-bi', 'PowerBI', PowerBiIcon],
+  ['dashboard', 'داشبورد شاخص‌ها', LayoutDashboard, 'داشبورد'],
+  ['profiles', 'شناسنامه شاخص‌ها', ClipboardList, 'شناسنامه'],
+  ['power-bi', 'PowerBI', PowerBiIcon, 'PowerBI'],
 ] as const;
 const themes = {
   ocean: {name:'آبی اقیانوسی', colors:['#2669a7','#1a8391','#6b60af','#4b8cbf','#277173','#754e88']},
@@ -258,8 +258,8 @@ export function KpiMonitoring({data, profiles, reportId}: {data: Data; reportId?
   return <div className={'kpi-workspace'+(tab==='dashboard'&&model.cards.length>0&&model.cards.length<=4?' kpi-workspace-fit':'')}>
     <div className="module-toolbar">
       <nav className="process-workspace-tabs" aria-label="بخش‌های شاخص‌های عملکرد">
-        {tabs.map(([id, title, Icon]) => <button key={id} type="button" className={tab === id ? 'active' : ''}
-          aria-current={tab === id ? 'page' : undefined} onClick={() => go(id==='dashboard'?'/kpis':'/kpis?tab='+id)}><Icon size={17}/>{title}</button>)}
+        {tabs.map(([id, title, Icon, shortTitle]) => <button key={id} type="button" className={tab === id ? 'active' : ''}
+          aria-label={title} aria-current={tab === id ? 'page' : undefined} onClick={() => go(id==='dashboard'?'/kpis':'/kpis?tab='+id)}><Icon size={17}/><span className="workspace-tab-label">{title}</span><span className="workspace-tab-label-short" aria-hidden="true">{shortTitle}</span></button>)}
       </nav>
       {tab === 'dashboard' && <div className="kpi-date-filters">
         <JalaliDatePicker label="از تاریخ" shortLabel="از" value={start} onChange={setStart}/>

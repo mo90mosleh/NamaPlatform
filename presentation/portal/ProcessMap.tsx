@@ -68,7 +68,7 @@ export function ProcessMap({data,refresh}:{data:Data;refresh:()=>Promise<void>})
  </button>;
  return <div className="process-map">
   <div className="process-map-tools">
-   <div className="process-map-search-wrap"><label className="process-map-search"><Search size={17}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="نام یا کد فرآیند را پیدا کنید…" aria-label="جست‌وجوی فرآیند روی نقشه"/>{search&&<button className="icon-button" aria-label="پاک کردن جست‌وجو" onClick={()=>setSearch('')}><X size={14}/></button>}</label>
+   <div className="process-map-search-wrap"><label className="process-map-search"><Search size={17}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="نام یا کد فرآیند" aria-label="جست‌وجوی فرآیند روی نقشه"/>{search&&<button className="icon-button" aria-label="پاک کردن جست‌وجو" onClick={()=>setSearch('')}><X size={14}/></button>}</label>
     {search.trim()&&<div className="pm-search-results" aria-label="نتایج جست‌وجوی نقشه">{filtered.length?filtered.map(p=><button key={p.id} onClick={()=>reveal(p.id)}><strong>{p.name}</strong><small>{data.units.find(u=>u.id===p.owner_org_unit_id)?.name??'بدون دپارتمان'} · {p.code}</small></button>):<p>فرآیندی پیدا نشد.</p>}</div>}
    </div>
    <select className="pm-department-filter" aria-label="دپارتمان نقشه" value={department} onChange={e=>{const value=e.target.value;setDepartment(value);if(value){const first=processes.find(p=>p.owner_org_unit_id===value);if(first)setFocus(first.id);}}}><option value="">همه دپارتمان‌ها</option>{departments.map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select>
